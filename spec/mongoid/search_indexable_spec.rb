@@ -439,5 +439,115 @@ describe Mongoid::SearchIndexable do
         end
       end
     end
+
+    context 'with an auto-embed search index' do
+      let(:embed_model) do
+        Class.new do
+          include Mongoid::Document
+
+          store_in collection: BSON::ObjectId.new.to_s
+          field :description, type: String
+          auto_embed_field :description, model: 'voyage-4'
+        end
+      end
+
+      let(:embed_helper) { SearchIndexHelper.new(embed_model) }
+
+      context 'when creating an auto-embed index' do
+        before { embed_helper } # ensure collection is set up before indexes are created
+
+        let(:index_names) { embed_model.create_search_indexes }
+        let(:actual_indexes) { embed_helper.wait_for(*index_names) }
+
+        describe '.create_search_indexes' do
+          it 'creates the auto-embed index' do
+            expect(actual_indexes).not_to be_empty
+          end
+
+          it 'creates an index with the autoEmbed field type' do
+            field_types = actual_indexes
+                          .flat_map { |i| i.dig('latestDefinition', 'fields') }
+                          .map { |f| f['type'] }
+            expect(field_types).to include('autoEmbed')
+          end
+        end
+
+        describe '.auto_embed_search' do
+          before do
+            actual_indexes # wait for index to be ready
+            embed_model.create(description: 'machine learning and neural networks')
+            embed_model.create(description: 'recipe for chocolate cake')
+            embed_model.create(description: 'deep learning for natural language processing')
+            # Atlas may need a moment to index new documents
+            sleep 5
+          end
+
+          it 'returns documents ranked by text similarity' do
+            results = embed_model.auto_embed_search('AI and machine learning', limit: 2)
+            expect(results).not_to be_empty
+            expect(results.first).to be_a(embed_model)
+            expect(results.first.vector_search_score).to be_a(Float)
+          end
+
+          it 'does not return more documents than the limit' do
+            results = embed_model.auto_embed_search('AI', limit: 1)
+            expect(results.size).to be <= 1
+          end
+
+          it 'supports exact nearest-neighbor search' do
+            results = embed_model.auto_embed_search('neural networks', exact: true, limit: 2)
+            expect(results).not_to be_empty
+          end
+        end
+
+        describe '#auto_embed_search' do
+          before do
+            actual_indexes # wait for index to be ready
+            embed_model.create(description: 'machine learning and neural networks')
+            embed_model.create(description: 'recipe for chocolate cake')
+            sleep 5
+          end
+
+          it 'returns similar documents excluding self' do
+            doc = embed_model.create(description: 'deep learning research')
+            sleep 5 # wait for the new document to be indexed
+            results = doc.auto_embed_search(limit: 5)
+            expect(results).not_to be_empty
+            expect(results.map(&:id)).not_to include(doc.id)
+          end
+        end
+      end
+
+      context 'with numDimensions and quantization options' do
+        let(:embed_model_with_opts) do
+          Class.new do
+            include Mongoid::Document
+
+            store_in collection: BSON::ObjectId.new.to_s
+            field :description, type: String
+            auto_embed_field :description,
+                             model: 'voyage-4',
+                             num_dimensions: 512,
+                             quantization: 'scalar'
+          end
+        end
+
+        let(:opts_helper) { SearchIndexHelper.new(embed_model_with_opts) }
+
+        before { opts_helper } # initialize (drop/create collection) before index creation
+
+        it 'creates the index with the specified numDimensions and quantization' do
+          index_names = embed_model_with_opts.create_search_indexes
+          actual_indexes = opts_helper.wait_for(*index_names)
+
+          field_spec = actual_indexes
+                       .flat_map { |i| i.dig('latestDefinition', 'fields') }
+                       .find { |f| f['type'] == 'autoEmbed' }
+
+          expect(field_spec['numDimensions']).to eq 512
+          expect(field_spec['quantization']).to eq 'scalar'
+        end
+      end
+    end
   end
 end

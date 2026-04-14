@@ -323,7 +323,8 @@ module Mongoid
       # pre-computed embedding is required.
       #
       # Each returned document has a +vector_search_score+ attribute populated
-      # with its relevance score.
+      # with its relevance score. Unlike +vector_search+, the indexed text field
+      # is retained in returned documents.
       #
       # @example Search by text.
       #   Article.auto_embed_search('machine learning', limit: 5)
