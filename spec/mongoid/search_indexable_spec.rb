@@ -438,6 +438,10 @@ describe Mongoid::SearchIndexable do
     end
 
     context 'with an auto-embed search index' do
+      before do
+        skip 'per DRIVERS-3315: "Integration tests can be deferred to follow up work to complete once a CI-compatible server is available with this feature (autoembedding indexes)"'
+      end
+
       let(:embed_model) do
         Class.new do
           include Mongoid::Document
