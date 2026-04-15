@@ -68,6 +68,37 @@ RSpec::Core::RakeTask.new('spec:progress') do |spec|
   spec.pattern = "spec/**/*_spec.rb"
 end
 
+RUBOCOPABLE = %w[ examples gemfiles perf lib spec mongoid.gemspec Gemfile Rakefile upload-api-docs ].freeze
+
+desc 'Run rubocop'
+task rubocop: %w[ rubocop:run ]
+
+namespace :rubocop do
+  desc 'Run rubocop on the codebase'
+  task :run do
+    Bundler.with_unbundled_env do
+      sh 'bundle', 'exec', 'rubocop', *RUBOCOPABLE, verbose: false
+    end
+  end
+
+  desc 'Add a git pre-commit hook that runs rubocop'
+  task :install_hook do
+    hook_path = File.join('.git', 'hooks', 'pre-commit')
+    hook_script = <<~HOOK
+      #!/usr/bin/env bash
+      set -e
+
+      echo "Running rubocop..."
+      rake rubocop
+    HOOK
+
+    File.write(hook_path, hook_script)
+    FileUtils.chmod('+x', hook_path)
+
+    puts "Git pre-commit hook installed at #{hook_path}."
+  end
+end
+
 desc 'Build and validate the evergreen config'
 task eg: %w[ eg:build eg:validate ]
 

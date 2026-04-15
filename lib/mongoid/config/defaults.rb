@@ -18,19 +18,24 @@ module Mongoid
         case version.to_s
         when /^[0-7]\./
           raise ArgumentError, "Version no longer supported: #{version}"
-        when "8.0"
+
+        when '8.0'
           self.legacy_readonly = true
 
-          load_defaults "8.1"
-        when "8.1"
+          load_defaults '8.1'
+
+        when '8.1'
           self.immutable_ids = false
           self.legacy_persistence_context_behavior = true
           self.around_callbacks_for_embeds = true
           self.prevent_multiple_calls_of_embedded_callbacks = false
 
-          load_defaults "9.0"
-        when "9.0"
+          load_defaults '9.0'
+
+        when '9.0'
           # All flag defaults currently reflect 9.0 behavior.
+          load_defaults '9.0'
+
         else
           raise ArgumentError, "Unknown version: #{version}"
         end
