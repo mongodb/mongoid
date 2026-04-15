@@ -34,7 +34,6 @@ module Mongoid
 
         when '9.0'
           # All flag defaults currently reflect 9.0 behavior.
-          load_defaults '9.0'
 
         else
           raise ArgumentError, "Unknown version: #{version}"
