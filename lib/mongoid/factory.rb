@@ -175,12 +175,8 @@ module Mongoid
     def execute_build(klass, attributes = nil, options = {})
       attributes ||= {}
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
-      type = klass.get_discriminator_mapping(dvalue)
-      if type
-        type.construct_document(attributes, options)
-      else
-        klass.construct_document(attributes, options)
-      end
+      type = klass.get_discriminator_mapping(dvalue) || klass
+      type.construct_document(attributes, options)
     end
 
     # Builds a new +Document+ from the supplied attributes loaded from the
