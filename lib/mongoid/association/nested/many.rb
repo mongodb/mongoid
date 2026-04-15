@@ -189,11 +189,17 @@ module Mongoid
             else
               update_document(doc, attrs)
             end
-          else
+          elsif association.embedded?
+            raise Errors::DocumentNotFound.new(association.klass, id)
+          elsif association.is_a?(Association::Referenced::HasAndBelongsToMany) || Mongoid.allow_reparenting_via_nested_attributes?
+            Mongoid::Warnings.warn_reparenting_via_nested_attributes if Mongoid.allow_reparenting_via_nested_attributes?
+
             # push existing document to association
             doc = association.klass.unscoped.find(converted)
             update_document(doc, attrs)
             existing.push(doc) unless destroyable?(attrs)
+          else
+            raise Errors::DocumentNotFound.new(association.klass, { _id: id, association.foreign_key => parent.id })
           end
 
           parent.children_may_have_changed!
