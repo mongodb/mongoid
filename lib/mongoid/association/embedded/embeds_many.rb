@@ -157,6 +157,8 @@ module Mongoid
           define_getter!
           define_setter!
           define_existence_check!
+          define_builder!
+          define_creator!
           @owner_class.cyclic = true if cyclic?
           @owner_class.validates_associated(name) if validate?
         end
