@@ -75,6 +75,49 @@ describe Mongoid::Association::Builders do
         end
       end
     end
+
+    context 'when providing a type argument' do
+      context 'when the relation is an embeds_one' do
+        let(:canvas) { Canvas.new }
+
+        context 'when the type is a subclass of the association class' do
+          let(:writer) { canvas.build_writer({}, PdfWriter) }
+
+          it 'builds an instance of the specified type' do
+            expect(writer).to be_a(PdfWriter)
+          end
+
+          it 'assigns the built document to the association' do
+            writer # build the association
+            expect(canvas.writer).to eq(writer)
+          end
+
+          it 'does not persist the document' do
+            expect(writer).not_to be_persisted
+          end
+        end
+
+        context 'when no type is given' do
+          let(:writer) { canvas.build_writer(speed: 3) }
+
+          it 'builds an instance of the default association class' do
+            expect(writer).to be_a(Writer)
+          end
+
+          it 'applies the given attributes' do
+            expect(writer.speed).to eq(3)
+          end
+        end
+
+        context 'when nil is passed as the type' do
+          let(:writer) { canvas.build_writer({}, nil) }
+
+          it 'builds an instance of the default association class' do
+            expect(writer).to be_a(Writer)
+          end
+        end
+      end
+    end
   end
 
   describe "#create_#\{name}" do
@@ -153,6 +196,33 @@ describe Mongoid::Association::Builders do
 
           it 'saves the child' do
             expect(game).to be_persisted
+          end
+        end
+      end
+    end
+
+    context 'when providing a type argument' do
+      context 'when the relation is an embeds_one' do
+        let(:canvas) { Canvas.new }
+
+        context 'when the type is a subclass of the association class' do
+          let(:writer) { canvas.create_writer({}, PdfWriter) }
+
+          it 'builds an instance of the specified type' do
+            expect(writer).to be_a(PdfWriter)
+          end
+
+          it 'assigns the built document to the association' do
+            writer # create the association
+            expect(canvas.writer).to eq(writer)
+          end
+        end
+
+        context 'when no type is given' do
+          let(:writer) { canvas.create_writer(speed: 3) }
+
+          it 'builds an instance of the default association class' do
+            expect(writer).to be_a(Writer)
           end
         end
       end

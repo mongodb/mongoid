@@ -20,17 +20,20 @@ module Mongoid
 
       private
 
-      # Parse out the attributes and the options from the args passed to a
-      # build_ or create_ methods.
+      # Parses the arguments passed to the build and create methods. The first
+      # argument is always the attributes (defaulting to {} if not given). The
+      # last argument is always the options hash, if the last argument is a
+      # hash. The first of any remaining arguments is the type.
       #
-      # @example Parse the args.
-      #   doc.parse_args(:name => "Joe")
+      # @param [ Array ] args The arguments passed to the method.
       #
-      # @param [ Hash... ] *args The arguments.
-      #
-      # @return [ Array<Hash> ] The attributes and options.
-      def parse_args(*args)
-        [ args.first || {}, (args.size > 1) ? args[1] : {} ]
+      # @return [ Array ] An array containing the attributes, type, and options.
+      def parse_args(args)
+        attributes = args.shift || {}
+        opts = args.last.is_a?(Hash) ? args.pop : {}
+        type = args.shift
+
+        [ attributes, type, opts ]
       end
 
       # Defines a builder method. This is defined as #build_name.
@@ -44,8 +47,9 @@ module Mongoid
       def self.define_builder!(association)
         association.inverse_class.tap do |klass|
           klass.re_define_method("build_#{association.name}") do |*args|
-            attributes, _options = parse_args(*args)
-            document = Factory.execute_build(association.relation_class, attributes, execute_callbacks: false)
+            attributes, type, _opts = parse_args(args)
+
+            document = Factory.execute_build(type || association.relation_class, attributes, execute_callbacks: false)
             _building do
               child = send("#{association.name}=", document)
               child.run_pending_callbacks
@@ -68,8 +72,9 @@ module Mongoid
       def self.define_creator!(association)
         association.inverse_class.tap do |klass|
           klass.re_define_method("create_#{association.name}") do |*args|
-            attributes, _options = parse_args(*args)
-            document = Factory.execute_build(association.relation_class, attributes, execute_callbacks: false)
+            attributes, type, _opts = parse_args(args)
+
+            document = Factory.execute_build(type || association.relation_class, attributes, execute_callbacks: false)
             doc = _assigning do
               send("#{association.name}=", document)
             end
