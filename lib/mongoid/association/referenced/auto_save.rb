@@ -96,8 +96,16 @@ module Mongoid
         def autosave_children_changed?(doc, seen)
           doc.class.relations.values.select { |a| a.autosave? && !a.embedded? }.any? do |assoc|
             (assoc_value = doc.ivar(assoc.name)) &&
-              assoc_value.in_memory.any? { |child| changed_for_autosave?(child, seen) }
+              in_memory_docs(assoc_value).any? { |child| changed_for_autosave?(child, seen) }
           end
+        end
+
+        # Returns the in-memory documents for an association value without
+        # triggering a database load of any unloaded documents. Association
+        # proxies expose in_memory for this purpose; a plain document (which
+        # belongs_to can store directly in the ivar) is itself in-memory.
+        def in_memory_docs(assoc_value)
+          assoc_value.respond_to?(:in_memory) ? assoc_value.in_memory : [ assoc_value ]
         end
       end
     end
