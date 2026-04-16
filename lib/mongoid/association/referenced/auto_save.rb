@@ -96,7 +96,7 @@ module Mongoid
         def autosave_children_changed?(doc, seen)
           doc.class.relations.values.select { |a| a.autosave? && !a.embedded? }.any? do |assoc|
             (assoc_value = doc.ivar(assoc.name)) &&
-              Array(assoc_value).any? { |child| changed_for_autosave?(child, seen) }
+              assoc_value.in_memory.any? { |child| changed_for_autosave?(child, seen) }
           end
         end
       end
