@@ -128,11 +128,11 @@ module Mongoid
     # When this flag is true, any documents in associations with `autosave: true`
     # will be saved even if they have not been changed. When this flag is false,
     # only autosaved documents that have been changed will be saved. The default
-    # is false.
+    # is `true`.
     #
-    # This option will default to 'false' in Mongoid 9.1, and will be removed
+    # This option will default to `false` in Mongoid 9.1, and will be removed
     # in Mongoid 10, with the only behavior at that point being as if this
-    # option were set to false.
+    # option were set to `false`.
     option :autosave_saves_unchanged_documents, default: true
 
     # When this flag is false, a document will become read-only only once the
