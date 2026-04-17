@@ -94,6 +94,11 @@ module Mongoid
         #
         # @return [ true | false ]
         def autosave_children_changed?(doc, seen)
+          if Mongoid.autosave_saves_unchanged_documents?
+            Mongoid::Warnings.warn_autosave_saves_unchanged_documents
+            return true
+          end
+
           doc.class.relations.values.select { |a| a.autosave? && !a.embedded? }.any? do |assoc|
             (assoc_value = doc.ivar(assoc.name)) &&
               in_memory_docs(assoc_value).any? { |child| changed_for_autosave?(child, seen) }

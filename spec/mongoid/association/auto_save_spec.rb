@@ -446,12 +446,24 @@ describe Mongoid::Association::Referenced::AutoSave do
           expect(AutoSaveMONGOID5751::Table.after_save_count).to eq(1)
         end
 
-        it 'fires after_save only for the newly added row, not for pre-existing rows' do
-          expect(AutoSaveMONGOID5751::Row.after_save_count).to eq(1)
-        end
-
         it 'fires after_save only for the newly added cell' do
           expect(AutoSaveMONGOID5751::Cell.after_save_count).to eq(1)
+        end
+
+        context 'when autosave_saves_unchanged_documents is true' do
+          config_override :autosave_saves_unchanged_documents, true
+
+          it 'fires after_save for all new and pre-existing rows' do
+            expect(AutoSaveMONGOID5751::Row.after_save_count).to eq(4)
+          end
+        end
+
+        context 'when autosave_saves_unchanged_documents is false' do
+          config_override :autosave_saves_unchanged_documents, false
+
+          it 'fires after_save only for the newly added row, not for pre-existing rows' do
+            expect(AutoSaveMONGOID5751::Row.after_save_count).to eq(1)
+          end
         end
       end
     end
