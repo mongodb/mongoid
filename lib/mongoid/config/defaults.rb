@@ -31,6 +31,7 @@ module Mongoid
 
         when '9.0'
           self.allow_reparenting_via_nested_attributes = true
+          self.autosave_saves_unchanged_documents = true
 
           load_defaults '9.1'
 

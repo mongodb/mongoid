@@ -33,5 +33,8 @@ module Mongoid
     warning :mutable_ids,
             'Ignoring updates to immutable attribute `_id`. Please set Mongoid::Config.immutable_ids to true and update your code so that `_id` is never updated.'
     warning :reparenting_via_nested_attributes, 'Reparenting documents via nested attributes is insecure and is deprecated. Set Mongoid.allow_reparenting_via_nested_attributes to false and update your code to avoid reparenting documents via nested attributes.'
+    warning :autosave_saves_unchanged_documents, "Autosave associations are currently configured to save documents even if they haven't changed. " \
+                                                 'This legacy behavior is deprecated. Set Mongoid.autosave_saves_unchanged_documents to false to ' \
+                                                 'skip saving unchanged documents in autosave associations.'
   end
 end

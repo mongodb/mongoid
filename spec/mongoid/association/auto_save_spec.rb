@@ -4,6 +4,53 @@ require 'spec_helper'
 require_relative 'referenced/has_many_models'
 require_relative 'referenced/has_one_models'
 
+# Models for the MONGOID-5751 regression test: after_save callbacks must not
+# fire for pre-existing, unchanged documents when autosave: true cascades a
+# save from a parent to its children.
+module AutoSaveMONGOID5751
+  class Table
+    include Mongoid::Document
+
+    has_many :rows, autosave: true, class_name: 'AutoSaveMONGOID5751::Row',
+                    inverse_of: :table
+
+    class << self
+      attr_accessor :after_save_count
+    end
+    self.after_save_count = 0
+
+    after_save { self.class.after_save_count += 1 }
+  end
+
+  class Row
+    include Mongoid::Document
+
+    belongs_to :table, class_name: 'AutoSaveMONGOID5751::Table', inverse_of: :rows
+    has_many :cells, autosave: true, class_name: 'AutoSaveMONGOID5751::Cell',
+                     inverse_of: :row
+
+    class << self
+      attr_accessor :after_save_count
+    end
+    self.after_save_count = 0
+
+    after_save { self.class.after_save_count += 1 }
+  end
+
+  class Cell
+    include Mongoid::Document
+
+    belongs_to :row, class_name: 'AutoSaveMONGOID5751::Row', inverse_of: :cells
+
+    class << self
+      attr_accessor :after_save_count
+    end
+    self.after_save_count = 0
+
+    after_save { self.class.after_save_count += 1 }
+  end
+end
+
 describe Mongoid::Association::Referenced::AutoSave do
   describe '.auto_save' do
     before(:all) do
@@ -366,6 +413,57 @@ describe Mongoid::Association::Referenced::AutoSave do
 
         it 'cascades the save' do
           expect(harvest.reload.season).to eq('Fall')
+        end
+      end
+
+      # Regression test for MONGOID-5751: after_save must not fire for
+      # pre-existing, unchanged documents that are merely loaded into memory
+      # as a side-effect of the autosave traversal.
+      context 'when a parent with existing children has a new child added' do
+        before do
+          # Persist a table with 3 pre-existing rows, each with 3 cells.
+          table = AutoSaveMONGOID5751::Table.create!
+          3.times do
+            row = table.rows.create!
+            3.times { row.cells.create! }
+          end
+
+          # Reset counters so only the saves triggered by the call below are
+          # measured.
+          AutoSaveMONGOID5751::Table.after_save_count = 0
+          AutoSaveMONGOID5751::Row.after_save_count = 0
+          AutoSaveMONGOID5751::Cell.after_save_count = 0
+
+          # Reload the table fresh from the database, then append exactly one
+          # new row (with one new cell) and persist.
+          reloaded = AutoSaveMONGOID5751::Table.find(table.id)
+          new_row = reloaded.rows.build
+          new_row.cells.build
+          reloaded.save!
+        end
+
+        it 'fires after_save once for the parent table' do
+          expect(AutoSaveMONGOID5751::Table.after_save_count).to eq(1)
+        end
+
+        it 'fires after_save only for the newly added cell' do
+          expect(AutoSaveMONGOID5751::Cell.after_save_count).to eq(1)
+        end
+
+        context 'when autosave_saves_unchanged_documents is true' do
+          config_override :autosave_saves_unchanged_documents, true
+
+          it 'fires after_save for all new and pre-existing rows' do
+            expect(AutoSaveMONGOID5751::Row.after_save_count).to eq(4)
+          end
+        end
+
+        context 'when autosave_saves_unchanged_documents is false' do
+          config_override :autosave_saves_unchanged_documents, false
+
+          it 'fires after_save only for the newly added row, not for pre-existing rows' do
+            expect(AutoSaveMONGOID5751::Row.after_save_count).to eq(1)
+          end
         end
       end
     end

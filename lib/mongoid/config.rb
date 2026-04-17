@@ -145,6 +145,15 @@ module Mongoid
     # as if this option were set to false.
     option :allow_reparenting_via_nested_attributes, default: false
 
+    # When this flag is true, any documents in associations with `autosave: true`
+    # will be saved even if they have not been changed. When this flag is false,
+    # only autosaved documents that have been changed will be saved. The default
+    # is false.
+    #
+    # This option will be removed in Mongoid 10, with the only behavior at that
+    # point being as if this option were set to false.
+    option :autosave_saves_unchanged_documents, default: false
+
     # Returns the (potentially-dereferenced) isolation level that Mongoid
     # will use to store its internal state. If `isolation_level` is set to
     # `:rails`, this will return the isolation level that Rails is current
