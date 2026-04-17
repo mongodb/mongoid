@@ -32,13 +32,24 @@ module Mongoid
           Threaded.exit_autosave(self)
         end
 
-        # Check if there is changes for auto-saving
+        # Check if there are changes for auto-saving. Returns true if the
+        # document is new, changed, or marked for destruction, or if any
+        # in-memory referenced child with autosave: true recursively
+        # satisfies the same condition.
         #
-        # @example Return true if there is changes on self or in
-        #           autosaved associations.
-        #   document.changed_for_autosave?
-        def changed_for_autosave?(doc)
-          doc.new_record? || doc.changed? || doc.marked_for_destruction?
+        # The seen set prevents infinite recursion when autosave associations
+        # form a cycle (e.g. a belongs_to with autosave: true whose target
+        # has a has_many with autosave: true pointing back).
+        #
+        # @param [ Document ] doc The document to check.
+        # @param [ Set ] seen Documents already visited (cycle guard).
+        #
+        # @return [ true | false ] Whether the document needs autosaving.
+        def changed_for_autosave?(doc, seen = Set.new)
+          return false unless seen.add?(doc)
+
+          doc.new_record? || doc.changed? || doc.marked_for_destruction? ||
+            autosave_children_changed?(doc, seen)
         end
 
         # Define the autosave method on an association's owning class for
@@ -60,6 +71,8 @@ module Mongoid
                 __autosaving__ do
                   if assoc_value = ivar(association.name)
                     Array(assoc_value).each do |doc|
+                      next unless changed_for_autosave?(doc)
+
                       pc = doc.persistence_context? ? doc.persistence_context : persistence_context.for_child(doc)
                       doc.with(pc) do |d|
                         d.save
@@ -71,6 +84,35 @@ module Mongoid
             end
             klass.after_persist_parent save_method, unless: :autosaved?
           end
+        end
+
+        private
+
+        # Returns true if any in-memory referenced child with autosave: true
+        # needs saving.
+        #
+        # @param [ Document ] doc The document whose children to check.
+        # @param [ Set ] seen Cycle guard passed through from changed_for_autosave?.
+        #
+        # @return [ true | false ]
+        def autosave_children_changed?(doc, seen)
+          if Mongoid.autosave_saves_unchanged_documents?
+            Mongoid::Warnings.warn_autosave_saves_unchanged_documents
+            return true
+          end
+
+          doc.class.relations.values.select { |a| a.autosave? && !a.embedded? }.any? do |assoc|
+            (assoc_value = doc.ivar(assoc.name)) &&
+              in_memory_docs(assoc_value).any? { |child| changed_for_autosave?(child, seen) }
+          end
+        end
+
+        # Returns the in-memory documents for an association value without
+        # triggering a database load of any unloaded documents. Association
+        # proxies expose in_memory for this purpose; a plain document (which
+        # belongs_to can store directly in the ivar) is itself in-memory.
+        def in_memory_docs(assoc_value)
+          assoc_value.respond_to?(:in_memory) ? assoc_value.in_memory : [ assoc_value ]
         end
       end
     end
