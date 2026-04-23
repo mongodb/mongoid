@@ -259,10 +259,14 @@ module Mongoid
           # @yield [ Object ] Yields each enumerable element to the block.
           #
           # @return [ Document | Array<Document> | nil ] A document or matching documents.
-          def find(...)
-            matching = criteria.find(...)
-            Array(matching).each { |doc| _target.push(doc) }
-            matching
+          def find(*args, &block)
+            if block_given? && args.empty?
+              detect(&block)
+            else
+              matching = criteria.find(*args, &block)
+              Array(matching).each { |doc| _target.push(doc) }
+              matching
+            end
           end
 
           # Removes all associations between the base document and the target
