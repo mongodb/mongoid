@@ -62,8 +62,20 @@ module Mongoid
     # @return [ Mongo | Memory ] The context.
     def create_context
       return None.new(self) if empty_and_chainable?
+      return None.new(self) if short_circuit_query?
 
       embedded ? Memory.new(self) : Mongo.new(self)
+    end
+
+    def short_circuit_query?
+      return false unless Mongoid.allow_short_circuit_queries?
+
+      selector.any? do |_field, condition|
+        next unless condition.is_a?(Hash)
+
+        v = condition['$in'] || condition[:$in]
+        v.is_a?(Array) && v.empty?
+      end
     end
   end
 end

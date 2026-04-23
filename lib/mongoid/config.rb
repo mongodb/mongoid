@@ -145,6 +145,11 @@ module Mongoid
     # as if this option were set to false.
     option :allow_reparenting_via_nested_attributes, default: false
 
+    # When this flag is true, Mongoid will skip sending queries to the database
+    # for criteria that are guaranteed to return no results, such as those with
+    # an empty $in array (e.g. Band.in(name: [])). The default is false.
+    option :allow_short_circuit_queries, default: false
+
     # When this flag is true, any documents in associations with `autosave: true`
     # will be saved even if they have not been changed. When this flag is false,
     # only autosaved documents that have been changed will be saved. The default
