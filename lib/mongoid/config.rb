@@ -78,6 +78,11 @@ module Mongoid
     # Store BigDecimals as Decimal128s instead of strings in the db.
     option :map_big_decimal_to_decimal128, default: true
 
+    # When true (the default), preserve legacy behavior where Hash-typed fields
+    # return BSON::Document after loading from the database. Set to false to
+    # have Hash-typed fields return plain Hash, matching the declared field type.
+    option :legacy_hash_fields, default: true
+
     # Allow BSON::Decimal128 to be parsed and returned directly in
     # field values. When BSON 5 is present and this option is set to false
     # (the default), BSON::Decimal128 values in the database will be returned
