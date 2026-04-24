@@ -101,6 +101,11 @@ module Mongoid
     # @api private
     def process_raw_attribute(name, raw, field)
       value = field ? field.demongoize(raw) : raw
+      # When demongoize converts a BSON::Document to a plain Hash (i.e.
+      # legacy_hash_fields is false), store the plain Hash back into
+      # attributes so that in-place mutations on the returned value are
+      # visible to dirty tracking.
+      attributes[name] = value if raw.is_a?(BSON::Document) && !value.is_a?(BSON::Document)
       is_relation = relations.key?(name)
       attribute_will_change!(name) if value.resizable? && !is_relation
       value

@@ -251,6 +251,63 @@ describe Mongoid::Changeable do
           end
         end
       end
+
+      context 'when the attribute is a hash field and legacy_hash_fields is true (default)' do
+        let(:person) do
+          Person.create!(map: { 'location' => 'Home' })
+        end
+
+        let(:reloaded) do
+          Person.find(person.id)
+        end
+
+        it 'returns a BSON::Document after loading from the database' do
+          expect(reloaded.map).to be_a(BSON::Document)
+        end
+      end
+
+      context 'when the attribute is a hash field and legacy_hash_fields is false' do
+        around do |example|
+          Mongoid.config.legacy_hash_fields = false
+          example.run
+        ensure
+          Mongoid.config.legacy_hash_fields = true
+        end
+
+        let(:person) do
+          Person.create!(map: { 'location' => 'Home' })
+        end
+
+        let(:reloaded) do
+          Person.find(person.id)
+        end
+
+        it 'returns a plain Hash after loading from the database' do
+          expect(reloaded.map).to be_a(Hash)
+          expect(reloaded.map).not_to be_a(BSON::Document)
+        end
+
+        it 'returns the correct value' do
+          expect(reloaded.map).to eq({ 'location' => 'Home' })
+        end
+
+        context 'when the field is modified after loading' do
+          before do
+            reloaded.map['location'] = 'Work'
+          end
+
+          it 'field_was returns a plain Hash' do
+            old_value, = reloaded.map_change
+            expect(old_value).to be_a(Hash)
+            expect(old_value).not_to be_a(BSON::Document)
+          end
+
+          it 'field_was holds the original value' do
+            old_value, = reloaded.map_change
+            expect(old_value).to eq({ 'location' => 'Home' })
+          end
+        end
+      end
     end
 
     context 'when the attribute has not changed from the persisted value' do
