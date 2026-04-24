@@ -2246,6 +2246,23 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           end
         ).to be_nil
       end
+
+      context 'when the parent is not persisted (MONGOID-5759)' do
+        let(:person) { Person.new }
+        let!(:post) { person.posts.build(title: 'unpersisted post') }
+
+        it 'yields unpersisted built documents' do
+          expect(
+            person.posts.find { |p| p.title == 'unpersisted post' }
+          ).to eq(post)
+        end
+
+        it 'returns nil when no match among unpersisted documents' do
+          expect(
+            person.posts.find { |p| p.title == 'other' }
+          ).to be_nil
+        end
+      end
     end
   end
 
