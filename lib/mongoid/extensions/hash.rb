@@ -105,6 +105,27 @@ module Mongoid
       Mongoid.deprecate(self, :to_criteria)
 
       module ClassMethods
+        # Turn the object from a Mongo-friendly type back to the Ruby type.
+        # When +legacy_hash_fields+ is false, converts BSON::Document to a
+        # plain Hash recursively so that Hash-typed fields always return Hash.
+        #
+        # @param [ Object ] object The object to demongoize.
+        #
+        # @return [ Hash | Object | nil ] The demongoized object.
+        def demongoize(object)
+          return if object.nil?
+          return object if Mongoid.config.legacy_hash_fields
+
+          case object
+          when BSON::Document
+            object.each_with_object({}) { |(k, v), h| h[k] = ::Hash.demongoize(v) }
+          when ::Hash
+            object.transform_values { |v| ::Hash.demongoize(v) }
+          else
+            object
+          end
+        end
+
         # Turn the object from the ruby type we deal with to a Mongo friendly
         # type.
         #

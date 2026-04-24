@@ -179,6 +179,72 @@ describe Mongoid::Extensions::Hash do
         expect(demongoized).to eq(1)
       end
     end
+
+    context 'when the object is a BSON::Document and legacy_hash_fields is true' do
+      let(:doc) { BSON::Document.new('x' => 1, 'y' => 2) }
+
+      it 'returns the BSON::Document unchanged (legacy behavior)' do
+        expect(Hash.demongoize(doc)).to be_a(BSON::Document)
+        expect(Hash.demongoize(doc)).to equal(doc)
+      end
+    end
+
+    context 'when the object is a BSON::Document and legacy_hash_fields is false' do
+      around do |example|
+        Mongoid.config.legacy_hash_fields = false
+        example.run
+      ensure
+        Mongoid.config.legacy_hash_fields = true
+      end
+
+      let(:doc) { BSON::Document.new('x' => 1, 'y' => 2) }
+
+      it 'returns a plain Hash' do
+        result = Hash.demongoize(doc)
+        expect(result).to be_a(Hash)
+        expect(result).not_to be_a(BSON::Document)
+      end
+
+      it 'preserves the key/value data' do
+        result = Hash.demongoize(doc)
+        expect(result).to eq({ 'x' => 1, 'y' => 2 })
+      end
+
+      context 'when the object is a plain Hash with plain values' do
+        let(:plain) { { 'x' => 1, 'y' => 'hello' } }
+
+        it 'returns an equivalent plain Hash' do
+          result = Hash.demongoize(plain)
+          expect(result).to be_a(Hash)
+          expect(result).not_to be_a(BSON::Document)
+          expect(result).to eq({ 'x' => 1, 'y' => 'hello' })
+        end
+      end
+
+      context 'when the object is a plain Hash containing a nested BSON::Document' do
+        let(:hash_with_nested) do
+          { 'a' => BSON::Document.new('b' => 1) }
+        end
+
+        it 'recursively converts nested BSON::Documents inside plain Hash' do
+          result = Hash.demongoize(hash_with_nested)
+          expect(result['a']).to be_a(Hash)
+          expect(result['a']).not_to be_a(BSON::Document)
+          expect(result['a']['b']).to eq(1)
+        end
+      end
+
+      context 'when the BSON::Document has nested BSON::Documents' do
+        let(:nested) { BSON::Document.new('a' => BSON::Document.new('b' => 3)) }
+
+        it 'recursively converts nested BSON::Documents to plain Hash' do
+          result = Hash.demongoize(nested)
+          expect(result['a']).to be_a(Hash)
+          expect(result['a']).not_to be_a(BSON::Document)
+          expect(result['a']['b']).to eq(3)
+        end
+      end
+    end
   end
 
   describe '.mongoize' do
