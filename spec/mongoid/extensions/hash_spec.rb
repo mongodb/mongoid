@@ -210,27 +210,11 @@ describe Mongoid::Extensions::Hash do
         expect(result).to eq({ 'x' => 1, 'y' => 2 })
       end
 
-      context 'when the object is a plain Hash with plain values' do
+      context 'when the object is a plain Hash' do
         let(:plain) { { 'x' => 1, 'y' => 'hello' } }
 
-        it 'returns an equivalent plain Hash' do
-          result = Hash.demongoize(plain)
-          expect(result).to be_a(Hash)
-          expect(result).not_to be_a(BSON::Document)
-          expect(result).to eq({ 'x' => 1, 'y' => 'hello' })
-        end
-      end
-
-      context 'when the object is a plain Hash containing a nested BSON::Document' do
-        let(:hash_with_nested) do
-          { 'a' => BSON::Document.new('b' => 1) }
-        end
-
-        it 'recursively converts nested BSON::Documents inside plain Hash' do
-          result = Hash.demongoize(hash_with_nested)
-          expect(result['a']).to be_a(Hash)
-          expect(result['a']).not_to be_a(BSON::Document)
-          expect(result['a']['b']).to eq(1)
+        it 'returns the same object unchanged' do
+          expect(Hash.demongoize(plain)).to equal(plain)
         end
       end
 

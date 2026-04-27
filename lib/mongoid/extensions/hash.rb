@@ -108,22 +108,18 @@ module Mongoid
         # Turn the object from a Mongo-friendly type back to the Ruby type.
         # When +legacy_hash_fields+ is false, converts BSON::Document to a
         # plain Hash recursively so that Hash-typed fields always return Hash.
+        # Plain Hash inputs are returned as-is; conversion is only needed once
+        # (when the raw BSON::Document is first read from the database).
         #
         # @param [ Object ] object The object to demongoize.
         #
         # @return [ Hash | Object | nil ] The demongoized object.
         def demongoize(object)
           return if object.nil?
-          return object if Mongoid.config.legacy_hash_fields
+          return object unless object.is_a?(BSON::Document) &&
+                               !Mongoid.config.legacy_hash_fields
 
-          case object
-          when BSON::Document
-            object.each_with_object({}) { |(k, v), h| h[k] = ::Hash.demongoize(v) }
-          when ::Hash
-            object.transform_values { |v| ::Hash.demongoize(v) }
-          else
-            object
-          end
+          object.each_with_object({}) { |(k, v), h| h[k] = ::Hash.demongoize(v) }
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly
