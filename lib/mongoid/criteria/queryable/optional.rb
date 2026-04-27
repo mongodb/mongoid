@@ -91,9 +91,13 @@ module Mongoid
         # @param [ Integer ] value The max number of documents to scan.
         #
         # @return [ Optional ] The cloned optional.
+        #
+        # @deprecated The max_scan option is deprecated in MongoDB 4.0 and later.
+        #   Use max_time_ms instead.
         def max_scan(value = nil)
           option(value) { |options| options.store(:max_scan, value) }
         end
+        Mongoid.deprecate(self, :max_scan)
 
         # Adds a cumulative time limit in milliseconds for processing operations on a cursor.
         #
