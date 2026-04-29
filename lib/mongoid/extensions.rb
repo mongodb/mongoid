@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'mongoid/extensions/array'
+require 'mongoid/extensions/bson_document'
 require 'mongoid/extensions/big_decimal'
 require 'mongoid/extensions/binary'
 require 'mongoid/extensions/boolean'
