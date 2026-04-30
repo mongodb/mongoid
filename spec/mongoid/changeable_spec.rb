@@ -674,6 +674,24 @@ describe Mongoid::Changeable do
         expect(person.send(:attribute_was, 'title')).to eq('Grand Poobah')
       end
     end
+
+    context 'when the attribute is a Hash field stored as a BSON::Document' do
+      let(:person) do
+        Person.new(map: BSON::Document.new('foo' => true)).tap(&:move_changes)
+      end
+
+      before do
+        person.map['bar'] = true
+      end
+
+      it 'returns a BSON::Document, consistent with the field getter' do
+        expect(person.map_was).to be_a(BSON::Document)
+      end
+
+      it 'returns the correct previous value' do
+        expect(person.map_was).to eq('foo' => true)
+      end
+    end
   end
 
   describe '#attribute_previously_was' do
