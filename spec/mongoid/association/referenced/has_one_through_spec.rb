@@ -169,4 +169,43 @@ describe Mongoid::Association::Referenced::HasOneThrough do
       end
     end
   end
+
+  context 'with :source option resolving a differently-named association', :integration do
+    before(:all) do
+      Object.const_set(:SrcOrg, Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'src_orgs'
+        has_one :src_location, class_name: 'SrcLocation', inverse_of: :src_org
+        has_one :src_hq, through: :src_location,
+                         class_name: 'SrcBuilding', source: :src_main_building
+      end)
+      Object.const_set(:SrcLocation, Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'src_locations'
+        belongs_to :src_org, class_name: 'SrcOrg'
+        has_one :src_main_building, class_name: 'SrcBuilding', inverse_of: :src_location
+      end)
+      Object.const_set(:SrcBuilding, Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'src_buildings'
+        belongs_to :src_location, class_name: 'SrcLocation'
+      end)
+    end
+
+    after(:all) do
+      %w[SrcOrg SrcLocation SrcBuilding].each { |c| Object.send(:remove_const, c) }
+    end
+
+    before { [ SrcOrg, SrcLocation, SrcBuilding ].each(&:delete_all) }
+
+    it 'resolves the :source association on the intermediate' do
+      org      = SrcOrg.create!
+      location = SrcLocation.create!(src_org: org)
+      building = SrcBuilding.create!(src_location: location)
+      expect(org.src_hq).to eq(building)
+    end
+  end
 end
