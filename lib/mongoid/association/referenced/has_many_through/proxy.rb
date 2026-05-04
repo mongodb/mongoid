@@ -26,7 +26,8 @@ module Mongoid
           def_delegators :criteria,
                          :each, :to_a, :first, :last, :count, :size, :length,
                          :where, :pluck, :exists?, :any?, :none?, :empty?,
-                         :limit, :skip, :order_by, :only, :without
+                         :limit, :skip, :order_by, :only, :without,
+                         :sum, :avg, :min, :max
 
           READONLY_METHODS = %i[
             << push concat substitute build new create create!
@@ -38,10 +39,8 @@ module Mongoid
             @_association = association
           end
 
-          # Lazily compute the resolved criteria when first needed.
-          # Triggers the two-query through-join on first access.
           def criteria
-            @criteria ||= @_association.resolve(@_base)
+            @criteria ||= @_association.criteria(@_base)
           end
 
           READONLY_METHODS.each do |meth|

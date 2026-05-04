@@ -98,23 +98,14 @@ module Mongoid
           end
         end
 
-        # Return an unscoped criteria for the source class. Used by the base
-        # infrastructure to determine the target class; the actual two-query
-        # resolution is performed by resolve(base) when the proxy enumerates.
-        #
-        # @return [ Mongoid::Criteria ]
-        def criteria
-          source_association.klass.criteria
-        end
-
-        # Execute the two-query through-join and return a Criteria scoped to
-        # the matching target documents. Called lazily by the proxy on first
-        # enumeration.
+        # Return a Criteria scoped to the target documents reachable from base
+        # via the through association. Performs two queries: one against the
+        # intermediate collection, one against the source collection.
         #
         # @param [ Document ] base The owner document.
         #
         # @return [ Mongoid::Criteria ]
-        def resolve(base)
+        def criteria(base)
           through_crit = through_association.criteria(base)
 
           if source_association.stores_foreign_key?
