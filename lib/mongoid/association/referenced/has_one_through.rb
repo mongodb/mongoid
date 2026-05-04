@@ -91,8 +91,17 @@ module Mongoid
           end
         end
 
-        # Build the target by delegating through the intermediate proxy.
-        # Returns the source document or nil.
+        # Through associations never store a foreign key on the owner document.
+        #
+        # @return [ false ]
+        def stores_foreign_key?
+          false
+        end
+
+        # Resolve the target by delegating through the intermediate proxy.
+        # Unlike other association types, this returns a document (or nil)
+        # directly rather than a Mongoid::Criteria, because the two-hop
+        # traversal is performed eagerly via the existing association proxy.
         #
         # @param [ Document ] base The owner document.
         #

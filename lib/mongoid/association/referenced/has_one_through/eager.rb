@@ -50,6 +50,9 @@ module Mongoid
             end
           end
 
+          # Required by the base class contract. Not called by this preloader
+          # because preload manages document traversal directly without using
+          # the grouped_docs / keys_from_docs machinery from the base class.
           def group_by_key
             @association.through_association.primary_key
           end
