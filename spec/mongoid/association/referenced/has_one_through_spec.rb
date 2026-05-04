@@ -107,7 +107,8 @@ describe Mongoid::Association::Referenced::HasOneThrough do
 
         store_in collection: 'int_customers'
         has_one :int_franchise, class_name: 'IntFranchise', inverse_of: :int_customer
-        has_one :int_store, through: :int_franchise, class_name: 'IntStore'
+        # source: :depot exercises the :source option end-to-end
+        has_one :int_store, through: :int_franchise, class_name: 'IntStore', source: :depot
       end)
 
       Object.const_set(:IntFranchise, Class.new do
@@ -116,7 +117,7 @@ describe Mongoid::Association::Referenced::HasOneThrough do
         store_in collection: 'int_franchises'
         field :int_customer_id, type: BSON::ObjectId
         belongs_to :int_customer, class_name: 'IntCustomer'
-        has_one :int_store, class_name: 'IntStore', inverse_of: :int_franchise
+        has_one :depot, class_name: 'IntStore', inverse_of: :int_franchise
       end)
 
       Object.const_set(:IntStore, Class.new do
@@ -148,14 +149,16 @@ describe Mongoid::Association::Referenced::HasOneThrough do
         expect(lone.int_store).to be_nil
       end
 
-      it 'reloads the association when reload: true' do
-        customer.int_store # prime cache
-        new_store = IntStore.create!(int_franchise: franchise)
-        franchise.int_store = new_store
+      it 'returns cached value before reload and fresh value after' do
+        first_store = customer.int_store # prime cache
+        expect(first_store).to eq(store)
+
+        new_store = IntStore.create!
+        franchise.depot = new_store
         franchise.save!
 
-        # Without reload: stale cached value
-        expect(customer.int_store(true)).to eq(new_store)
+        expect(customer.int_store).to eq(store) # cached — still old
+        expect(customer.int_store(true)).to eq(new_store) # reloaded
       end
     end
 
