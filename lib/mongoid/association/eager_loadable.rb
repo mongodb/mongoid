@@ -52,8 +52,8 @@ module Mongoid
         if through_inclusions.any?
           names = through_inclusions.map { |a| ":#{a.name}" }.join(', ')
           Mongoid.logger.warn(
-            'The following :through associations do not support $lookup-based eager loading ' \
-            "and will be preloaded using separate queries: #{names}."
+            "#{names} are :through associations and do not support $lookup-based eager " \
+            'loading. All inclusions for this query will be preloaded using separate queries.'
           )
           return eager_load(docs_for_lookup_fallback)
         end
