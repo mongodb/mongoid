@@ -85,4 +85,85 @@ describe Mongoid::Association::Referenced::HasOneThrough do
       expect(assoc.criteria(customer)).to eq(store)
     end
   end
+
+  describe ':through on an embedded association' do
+    it 'raises InvalidRelationOption when through association is embedded' do
+      embedded_owner = Class.new do
+        include Mongoid::Document
+
+        embeds_one :address
+      end
+      embedded_owner.has_one(:city, through: :address)
+      expect do
+        embedded_owner.relations['city'].through_association # triggers lazy validation
+      end.to raise_error(Mongoid::Errors::InvalidRelationOption)
+    end
+  end
+
+  context 'integration', :integration do
+    before(:all) do
+      Object.const_set(:IntCustomer, Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'int_customers'
+        has_one :int_franchise, class_name: 'IntFranchise', inverse_of: :int_customer
+        has_one :int_store, through: :int_franchise, class_name: 'IntStore'
+      end)
+
+      Object.const_set(:IntFranchise, Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'int_franchises'
+        field :int_customer_id, type: BSON::ObjectId
+        belongs_to :int_customer, class_name: 'IntCustomer'
+        has_one :int_store, class_name: 'IntStore', inverse_of: :int_franchise
+      end)
+
+      Object.const_set(:IntStore, Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'int_stores'
+        field :int_franchise_id, type: BSON::ObjectId
+        belongs_to :int_franchise, class_name: 'IntFranchise'
+      end)
+    end
+
+    after(:all) do
+      %w[IntCustomer IntFranchise IntStore].each { |c| Object.send(:remove_const, c) }
+    end
+
+    before { [ IntCustomer, IntFranchise, IntStore ].each(&:delete_all) }
+
+    let!(:customer)  { IntCustomer.create! }
+    let!(:franchise) { IntFranchise.create!(int_customer: customer) }
+    let!(:store)     { IntStore.create!(int_franchise: franchise) }
+
+    describe 'getter' do
+      it 'returns the store via the franchise' do
+        expect(customer.int_store).to eq(store)
+      end
+
+      it 'returns nil when the franchise is absent' do
+        lone = IntCustomer.create!
+        expect(lone.int_store).to be_nil
+      end
+
+      it 'reloads the association when reload: true' do
+        customer.int_store # prime cache
+        new_store = IntStore.create!(int_franchise: franchise)
+        franchise.int_store = new_store
+        franchise.save!
+
+        # Without reload: stale cached value
+        expect(customer.int_store(true)).to eq(new_store)
+      end
+    end
+
+    describe 'setter' do
+      it 'raises ReadonlyAssociation' do
+        expect { customer.int_store = IntStore.new }.to \
+          raise_error(Mongoid::Errors::ReadonlyAssociation)
+      end
+    end
+  end
 end
