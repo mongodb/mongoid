@@ -98,15 +98,12 @@ module Mongoid
           end
         end
 
-        # Return a base criteria for the source class. The actual two-query
-        # resolution is deferred until the proxy enumerates the results (see
-        # resolve). This method is used by callers that only need the target
-        # klass (e.g., eager loaders bootstrapping the association type).
-        #
-        # @param [ Document ] _base The owner document (unused here).
+        # Return an unscoped criteria for the source class. Used by the base
+        # infrastructure to determine the target class; the actual two-query
+        # resolution is performed by resolve(base) when the proxy enumerates.
         #
         # @return [ Mongoid::Criteria ]
-        def criteria(_base = nil)
+        def criteria
           source_association.klass.criteria
         end
 

@@ -58,9 +58,8 @@ describe Mongoid::Association::Referenced::HasManyThrough do
   end
 
   describe '#criteria' do
-    it 'returns a Criteria for the source class' do
-      physician = Physician.new
-      crit = assoc.criteria(physician)
+    it 'returns an unscoped Criteria for the source class' do
+      crit = assoc.criteria
       expect(crit).to be_a(Mongoid::Criteria)
       expect(crit.klass).to eq(Patient)
     end
