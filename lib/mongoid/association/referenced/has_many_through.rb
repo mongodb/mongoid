@@ -6,7 +6,7 @@ module Mongoid
       class HasManyThrough
         include Relatable
 
-        ASSOCIATION_OPTIONS = %i[class_name source through scope].freeze
+        ASSOCIATION_OPTIONS = %i[source through scope].freeze
         VALID_OPTIONS = (ASSOCIATION_OPTIONS + SHARED_OPTIONS).freeze
 
         def embedded?
@@ -19,6 +19,10 @@ module Mongoid
 
         def relation
           Proxy
+        end
+
+        def validation_default
+          false
         end
 
         # Placeholder proxy class; replaced in a later task.
