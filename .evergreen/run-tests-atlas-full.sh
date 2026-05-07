@@ -23,7 +23,7 @@ export BUNDLE_GEMFILE=gemfiles/driver_master.gemfile
 bundle install
 
 ATLAS_URI=$MONGODB_URI \
-  EXAMPLE_TIMEOUT=600 \
+  EXAMPLE_TIMEOUT=900 \
   bundle exec rspec -fd spec/mongoid/search_indexable_spec.rb \
   --format Rfc::Riff --format RspecJunitFormatter --out tmp/rspec.xml
 
