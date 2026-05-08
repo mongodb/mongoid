@@ -25,5 +25,31 @@ describe Mongoid::Errors::NoClientHosts do
         'If configuring via a mongoid.yml, ensure that within your :analytics'
       )
     end
+
+    context 'when the config contains sensitive values' do
+      let(:error) do
+        described_class.new(
+          :analytics,
+          {
+            database: 'mongoid_test',
+            password: 's3cr3t',
+            options: {
+              auto_encryption_options: {
+                kms_providers: { local: { key: 'A' * 96 } }
+              }
+            }
+          }
+        )
+      end
+
+      it 'redacts the password value' do
+        expect(error.message).not_to include('s3cr3t')
+      end
+
+      it 'redacts auto_encryption_options entirely' do
+        expect(error.message).not_to include('kms_providers')
+        expect(error.message).not_to include('A' * 96)
+      end
+    end
   end
 end

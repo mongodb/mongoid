@@ -16,7 +16,7 @@ module Mongoid
         super(
           compose_message(
             'mixed_client_configuration',
-            { name: name, config: config }
+            { name: name, config: ConfigRedactor.redact(config) }
           )
         )
       end

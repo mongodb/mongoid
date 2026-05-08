@@ -15,7 +15,7 @@ module Mongoid
         super(
           compose_message(
             'no_client_database',
-            { name: name, config: config }
+            { name: name, config: ConfigRedactor.redact(config) }
           )
         )
       end
