@@ -325,6 +325,23 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
           eager.map(&:reviewer).should eq [ nil ]
         end
       end
+
+      context 'when the *_type field has not been registered with the resolver' do
+        before do
+          Publication::Review.collection.insert_one(
+            _id: BSON::ObjectId.new,
+            summary: 'tampered',
+            reviewer_id: BSON::ObjectId.new,
+            reviewer_type: 'Kernel'
+          )
+        end
+
+        it 'raises UnrecognizedModelAlias' do
+          expect do
+            Publication::Review.includes(:reviewer).entries
+          end.to raise_error(Mongoid::Errors::UnrecognizedModelAlias)
+        end
+      end
     end
 
     context 'when the association has scope' do

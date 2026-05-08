@@ -24,10 +24,15 @@ module Mongoid
           # association is not polymorphic, all documents are retrieved in
           # a single query. If the association is polymorphic, one query is
           # issued per association target class.
+          #
+          # The polymorphic *_type field is resolved through the
+          # association's resolver to keep this path consistent with the
+          # non-eager accessor and to avoid loading arbitrary constants
+          # named in user-controlled BSON data.
           def each_loaded_document(&block)
             if @association.polymorphic?
               keys_by_type_from_docs.each do |type, keys|
-                each_loaded_document_of_class(Object.const_get(type), keys, &block)
+                each_loaded_document_of_class(@association.resolver.model_for(type), keys, &block)
               end
             else
               super
