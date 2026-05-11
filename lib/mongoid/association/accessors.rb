@@ -301,7 +301,10 @@ module Mongoid
         association.inverse_class.tap do |klass|
           klass.re_define_method(name) do |reload = false|
             value = get_relation(name, association, nil, reload)
-            value = send("build_#{name}") if value.nil? && association.autobuilding? && !without_autobuild?
+            next value unless value.nil? && !without_autobuild?
+            next association.fallback if association.fallback?
+            next send("build_#{name}") if association.autobuilding?
+
             value
           end
         end
@@ -341,6 +344,8 @@ module Mongoid
         association.inverse_class.tap do |klass|
           klass.re_define_method("#{name}=") do |object|
             without_autobuild do
+              object = nil if association.fallback? && !object.is_a?(association.relation_class)
+
               if value = get_relation(name, association, object)
                 value = __build__(name, value, association) unless value.respond_to?(:substitute)
 
