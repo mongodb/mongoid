@@ -65,7 +65,98 @@ module Mongoid
     private
 
     def _flush_entries
-      # Task 6: batch grouping and driver execution
+      _build_batches(@entries).each do |batch|
+        batch.each do |entry|
+          entry.document&.run_callbacks(:before_flush)
+        end
+
+        if batch.size == 1
+          _execute_single(batch.first)
+        else
+          _execute_bulk(batch)
+        end
+
+        batch.each do |entry|
+          _update_document_state(entry)
+          entry.document&.run_callbacks(:after_flush)
+        end
+      end
+
+      @entries.each do |entry|
+        doc = entry.document
+        next unless doc
+
+        if doc.send(:in_transaction?)
+          Mongoid::Threaded.add_modified_document(entry.session, doc)
+        else
+          doc.run_callbacks(:commit)
+        end
+      end
+    end
+
+    def _build_batches(entries)
+      batches = []
+      entries.each do |entry|
+        if batches.last&.first&.collection.equal?(entry.collection)
+          batches.last << entry
+        else
+          batches << [ entry ]
+        end
+      end
+      batches
+    end
+
+    def _execute_single(entry)
+      opts = entry.session ? { session: entry.session } : {}
+      case entry.type
+      when :insert
+        entry.collection.insert_one(entry.payload, **opts)
+      when :update
+        entry.collection.find(entry.selector).update_one(entry.payload, **opts)
+      when :update_many
+        entry.collection.find(entry.selector).update_many(entry.payload, **opts)
+      when :delete
+        entry.collection.find(entry.selector).delete_one(**opts)
+      when :delete_many
+        entry.collection.find(entry.selector).delete_many(**opts)
+      end
+    end
+
+    def _execute_bulk(batch)
+      collection = batch.first.collection
+      session = batch.map(&:session).find { |s| s }
+      opts = session ? { session: session } : {}
+      ops = batch.map { |entry| _bulk_op_for(entry) }
+      collection.bulk_write(ops, **opts)
+    end
+
+    def _bulk_op_for(entry)
+      case entry.type
+      when :insert
+        { insert_one: entry.payload }
+      when :update
+        { update_one: { filter: entry.selector, update: entry.payload } }
+      when :update_many
+        { update_many: { filter: entry.selector, update: entry.payload } }
+      when :delete
+        { delete_one: { filter: entry.selector } }
+      when :delete_many
+        { delete_many: { filter: entry.selector } }
+      end
+    end
+
+    def _update_document_state(entry)
+      doc = entry.document
+      return unless doc
+
+      case entry.type
+      when :insert
+        doc.new_record = false
+        doc.remember_storage_options!
+        doc.flag_descendants_persisted
+      when :delete
+        doc.destroyed = true
+      end
     end
   end
 end

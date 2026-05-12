@@ -168,4 +168,171 @@ describe Mongoid::Changeset do
       expect(captured).to be_a(Mongoid::Changeset)
     end
   end
+
+  describe '#flush (unit)' do
+    let(:klass) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'changeset_flush_unit_test'
+        field :name, type: String
+      end
+    end
+
+    let(:coll) { instance_double(Mongo::Collection) }
+    let(:selector) { { '_id' => BSON::ObjectId.new } }
+    let(:payload) { { 'name' => 'Alice' } }
+
+    def make_entry(type:, collection: coll, sel: selector, pay: payload, doc: nil, session: nil)
+      Mongoid::Changeset::Entry.new(
+        type: type,
+        collection: collection,
+        selector: sel,
+        payload: pay,
+        document: doc,
+        session: session
+      )
+    end
+
+    context 'with a single :insert entry' do
+      it 'calls insert_one on the collection' do
+        allow(coll).to receive(:insert_one)
+        cs.add(make_entry(type: :insert))
+        cs.flush
+        expect(coll).to have_received(:insert_one).with(payload)
+      end
+    end
+
+    context 'with a single :update entry' do
+      it 'calls find(selector).update_one(payload)' do
+        view = instance_double(Mongo::Collection::View)
+        allow(coll).to receive(:find).with(selector).and_return(view)
+        allow(view).to receive(:update_one)
+        cs.add(make_entry(type: :update))
+        cs.flush
+        expect(view).to have_received(:update_one).with(payload)
+      end
+    end
+
+    context 'with a single :delete entry' do
+      it 'calls find(selector).delete_one' do
+        view = instance_double(Mongo::Collection::View)
+        allow(coll).to receive(:find).with(selector).and_return(view)
+        allow(view).to receive(:delete_one)
+        cs.add(make_entry(type: :delete, pay: nil))
+        cs.flush
+        expect(view).to have_received(:delete_one)
+      end
+    end
+
+    context 'with two consecutive same-collection entries' do
+      it 'calls bulk_write once' do
+        allow(coll).to receive(:bulk_write)
+        cs.add(make_entry(type: :insert, pay: { 'name' => 'Alice' }))
+        cs.add(make_entry(type: :insert, pay: { 'name' => 'Bob' }))
+        cs.flush
+        expect(coll).to have_received(:bulk_write).once
+      end
+
+      it 'does not call insert_one' do
+        allow(coll).to receive(:bulk_write)
+        allow(coll).to receive(:insert_one)
+        cs.add(make_entry(type: :insert, pay: { 'name' => 'Alice' }))
+        cs.add(make_entry(type: :insert, pay: { 'name' => 'Bob' }))
+        cs.flush
+        expect(coll).not_to have_received(:insert_one)
+      end
+    end
+
+    context 'with entries from two different collections' do
+      let(:coll2) { instance_double(Mongo::Collection) }
+
+      it 'makes two separate driver calls, not a cross-collection bulk_write' do
+        allow(coll).to receive(:insert_one)
+        allow(coll2).to receive(:insert_one)
+        cs.add(make_entry(type: :insert, collection: coll))
+        cs.add(make_entry(type: :insert, collection: coll2))
+        cs.flush
+        expect(coll).to have_received(:insert_one).once
+        expect(coll2).to have_received(:insert_one).once
+      end
+
+      it 'does not call bulk_write' do
+        allow(coll).to receive(:insert_one)
+        allow(coll).to receive(:bulk_write)
+        allow(coll2).to receive(:insert_one)
+        allow(coll2).to receive(:bulk_write)
+        cs.add(make_entry(type: :insert, collection: coll))
+        cs.add(make_entry(type: :insert, collection: coll2))
+        cs.flush
+        expect(coll).not_to have_received(:bulk_write)
+        expect(coll2).not_to have_received(:bulk_write)
+      end
+    end
+
+    context 'before_flush callback' do
+      it 'fires before the driver call' do
+        log = []
+        doc = klass.new(name: 'Alice')
+        klass.before_flush { log << :callback }
+        allow(coll).to receive(:insert_one) { log << :driver }
+        cs.add(make_entry(type: :insert, doc: doc))
+        cs.flush
+        expect(log).to eq(%i[callback driver])
+      end
+    end
+
+    context 'after_flush callback' do
+      it 'fires after the driver call' do
+        log = []
+        doc = klass.new(name: 'Alice')
+        klass.after_flush { log << :callback }
+        allow(coll).to receive(:insert_one) { log << :driver }
+        cs.add(make_entry(type: :insert, doc: doc))
+        cs.flush
+        expect(log).to eq(%i[driver callback])
+      end
+    end
+
+    context 'on driver error' do
+      it 'propagates the exception' do
+        allow(coll).to receive(:insert_one).and_raise(Mongo::Error::OperationFailure.new('write failed'))
+        cs.add(make_entry(type: :insert))
+        expect { cs.flush }.to raise_error(Mongo::Error::OperationFailure)
+      end
+
+      it 'does not mark the changeset terminated when the error escapes flush directly' do
+        allow(coll).to receive(:insert_one).and_raise(Mongo::Error::OperationFailure.new('write failed'))
+        cs.add(make_entry(type: :insert))
+        begin
+          cs.flush
+        rescue Mongo::Error::OperationFailure
+          nil
+        end
+        expect(cs).not_to be_terminated
+      end
+    end
+
+    context 'document state updates' do
+      it 'marks a document with :insert entry as not new_record after flush' do
+        doc = klass.new(name: 'Alice')
+        expect(doc.new_record?).to be(true)
+        allow(coll).to receive(:insert_one)
+        cs.add(make_entry(type: :insert, doc: doc))
+        cs.flush
+        expect(doc.new_record?).to be(false)
+      end
+
+      it 'marks a document with :delete entry as destroyed after flush' do
+        doc = klass.new(name: 'Alice')
+        doc.new_record = false
+        view = instance_double(Mongo::Collection::View)
+        allow(coll).to receive(:find).with(selector).and_return(view)
+        allow(view).to receive(:delete_one)
+        cs.add(make_entry(type: :delete, pay: nil, doc: doc))
+        cs.flush
+        expect(doc.destroyed?).to be(true)
+      end
+    end
+  end
 end
