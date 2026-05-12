@@ -143,8 +143,10 @@ module Mongoid
               )
             )
 
-            # Conflict updates: each conflicting group becomes its own entry.
-            # (See the MONGOID-4982 comment in the original code for context.)
+            # Conflict updates are applied in separate entries to avoid MongoDB
+            # path conflicts (e.g. writing foo.0.bars while also adding a new foo).
+            # Changes are grouped by root key and popped round-robin so each
+            # batch contains at most one change per conflicting path. See MONGOID-4982.
             conflicts.each_pair do |modifier, changes|
               conflicting_change_groups = changes.group_by { |key, _| key.split('.', 2).first }.values
               while batched = conflicting_change_groups.map(&:pop).compact.to_h.presence
@@ -161,9 +163,6 @@ module Mongoid
               end
             end
           end
-
-          # Dirty state cleared at stage time (same rationale as Creatable).
-          move_changes
         end
       end
 
