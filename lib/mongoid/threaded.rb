@@ -28,6 +28,8 @@ module Mongoid
 
     TOUCH_MERGED_KEY = 'touch-merged'
 
+    CURRENT_CHANGESET_KEY = 'current-changeset'
+
     STACK_KEYS = Hash.new do |hash, key|
       hash[key] = "#{key}-stack"
     end
@@ -294,6 +296,28 @@ module Mongoid
     # @return [ String | Symbol ] The override.
     def client_override=(name)
       set(CLIENT_OVERRIDE_KEY, name)
+    end
+
+    # Get the current changeset for this thread or fiber.
+    #
+    # @example Get the current changeset.
+    #   Threaded.current_changeset
+    #
+    # @return [ Mongoid::Changeset | nil ] The active changeset, or nil.
+    def current_changeset
+      get(CURRENT_CHANGESET_KEY)
+    end
+
+    # Set (or clear) the current changeset for this thread or fiber.
+    #
+    # @example Set the current changeset.
+    #   Threaded.current_changeset = changeset
+    #
+    # @param [ Mongoid::Changeset | nil ] changeset The changeset to set.
+    #
+    # @return [ Mongoid::Changeset | nil ] The changeset.
+    def current_changeset=(changeset)
+      set(CURRENT_CHANGESET_KEY, changeset)
     end
 
     # Get the current Mongoid scope.
