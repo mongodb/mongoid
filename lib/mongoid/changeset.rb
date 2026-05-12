@@ -110,18 +110,19 @@ module Mongoid
     end
 
     def _execute_single(entry)
-      opts = entry.session ? { session: entry.session } : {}
+      session_opts = entry.session ? { session: entry.session } : {}
+      driver_opts = entry.opts ? session_opts.merge(entry.opts) : session_opts
       case entry.type
       when :insert
-        entry.collection.insert_one(entry.payload, **opts)
+        entry.collection.insert_one(entry.payload, **driver_opts)
       when :update, :embedded_insert, :embedded_delete
-        entry.collection.find(entry.selector).update_one(entry.payload, **opts)
+        entry.collection.find(entry.selector).update_one(entry.payload, **driver_opts)
       when :update_many
-        entry.collection.find(entry.selector).update_many(entry.payload, **opts)
+        entry.collection.find(entry.selector).update_many(entry.payload, **driver_opts)
       when :delete
-        entry.collection.find(entry.selector).delete_one(**opts)
+        entry.collection.find(entry.selector).delete_one(**driver_opts)
       when :delete_many
-        entry.collection.find(entry.selector).delete_many(**opts)
+        entry.collection.find(entry.selector).delete_many(**driver_opts)
       end
     end
 
@@ -134,17 +135,18 @@ module Mongoid
     end
 
     def _bulk_op_for(entry)
+      inner_opts = entry.opts&.reject { |k, _| k == :session } || {}
       case entry.type
       when :insert
         { insert_one: entry.payload }
       when :update, :embedded_insert, :embedded_delete
-        { update_one: { filter: entry.selector, update: entry.payload } }
+        { update_one: { filter: entry.selector, update: entry.payload }.merge(inner_opts) }
       when :update_many
-        { update_many: { filter: entry.selector, update: entry.payload } }
+        { update_many: { filter: entry.selector, update: entry.payload }.merge(inner_opts) }
       when :delete
-        { delete_one: { filter: entry.selector } }
+        { delete_one: { filter: entry.selector }.merge(inner_opts) }
       when :delete_many
-        { delete_many: { filter: entry.selector } }
+        { delete_many: { filter: entry.selector }.merge(inner_opts) }
       end
     end
 

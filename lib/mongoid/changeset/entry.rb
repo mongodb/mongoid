@@ -17,6 +17,7 @@ module Mongoid
       :payload,     # Hash | nil
       :document,    # Mongoid::Document | nil (nil for criteria-level entries)
       :session,     # Mongo::Session | nil
+      :opts,        # Hash | nil - driver-level options (e.g. array_filters)
       keyword_init: true
     )
   end

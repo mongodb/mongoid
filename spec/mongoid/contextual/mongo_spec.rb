@@ -279,8 +279,8 @@ describe Mongoid::Contextual::Mongo do
           expect(Band.count).to eq(1)
         end
 
-        it 'returns the number of documents deleted' do
-          expect(deleted).to eq(1)
+        it 'returns nil' do
+          expect(deleted).to be_nil
         end
 
         context 'when the criteria has a collation' do
@@ -304,8 +304,8 @@ describe Mongoid::Contextual::Mongo do
             expect(Band.count).to eq(1)
           end
 
-          it 'returns the number of documents deleted' do
-            expect(deleted).to eq(1)
+          it 'returns nil' do
+            expect(deleted).to be_nil
           end
         end
       end
@@ -339,8 +339,8 @@ describe Mongoid::Contextual::Mongo do
           end
         end
 
-        it 'returns 0' do
-          expect(deleted).to eq(0)
+        it 'returns nil' do
+          expect(deleted).to be_nil
         end
       end
     end
