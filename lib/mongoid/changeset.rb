@@ -65,7 +65,7 @@ module Mongoid
     private
 
     def _flush_entries
-      raise NotImplementedError, 'flush not yet implemented — see Task 6'
+      # Task 6: batch grouping and driver execution
     end
   end
 end

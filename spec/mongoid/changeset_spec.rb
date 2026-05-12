@@ -120,18 +120,12 @@ describe Mongoid::Changeset do
     it 'does not discard on error when nested (inner scope)' do
       cs.run do
         cs.build do
-          # This inner-scope error should NOT trigger discard
-          # because depth > 0 inside build
-
           raise 'inner error'
         rescue RuntimeError
           # swallowed
         end
-        # Should still be usable after inner error was swallowed
         expect(cs).not_to be_terminated
       end
-    rescue NotImplementedError
-      # Expected — flush not yet implemented
     end
   end
 
@@ -140,34 +134,22 @@ describe Mongoid::Changeset do
 
     it 'creates a new changeset if none is active' do
       cs = nil
-      begin
-        Mongoid.changeset { cs = Mongoid.current_changeset }
-      rescue NotImplementedError
-        # flush stub — lifecycle still exercisable
-      end
+      Mongoid.changeset { cs = Mongoid.current_changeset }
       expect(cs).to be_a(Mongoid::Changeset)
     end
 
     it 'reuses an existing changeset when nested' do
       outer_cs = nil
       inner_cs = nil
-      begin
-        Mongoid.changeset do
-          outer_cs = Mongoid.current_changeset
-          Mongoid.changeset { inner_cs = Mongoid.current_changeset }
-        end
-      rescue NotImplementedError
-        # flush not yet implemented — still verifiable
+      Mongoid.changeset do
+        outer_cs = Mongoid.current_changeset
+        Mongoid.changeset { inner_cs = Mongoid.current_changeset }
       end
       expect(inner_cs).to equal(outer_cs)
     end
 
     it 'clears current_changeset after the block exits' do
-      begin
-        Mongoid.changeset { nil }
-      rescue NotImplementedError
-        # expected
-      end
+      Mongoid.changeset { nil }
       expect(Mongoid.current_changeset).to be_nil
     end
 
@@ -182,11 +164,7 @@ describe Mongoid::Changeset do
 
     it 'exposes Mongoid.current_changeset inside the block' do
       captured = nil
-      begin
-        Mongoid.changeset { captured = Mongoid.current_changeset }
-      rescue NotImplementedError
-        # expected
-      end
+      Mongoid.changeset { captured = Mongoid.current_changeset }
       expect(captured).to be_a(Mongoid::Changeset)
     end
   end
