@@ -28,7 +28,7 @@ require 'mongoid/tasks/database'
 require 'mongoid/tasks/encryption'
 require 'mongoid/warnings'
 require 'mongoid/utils'
-require 'mongoid/changeset/entry'
+require 'mongoid/changeset'
 
 # If we are using Rails then we will include the Mongoid railtie.
 # This configures initializers required to integrate Mongoid with Rails.
