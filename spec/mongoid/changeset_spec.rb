@@ -134,4 +134,60 @@ describe Mongoid::Changeset do
       # Expected — flush not yet implemented
     end
   end
+
+  describe 'Mongoid.changeset' do
+    after { Mongoid::Threaded.current_changeset = nil }
+
+    it 'creates a new changeset if none is active' do
+      cs = nil
+      begin
+        Mongoid.changeset { cs = Mongoid.current_changeset }
+      rescue NotImplementedError
+        # flush stub — lifecycle still exercisable
+      end
+      expect(cs).to be_a(Mongoid::Changeset)
+    end
+
+    it 'reuses an existing changeset when nested' do
+      outer_cs = nil
+      inner_cs = nil
+      begin
+        Mongoid.changeset do
+          outer_cs = Mongoid.current_changeset
+          Mongoid.changeset { inner_cs = Mongoid.current_changeset }
+        end
+      rescue NotImplementedError
+        # flush not yet implemented — still verifiable
+      end
+      expect(inner_cs).to equal(outer_cs)
+    end
+
+    it 'clears current_changeset after the block exits' do
+      begin
+        Mongoid.changeset { nil }
+      rescue NotImplementedError
+        # expected
+      end
+      expect(Mongoid.current_changeset).to be_nil
+    end
+
+    it 'clears current_changeset after a block error' do
+      begin
+        Mongoid.changeset { raise 'boom' }
+      rescue StandardError
+        nil
+      end
+      expect(Mongoid.current_changeset).to be_nil
+    end
+
+    it 'exposes Mongoid.current_changeset inside the block' do
+      captured = nil
+      begin
+        Mongoid.changeset { captured = Mongoid.current_changeset }
+      rescue NotImplementedError
+        # expected
+      end
+      expect(captured).to be_a(Mongoid::Changeset)
+    end
+  end
 end

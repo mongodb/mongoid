@@ -108,6 +108,30 @@ module Mongoid
     Clients.reconnect
   end
 
+  # Returns the current active changeset for this thread or fiber, or nil.
+  #
+  # @return [ Changeset | nil ] The active changeset.
+  def current_changeset
+    Threaded.current_changeset
+  end
+
+  # Creates or reuses the current changeset, yields the block within it,
+  # and flushes when the outermost scope exits. When nested inside an
+  # existing changeset block, the inner call accumulates without flushing.
+  #
+  # @example Explicit outer scope — flush happens once at block exit.
+  #   Mongoid.changeset do
+  #     parent.save
+  #     child.save
+  #   end
+  def changeset(&block)
+    outermost = current_changeset.nil?
+    cs = current_changeset || (Threaded.current_changeset = Changeset.new)
+    cs.run(&block)
+  ensure
+    Threaded.current_changeset = nil if outermost
+  end
+
   # Convenience method for getting a named client.
   #
   # @example Get a named client.
