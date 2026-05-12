@@ -21,7 +21,9 @@ module Mongoid
       # @return [ true | false ] True if success, false if not.
       def save(options = {})
         if new_record?
-          !insert(options).new_record?
+          result = insert(options)
+          # staged? handles the case where the insert was deferred via Mongoid.changeset{}
+          !result.new_record? || result.staged?
         else
           update_document(options)
         end
