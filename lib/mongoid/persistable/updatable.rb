@@ -104,11 +104,13 @@ module Mongoid
         process_flagged_destroys
         update_children = cascadable_children(:update)
         process_touch_option(options, update_children) do
-          run_all_callbacks_for_update(update_children) do
-            result = yield(self)
-            self.previously_new_record = false
-            post_process_persist(result, options)
-            true
+          Mongoid.changeset do
+            run_all_callbacks_for_update(update_children) do
+              result = yield(self)
+              self.previously_new_record = false
+              post_process_persist(result, options)
+              true
+            end
           end
         end
       end
@@ -127,36 +129,41 @@ module Mongoid
         prepare_update(options) do
           updates, conflicts = init_atomic_updates
           unless updates.empty?
-            coll = collection(_root)
             selector = atomic_selector
+            payload = positionally(selector, updates)
 
-            # TODO: DRIVERS-716: If a new "Bulk Write" API is introduced, it may
-            # become possible to handle the writes for conflicts in the following call.
-            coll.find(selector).update_one(positionally(selector, updates), session: _session)
+            Mongoid.current_changeset.add(
+              Changeset::Entry.new(
+                type: :update,
+                collection: collection(_root),
+                selector: selector,
+                payload: payload,
+                document: self,
+                session: _session
+              )
+            )
 
-            # The following code applies updates which would cause
-            # path conflicts in MongoDB, for example when changing attributes
-            # of foo.0.bars while adding another foo. Each conflicting update
-            # is applied using its own write.
+            # Conflict updates: each conflicting group becomes its own entry.
+            # (See the MONGOID-4982 comment in the original code for context.)
             conflicts.each_pair do |modifier, changes|
-              # Group the changes according to their root key which is
-              # the top-level association name.
-              # This handles at least the cases described in MONGOID-4982.
-              conflicting_change_groups = changes.group_by do |key, _|
-                key.split('.', 2).first
-              end.values
-
-              # Apply changes in batches. Pop one change from each
-              # field-conflict group round-robin until all changes
-              # have been applied.
-              while batched_changes = conflicting_change_groups.map(&:pop).compact.to_h.presence
-                coll.find(selector).update_one(
-                  positionally(selector, modifier => batched_changes),
-                  session: _session
+              conflicting_change_groups = changes.group_by { |key, _| key.split('.', 2).first }.values
+              while batched = conflicting_change_groups.map(&:pop).compact.to_h.presence
+                Mongoid.current_changeset.add(
+                  Changeset::Entry.new(
+                    type: :update,
+                    collection: collection(_root),
+                    selector: selector,
+                    payload: positionally(selector, modifier => batched),
+                    document: self,
+                    session: _session
+                  )
                 )
               end
             end
           end
+
+          # Dirty state cleared at stage time (same rationale as Creatable).
+          move_changes
         end
       end
 
@@ -209,17 +216,15 @@ module Mongoid
       # @param [ Array<Document> ] update_children The children that the
       #   :update callbacks will be executed on.
       def run_all_callbacks_for_update(update_children, &block)
-        run_callbacks(:commit, with_children: true, skip_if: -> { in_transaction? }) do
-          run_callbacks(:save, with_children: false) do
-            run_callbacks(:update, with_children: false) do
-              run_callbacks(:persist_parent, with_children: false) do
-                _mongoid_run_child_callbacks(:save) do
-                  _mongoid_run_child_callbacks(:update, children: update_children, &block) # _mongoid_run_child_callbacks :update
-                end # _mongoid_run_child_callbacks :save
-              end # :persist_parent
-            end # :update
-          end # :save
-        end # :commit
+        run_callbacks(:save, with_children: false) do
+          run_callbacks(:update, with_children: false) do
+            run_callbacks(:persist_parent, with_children: false) do
+              _mongoid_run_child_callbacks(:save) do
+                _mongoid_run_child_callbacks(:update, children: update_children, &block)
+              end
+            end
+          end
+        end
       end
     end
   end
