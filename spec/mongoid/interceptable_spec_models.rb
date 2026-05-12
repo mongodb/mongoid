@@ -49,7 +49,7 @@ module InterceptableSpec
   end
 
   module RootInsertable
-    def insert_as_root
+    def _stage_insert_as_root
       @callback_registry&.record_call(self.class, :insert_into_database)
       super
     end

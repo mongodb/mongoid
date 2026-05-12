@@ -212,7 +212,7 @@ module Mongoid
         define_method(method_name) do
           without_autobuild do
             # If the touch updates were already merged into an atomic
-            # insert (see Persistable::Creatable#insert_as_embedded),
+            # insert (see Persistable::Creatable#_stage_insert_as_embedded),
             # skip the redundant persistence but still run :touch
             # callbacks and clean up dirty tracking.
             if Threaded.touch_merged?(self)
