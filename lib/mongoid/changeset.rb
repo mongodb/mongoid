@@ -82,22 +82,24 @@ module Mongoid
         end
       end
 
-      @entries.each do |entry|
-        doc = entry.document
-        next unless doc
+      @entries.each { |entry| _dispatch_commit(entry) }
+    end
 
-        if doc.send(:in_transaction?)
-          Mongoid::Threaded.add_modified_document(entry.session, doc)
-        else
-          doc.run_callbacks(:commit)
-        end
+    def _dispatch_commit(entry)
+      doc = entry.document
+      return unless doc
+
+      if entry.session&.in_transaction?
+        Mongoid::Threaded.add_modified_document(entry.session, doc)
+      else
+        doc.run_callbacks(:commit)
       end
     end
 
     def _build_batches(entries)
       batches = []
       entries.each do |entry|
-        if batches.last&.first&.collection.equal?(entry.collection)
+        if batches.last&.first&.collection == entry.collection
           batches.last << entry
         else
           batches << [ entry ]

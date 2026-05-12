@@ -226,6 +226,10 @@ describe Mongoid::Changeset do
     end
 
     context 'with two consecutive same-collection entries' do
+      # Both entries use the same `coll` object; a single Ruby object is equal
+      # to itself by both `==` and `equal?`. The implementation uses `==`
+      # (value equality), which is what matters in production where
+      # `client[name]` returns a fresh Collection object on every call.
       it 'calls bulk_write once' do
         allow(coll).to receive(:bulk_write)
         cs.add(make_entry(type: :insert, pay: { 'name' => 'Alice' }))
