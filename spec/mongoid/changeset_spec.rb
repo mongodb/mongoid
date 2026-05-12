@@ -127,6 +127,11 @@ describe Mongoid::Changeset do
         expect(cs).not_to be_terminated
       end
     end
+
+    it 'returns the block return value' do
+      val = cs.run { 42 }
+      expect(val).to eq(42)
+    end
   end
 
   describe 'Mongoid.changeset' do

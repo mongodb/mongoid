@@ -26,8 +26,9 @@ module Mongoid
     def run(&block)
       raise Errors::InvalidOperation.new('Changeset is terminated') if terminated?
 
-      build(&block)
+      result = build(&block)
       flush if @depth.zero?
+      result
     rescue StandardError
       discard if @depth.zero?
       raise

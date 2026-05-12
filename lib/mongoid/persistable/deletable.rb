@@ -59,10 +59,18 @@ module Mongoid
         _parent.remove_child(self) if notifying_parent?(options)
         if _parent.persisted?
           selector = _parent.atomic_selector
-          _root.collection.find(selector).update_one(
-            positionally(selector, atomic_deletes),
-            session: _session
-          )
+          Mongoid.changeset do
+            Mongoid.current_changeset.add(
+              Changeset::Entry.new(
+                type: :update,
+                collection: _root.collection,
+                selector: selector,
+                payload: positionally(selector, atomic_deletes),
+                document: self,
+                session: _session
+              )
+            )
+          end
         end
         true
       end
@@ -76,7 +84,18 @@ module Mongoid
       #
       # @return [ true ] If the document was removed.
       def delete_as_root
-        collection.find(atomic_selector).delete_one(session: _session)
+        Mongoid.changeset do
+          Mongoid.current_changeset.add(
+            Changeset::Entry.new(
+              type: :delete,
+              collection: collection,
+              selector: atomic_selector,
+              payload: nil,
+              document: self,
+              session: _session
+            )
+          )
+        end
         true
       end
 

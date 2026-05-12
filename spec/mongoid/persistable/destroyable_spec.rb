@@ -74,6 +74,17 @@ describe Mongoid::Persistable::Destroyable do
       end
     end
 
+    context 'inside a Mongoid.changeset block' do
+      it 'defers the delete until block exit' do
+        person = Person.create!(title: 'Mr')
+        Mongoid.changeset do
+          person.destroy
+          expect(Person.where(id: person.id).first).not_to be_nil
+        end
+        expect(Person.where(id: person.id).first).to be_nil
+      end
+    end
+
     context 'when destroying an embedded document' do
       let(:address) do
         person.addresses.build(street: 'Bond Street')
