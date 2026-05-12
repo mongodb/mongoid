@@ -145,10 +145,10 @@ describe Mongoid::Persistable::Unsettable do
         Person.create!(title: 'sir', age: 30)
       end
 
-      it 'marks a dirty change for the unset fields' do
+      it 'stages the operation and clears dirty tracking immediately' do
         person.atomically do
           person.unset :title
-          expect(person.changes).to eq({ 'title' => [ 'sir', nil ] })
+          expect(person.changes).to be_empty
         end
       end
     end

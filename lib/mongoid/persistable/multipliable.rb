@@ -22,7 +22,7 @@ module Mongoid
             factor = value.is_a?(BigDecimal) ? value.to_f : value
             current = attributes[field]
             new_value = (current || 0) * factor
-            process_attribute field, new_value if executing_atomically?
+            process_attribute field, new_value
             attributes[field] = new_value
             ops[atomic_attribute_name(field)] = factor
           end

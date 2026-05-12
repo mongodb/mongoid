@@ -45,79 +45,43 @@ module Mongoid
     LIST_OPERATIONS = [ '$addToSet', '$push', '$pull', '$pullAll' ].freeze
 
     # Execute operations atomically (in a single database call) for everything
-    # that would happen inside the block. This method supports nesting further
-    # calls to atomically, which will behave according to the options described
-    # below.
+    # that would happen inside the block. When nested, inner calls merge into
+    # the outermost changeset and flush together when that outermost block exits.
     #
-    # An option join_context can be given which, when true, will merge the
-    # operations declared by the given block with the atomically block wrapping
-    # the current invocation for the same document, if one exists. If this
-    # block or any other block sharing the same context raises before
-    # persisting, then all the operations of that context will not be
-    # persisted, and will also be reset in memory.
-    #
-    # When join_context is false, the given block of operations will be
-    # persisted independently of other contexts. Failures in other contexts will
-    # not affect this one, so long as this block was able to run and persist
-    # changes.
-    #
-    # The default value of join_context is set by the global configuration
-    # option join_contexts, whose own default is false.
+    # Passing join_context: false persists operations independently — they are
+    # not affected by a failure in the enclosing block. This usage is deprecated;
+    # instead call save outside any enclosing changeset scope.
     #
     # @example Execute the operations atomically.
     #   document.atomically do
     #     document.set(name: "Tool").inc(likes: 10)
     #   end
     #
-    # @example Execute some inner operations atomically, but independently from the outer operations.
-    #
+    # @example Execute some inner operations independently (deprecated).
     #   document.atomically do
     #     document.inc likes: 10
-    #     document.atomically join_context: false do
-    #       # The following is persisted to the database independently.
+    #     document.atomically(join_context: false) do
+    #       # Persisted immediately, unaffected by outer failure.
     #       document.unset :origin
     #     end
-    #     document.atomically join_context: true do
-    #       # The following is persisted along with the other outer operations.
-    #       document.inc member_count: 3
-    #     end
-    #     document.set name: "Tool"
     #   end
     #
-    # @param [ true | false ] join_context Join the context (i.e. merge
-    #   declared atomic operations) of the atomically block wrapping this one
-    #   for the same document, if one exists.
+    # @param [ true | false | nil ] join_context When false, operations persist
+    #   independently of any enclosing changeset (deprecated). Any other value
+    #   joins the enclosing changeset (the default).
     #
-    # @return [ true | false ] If the operation succeeded.
+    # @return [ true ] Always true.
     def atomically(join_context: nil)
-      join_context = Mongoid.join_contexts if join_context.nil?
-      call_depth = @atomic_depth ||= 0
-      has_own_context = call_depth.zero? || !join_context
-      @atomic_updates_to_execute_stack ||= []
-      _mongoid_push_atomic_context if has_own_context
-
-      if block_given?
-        @atomic_depth += 1
-        yield(self)
-        @atomic_depth -= 1
+      if join_context == false
+        Mongoid::Warnings.warn_join_context_false_deprecated
+        if block_given?
+          doc = self
+          _atomically_independent { yield doc }
+        end
+      elsif block_given?
+        Mongoid.changeset { yield self }
       end
-
-      if has_own_context
-        persist_atomic_operations @atomic_context
-        _mongoid_remove_atomic_context_changes
-      end
-
       true
-    rescue StandardError => e
-      _mongoid_reset_atomic_context_changes! if has_own_context
-      raise e
-    ensure
-      _mongoid_pop_atomic_context if has_own_context
-
-      if call_depth.zero?
-        @atomic_depth = nil
-        @atomic_updates_to_execute_stack = nil
-      end
     end
 
     # Raise an error if validation failed.
@@ -144,18 +108,6 @@ module Mongoid
 
     private
 
-    # Are we executing an atomically block on the current document?
-    #
-    # @api private
-    #
-    # @example Are we executing atomically?
-    #   document.executing_atomically?
-    #
-    # @return [ true | false ] If we are current executing atomically.
-    def executing_atomically?
-      !@atomic_updates_to_execute_stack.nil?
-    end
-
     # Post process the persistence operation.
     #
     # @api private
@@ -177,27 +129,40 @@ module Mongoid
     end
 
     # Prepare an atomic persistence operation. Yields an empty hash to be sent
-    # to the update.
+    # to the update, then stages the result in the current changeset.
     #
     # @api private
     #
     # @example Prepare the atomic operation.
-    #   document.prepare_atomic_operation do |coll, selector, opts|
+    #   document.prepare_atomic_operation do |ops|
     #     ...
     #   end
     #
-    # @return [ Object ] The result of the operation.
+    # @return [ Document ] self.
     def prepare_atomic_operation
       raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
 
       operations = yield({})
-      persist_or_delay_atomic_operation(operations)
+      return self unless operations && !operations.empty?
+
+      selector = atomic_selector
+      Mongoid.changeset do
+        Mongoid.current_changeset.add(
+          Changeset::Entry.new(
+            type: :update,
+            collection: collection(_root),
+            selector: selector,
+            payload: positionally(selector, operations),
+            document: self,
+            session: _session
+          )
+        )
+      end
       self
     end
 
-    # Process the atomic operations - this handles the common behavior of
-    # iterating through each op, getting the aliased field name, and removing
-    # appropriate dirty changes.
+    # Process the atomic operations — iterates each op, resolves the aliased
+    # field name, yields, and removes the dirty change.
     #
     # @api private
     #
@@ -213,95 +178,12 @@ module Mongoid
       operations.each do |field, value|
         access = database_field_name(field)
         yield(access, value)
-        remove_change(access) unless executing_atomically?
+        remove_change(access)
       end
     end
 
-    # Remove the dirty changes for all fields changed in the current atomic
-    # context.
-    #
-    # @api private
-    #
-    # @example Remove the current atomic context's dirty changes.
-    #   document._mongoid_remove_atomic_context_changes
-    def _mongoid_remove_atomic_context_changes
-      return unless executing_atomically?
-
-      _mongoid_atomic_context_changed_fields.each { |f| remove_change f }
-    end
-
-    # Reset the attributes for all fields changed in the current atomic
-    # context.
-    #
-    # @api private
-    #
-    # @example Reset the current atomic context's changed attributes.
-    #   document._mongoid_reset_atomic_context_changes!
-    def _mongoid_reset_atomic_context_changes!
-      return unless executing_atomically?
-
-      _mongoid_atomic_context_changed_fields.each { |f| reset_attribute! f }
-    end
-
-    # Push a new atomic context onto the stack.
-    #
-    # @api private
-    #
-    # @example Push a new atomic context onto the stack.
-    #   document._mongoid_push_atomic_context
-    def _mongoid_push_atomic_context
-      return unless executing_atomically?
-
-      @atomic_context = {}
-      @atomic_updates_to_execute_stack << @atomic_context
-    end
-
-    # Pop an atomic context off the stack.
-    #
-    # @api private
-    #
-    # @example Pop an atomic context off the stack.
-    #   document._mongoid_pop_atomic_context
-    def _mongoid_pop_atomic_context
-      return unless executing_atomically?
-
-      @atomic_updates_to_execute_stack.pop
-      @atomic_context = @atomic_updates_to_execute_stack.last
-    end
-
-    # Return the current atomic context's changed fields.
-    #
-    # @api private
-    #
-    # @example Return the current atomic context's changed fields.
-    #   document._mongoid_atomic_context_changed_fields
-    #
-    # @return [ Array ] The changed fields.
-    def _mongoid_atomic_context_changed_fields
-      @atomic_context.values.flat_map(&:keys)
-    end
-
-    # If we are in an atomically block, add the operations to the delayed group,
-    # otherwise persist immediately.
-    #
-    # @api private
-    #
-    # @example Persist immediately or delay the operations.
-    #   document.persist_or_delay_atomic_operation(ops)
-    #
-    # @param [ Hash ] operation The operation.
-    def persist_or_delay_atomic_operation(operation)
-      if executing_atomically?
-        operation.each do |(name, hash)|
-          @atomic_context[name] ||= {}
-          @atomic_context[name].merge!(hash)
-        end
-      else
-        persist_atomic_operations(operation)
-      end
-    end
-
-    # Persist the atomic operations.
+    # Persist the atomic operations by staging an update entry in the current
+    # changeset. Called by touchable on the root document.
     #
     # @api private
     #
@@ -313,7 +195,32 @@ module Mongoid
       return unless persisted? && operations && !operations.empty?
 
       selector = atomic_selector
-      _root.collection.find(selector).update_one(positionally(selector, operations), session: _session)
+      Mongoid.changeset do
+        Mongoid.current_changeset.add(
+          Changeset::Entry.new(
+            type: :update,
+            collection: collection(_root),
+            selector: selector,
+            payload: positionally(selector, operations),
+            document: self,
+            session: _session
+          )
+        )
+      end
+    end
+
+    # Run the given block in an independent changeset, temporarily hiding any
+    # enclosing changeset so that the inner block flushes immediately on exit.
+    #
+    # @api private
+    def _atomically_independent(&block)
+      outer = Mongoid.current_changeset
+      Mongoid::Threaded.current_changeset = nil
+      begin
+        Mongoid.changeset(&block)
+      ensure
+        Mongoid::Threaded.current_changeset = outer
+      end
     end
   end
 end

@@ -137,10 +137,10 @@ describe Mongoid::Persistable::Logical do
         Person.create!(age: 10, score: 100)
       end
 
-      it 'marks a dirty change for the modified fields' do
+      it 'stages the operation and clears dirty tracking immediately' do
         person.atomically do
           person.bit age: { and: 6 }, score: { or: 122 }
-          expect(person.changes).to eq({ 'age' => [ 10, 2 ], 'score' => [ 100, 126 ] })
+          expect(person.changes).to be_empty
         end
       end
     end

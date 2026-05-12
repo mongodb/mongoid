@@ -109,10 +109,10 @@ describe Mongoid::Persistable::Pullable do
         Person.create!(test_array: [ 1, 1, 2, 3 ])
       end
 
-      it 'marks a dirty change for the pulled fields' do
+      it 'stages the operation and clears dirty tracking immediately' do
         person.atomically do
           person.pull test_array: 1
-          expect(person.changes).to eq({ 'test_array' => [ [ 1, 1, 2, 3 ], [ 2, 3 ] ] })
+          expect(person.changes).to be_empty
         end
       end
     end
@@ -261,10 +261,10 @@ describe Mongoid::Persistable::Pullable do
         Person.create!(test_array: [ 1, 1, 2, 3, 4 ])
       end
 
-      it 'marks a dirty change for the pulled fields' do
+      it 'stages the operation and clears dirty tracking immediately' do
         person.atomically do
           person.pull_all test_array: [ 1, 2 ]
-          expect(person.changes).to eq({ 'test_array' => [ [ 1, 1, 2, 3, 4 ], [ 3, 4 ] ] })
+          expect(person.changes).to be_empty
         end
       end
     end

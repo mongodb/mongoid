@@ -22,8 +22,7 @@ module Mongoid
             increment = value.is_a?(BigDecimal) ? value.to_f : value
             current = attributes[field]
             new_value = (current || 0) + increment
-            process_attribute field, new_value if executing_atomically?
-            attributes[field] = new_value
+            process_attribute field, new_value
             ops[atomic_attribute_name(field)] = increment
           end
           { '$inc' => ops } unless ops.empty?

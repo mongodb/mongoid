@@ -36,5 +36,8 @@ module Mongoid
     warning :autosave_saves_unchanged_documents, "Autosave associations are currently configured to save documents even if they haven't changed. " \
                                                  'This legacy behavior is deprecated. Set Mongoid.autosave_saves_unchanged_documents to false to ' \
                                                  'skip saving unchanged documents in autosave associations.'
+    warning :join_context_false_deprecated,
+            'atomically(join_context: false) is deprecated. ' \
+            'Use save outside any enclosing changeset scope instead.'
   end
 end

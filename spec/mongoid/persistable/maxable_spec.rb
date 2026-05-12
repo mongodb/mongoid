@@ -123,11 +123,10 @@ describe Mongoid::Persistable::Maxable do
       context 'when executing atomically' do
         let(:band) { Band.create!(member_count: 10, name: 'Manhattan Transfer') }
 
-        it 'marks a dirty change for the modified fields' do
+        it 'stages the operation and clears dirty tracking immediately' do
           band.atomically do
             band.send(max_method, member_count: 15, name: 'Manhattan Transfer')
-            expect(band.changes)
-              .to eq({ 'member_count' => [ 10, 15 ] })
+            expect(band.changes).to be_empty
           end
         end
       end

@@ -20,11 +20,8 @@ module Mongoid
         prepare_atomic_operation do |ops|
           fields.flatten.each do |field|
             normalized = database_field_name(field)
-            if executing_atomically?
-              process_attribute normalized, nil
-            else
-              attributes.delete(normalized)
-            end
+            process_attribute normalized, nil
+            remove_change(normalized)
             ops[atomic_attribute_name(normalized)] = true
           end
           { '$unset' => ops }
