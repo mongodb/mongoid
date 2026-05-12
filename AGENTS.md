@@ -13,6 +13,10 @@ Mongoid is a Ruby Object-Document Mapper (ODM) framework for MongoDB. Mongoid al
 
 # Development Workflow
 
+## Planning and Design
+
+When producing a design document or specification for a new feature or significant change, leave the document unstaged. Do not add it to the repository.
+
 ## Running tests
 
 Tests require a running MongoDB instance. Set the URI via the `MONGODB_URI` environment variable:

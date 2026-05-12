@@ -18,7 +18,6 @@ module Mongoid
       # @return [ Document ] The document.
       def inc(increments)
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
-        return self unless persisted?
 
         ops = {}
         increments.each do |field, value|
@@ -30,7 +29,7 @@ module Mongoid
           ops[atomic_attribute_name(access)] = increment
         end
 
-        return self if ops.empty?
+        return self if ops.empty? || !persisted?
 
         selector = atomic_selector
         Mongoid.changeset do
