@@ -73,7 +73,7 @@ module Mongoid
 
             if (doc = docs.first)
               append(doc)
-              doc.save if persistable? && !_assigning? && !doc.validated?
+              doc.save! if persistable? && !_assigning? && !doc.validated?
             end
             self
           end
@@ -597,7 +597,7 @@ module Mongoid
               docs.push(doc)
               inserts.push(doc.send(:as_attributes))
             else
-              doc.save
+              doc.save!
             end
           end
         end
