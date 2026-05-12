@@ -172,7 +172,7 @@ module Mongoid
     def post_process_persist(result, options = {})
       post_persist unless result == false
       errors.clear unless performing_validations?(options)
-      Threaded.add_modified_document(_session, self) if in_transaction?
+      Threaded.add_modified_document(_session, self) if in_transaction? && !Mongoid.current_changeset
       true
     end
 

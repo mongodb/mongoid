@@ -156,6 +156,14 @@ module Mongoid
         doc.new_record = false
         doc.remember_storage_options!
         doc.flag_descendants_persisted
+      when :update
+        # An :update entry with a new_record document is an embedded insert
+        # staged against the root collection. Flip new_record and persist state.
+        if doc.new_record?
+          doc.new_record = false
+          doc.remember_storage_options!
+          doc.flag_descendants_persisted
+        end
       when :delete
         doc.destroyed = true
       end
