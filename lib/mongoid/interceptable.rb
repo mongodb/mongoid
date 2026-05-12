@@ -10,6 +10,7 @@ module Mongoid
       after_create
       after_destroy
       after_find
+      after_flush
       after_initialize
       after_save
       after_touch
@@ -23,11 +24,24 @@ module Mongoid
       around_upsert
       before_create
       before_destroy
+      before_flush
       before_save
       before_update
       before_upsert
       before_validation
     ].freeze
+
+    module ClassMethods
+      # Register a callback to run before flush (as part of a batch write).
+      def before_flush(*args, &block)
+        set_callback(:before_flush, :after, *args, &block)
+      end
+
+      # Register a callback to run after flush (as part of a batch write).
+      def after_flush(*args, &block)
+        set_callback(:after_flush, :after, *args, &block)
+      end
+    end
 
     included do
       extend ActiveModel::Callbacks
@@ -43,6 +57,10 @@ module Mongoid
       define_model_callbacks :persist_parent
 
       define_callbacks :commit, :rollback,
+                       only: :after,
+                       scope: %i[kind name]
+
+      define_callbacks :before_flush, :after_flush,
                        only: :after,
                        scope: %i[kind name]
 

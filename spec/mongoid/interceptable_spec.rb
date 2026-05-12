@@ -2577,4 +2577,41 @@ describe Mongoid::Interceptable do
       end
     end
   end
+
+  describe 'before_flush / after_flush callbacks' do
+    let(:klass) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'interceptable_flush_test'
+
+        attr_accessor :log
+
+        def initialize(*)
+          super
+          @log = []
+        end
+
+        before_flush { @log << :before_flush }
+        after_flush  { @log << :after_flush }
+      end
+    end
+
+    let(:doc) { klass.new }
+
+    it 'fires before_flush callbacks via run_callbacks(:before_flush)' do
+      doc.run_callbacks(:before_flush)
+      expect(doc.log).to eq([ :before_flush ])
+    end
+
+    it 'fires after_flush callbacks via run_callbacks(:after_flush)' do
+      doc.run_callbacks(:after_flush)
+      expect(doc.log).to eq([ :after_flush ])
+    end
+
+    it 'does not fire after_flush when running before_flush' do
+      doc.run_callbacks(:before_flush)
+      expect(doc.log).not_to include(:after_flush)
+    end
+  end
 end
