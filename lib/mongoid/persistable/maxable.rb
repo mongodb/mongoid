@@ -18,16 +18,36 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def set_max(fields)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(fields) do |field, value|
-            current_value = attributes[field]
-            if value > current_value
-              process_attribute field, value
-              ops[atomic_attribute_name(field)] = value
-            end
-          end
-          { '$max' => ops } unless ops.empty?
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        ops = {}
+        fields.each do |field, value|
+          access = database_field_name(field)
+          current_value = attributes[access]
+          next unless value > current_value
+
+          process_attribute access, value
+          remove_change(access)
+          ops[atomic_attribute_name(access)] = value
         end
+
+        return self if ops.empty?
+
+        selector = atomic_selector
+        Mongoid.changeset do
+          Mongoid.current_changeset.add(
+            Changeset::Entry.new(
+              type: :update,
+              collection: collection(_root),
+              selector: selector,
+              payload: positionally(selector, { '$max' => ops }),
+              document: self,
+              session: _session
+            )
+          )
+        end
+        self
       end
       alias clamp_lower_bound set_max
     end

@@ -16,23 +16,43 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def add_to_set(adds)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(adds) do |field, value|
-            existing = send(field) || attributes[field]
-            if existing.nil?
-              attributes[field] = []
-              # Read the value out of attributes:
-              # https://jira.mongodb.org/browse/MONGOID-4874
-              existing = attributes[field]
-            end
-            values = [ value ].flatten(1)
-            values.each do |val|
-              existing.push(val) unless existing.include?(val)
-            end
-            ops[atomic_attribute_name(field)] = { '$each' => values }
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+
+        ops = {}
+        adds.each do |field, value|
+          access = database_field_name(field)
+          existing = send(access) || attributes[access]
+          if existing.nil?
+            attributes[access] = []
+            # Read the value out of attributes:
+            # https://jira.mongodb.org/browse/MONGOID-4874
+            existing = attributes[access]
           end
-          { '$addToSet' => ops }
+          values = [ value ].flatten(1)
+          values.each do |val|
+            existing.push(val) unless existing.include?(val)
+          end
+          remove_change(access)
+          ops[atomic_attribute_name(access)] = { '$each' => values }
         end
+
+        return self unless persisted?
+        return self if ops.empty?
+
+        selector = atomic_selector
+        Mongoid.changeset do
+          Mongoid.current_changeset.add(
+            Changeset::Entry.new(
+              type: :update,
+              collection: collection(_root),
+              selector: selector,
+              payload: positionally(selector, { '$addToSet' => ops }),
+              document: self,
+              session: _session
+            )
+          )
+        end
+        self
       end
 
       # Push a single value or multiple values onto arrays.
@@ -47,18 +67,38 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def push(pushes)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(pushes) do |field, value|
-            existing = send(field) || begin
-              attributes[field] ||= []
-              attributes[field]
-            end
-            values = [ value ].flatten(1)
-            values.each { |val| existing.push(val) }
-            ops[atomic_attribute_name(field)] = { '$each' => values }
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+
+        ops = {}
+        pushes.each do |field, value|
+          access = database_field_name(field)
+          existing = send(access) || begin
+            attributes[access] ||= []
+            attributes[access]
           end
-          { '$push' => ops }
+          values = [ value ].flatten(1)
+          values.each { |val| existing.push(val) }
+          remove_change(access)
+          ops[atomic_attribute_name(access)] = { '$each' => values }
         end
+
+        return self unless persisted?
+        return self if ops.empty?
+
+        selector = atomic_selector
+        Mongoid.changeset do
+          Mongoid.current_changeset.add(
+            Changeset::Entry.new(
+              type: :update,
+              collection: collection(_root),
+              selector: selector,
+              payload: positionally(selector, { '$push' => ops }),
+              document: self,
+              session: _session
+            )
+          )
+        end
+        self
       end
     end
   end

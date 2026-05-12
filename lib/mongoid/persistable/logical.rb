@@ -16,19 +16,38 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def bit(operations)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(operations) do |field, values|
-            value = attributes[field]
-            values.each do |op, val|
-              value &= val if op.to_s == 'and'
-              value |= val if op.to_s == 'or'
-            end
-            process_attribute field, value
-            attributes[field] = value
-            ops[atomic_attribute_name(field)] = values
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        ops = {}
+        operations.each do |field, values|
+          access = database_field_name(field)
+          value = attributes[access]
+          values.each do |op, val|
+            value &= val if op.to_s == 'and'
+            value |= val if op.to_s == 'or'
           end
-          { '$bit' => ops } unless ops.empty?
+          attributes[access] = value
+          remove_change(access)
+          ops[atomic_attribute_name(access)] = values
         end
+
+        return self if ops.empty?
+
+        selector = atomic_selector
+        Mongoid.changeset do
+          Mongoid.current_changeset.add(
+            Changeset::Entry.new(
+              type: :update,
+              collection: collection(_root),
+              selector: selector,
+              payload: positionally(selector, { '$bit' => ops }),
+              document: self,
+              session: _session
+            )
+          )
+        end
+        self
       end
     end
   end

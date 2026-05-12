@@ -17,16 +17,35 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def inc(increments)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(increments) do |field, value|
-            increment = value.is_a?(BigDecimal) ? value.to_f : value
-            current = attributes[field]
-            new_value = (current || 0) + increment
-            process_attribute field, new_value
-            ops[atomic_attribute_name(field)] = increment
-          end
-          { '$inc' => ops } unless ops.empty?
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        ops = {}
+        increments.each do |field, value|
+          access = database_field_name(field)
+          increment = value.is_a?(BigDecimal) ? value.to_f : value
+          current = attributes[access]
+          attributes[access] = (current || 0) + increment
+          remove_change(access)
+          ops[atomic_attribute_name(access)] = increment
         end
+
+        return self if ops.empty?
+
+        selector = atomic_selector
+        Mongoid.changeset do
+          Mongoid.current_changeset.add(
+            Changeset::Entry.new(
+              type: :update,
+              collection: collection(_root),
+              selector: selector,
+              payload: positionally(selector, { '$inc' => ops }),
+              document: self,
+              session: _session
+            )
+          )
+        end
+        self
       end
     end
   end

@@ -17,13 +17,33 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def pull(pulls)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(pulls) do |field, value|
-            (send(field) || []).delete(value)
-            ops[atomic_attribute_name(field)] = value
-          end
-          { '$pull' => ops }
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        ops = {}
+        pulls.each do |field, value|
+          access = database_field_name(field)
+          (send(access) || []).delete(value)
+          remove_change(access)
+          ops[atomic_attribute_name(access)] = value
         end
+
+        return self if ops.empty?
+
+        selector = atomic_selector
+        Mongoid.changeset do
+          Mongoid.current_changeset.add(
+            Changeset::Entry.new(
+              type: :update,
+              collection: collection(_root),
+              selector: selector,
+              payload: positionally(selector, { '$pull' => ops }),
+              document: self,
+              session: _session
+            )
+          )
+        end
+        self
       end
 
       # Pull multiple values from the provided array fields.
@@ -35,14 +55,34 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def pull_all(pulls)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(pulls) do |field, value|
-            existing = send(field) || []
-            value.each { |val| existing.delete(val) }
-            ops[atomic_attribute_name(field)] = value
-          end
-          { '$pullAll' => ops }
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        ops = {}
+        pulls.each do |field, value|
+          access = database_field_name(field)
+          existing = send(access) || []
+          value.each { |val| existing.delete(val) }
+          remove_change(access)
+          ops[atomic_attribute_name(access)] = value
         end
+
+        return self if ops.empty?
+
+        selector = atomic_selector
+        Mongoid.changeset do
+          Mongoid.current_changeset.add(
+            Changeset::Entry.new(
+              type: :update,
+              collection: collection(_root),
+              selector: selector,
+              payload: positionally(selector, { '$pullAll' => ops }),
+              document: self,
+              session: _session
+            )
+          )
+        end
+        self
       end
     end
   end

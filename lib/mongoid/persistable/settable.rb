@@ -44,41 +44,66 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def set(setters)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(setters) do |field, value|
-            field_seq = field.to_s.split('.')
-            field = field_seq.shift
-            if field_seq.length > 0
-              # nested hash path
-              old_value = attributes[field]
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
 
-              # if the old value is not a hash, clobber it
-              old_value = {} unless old_value.is_a?(Hash)
-
-              # descend into the hash, creating intermediate keys as needed
-              cur_value = old_value
-              while field_seq.length > 1
-                cur_key = field_seq.shift
-                # clobber on each level if type is not a hash
-                cur_value[cur_key] = {} unless cur_value[cur_key].is_a?(Hash)
-                cur_value = cur_value[cur_key]
-              end
-
-              # now we are on the leaf level, perform the set
-              # and overwrite whatever was on this level before
-              cur_value[field_seq.shift] = value
-
-              # and set value to the value of the top level field
-              # because this is what we pass to $set
-              value = old_value
-            end
-
-            process_attribute(field, value)
-
-            ops[atomic_attribute_name(field)] = attributes[field] unless relations.include?(field.to_s)
+        ops = {}
+        setters.each do |field, value|
+          access = database_field_name(field)
+          field_seq = access.to_s.split('.')
+          top_field = field_seq.shift
+          if field_seq.length > 0
+            value = _set_nested(top_field, field_seq, value)
           end
-          { '$set' => ops } unless ops.empty?
+          process_attribute(top_field, value)
+          remove_change(top_field)
+          ops[atomic_attribute_name(top_field)] = attributes[top_field] unless relations.include?(top_field)
         end
+
+        return self if ops.empty?
+
+        selector = atomic_selector
+        Mongoid.changeset do
+          Mongoid.current_changeset.add(
+            Changeset::Entry.new(
+              type: :update,
+              collection: collection(_root),
+              selector: selector,
+              payload: positionally(selector, { '$set' => ops }),
+              document: self,
+              session: _session
+            )
+          )
+        end
+        self
+      end
+
+      private
+
+      # Build the nested-hash value for a dotted field path.
+      #
+      # Descends into the top-level field's current hash value (creating
+      # intermediate keys as needed), sets the leaf, and returns the updated
+      # top-level hash to be written back via process_attribute.
+      #
+      # @api private
+      #
+      # @param [ String ] top_field The top-level attribute name.
+      # @param [ Array<String> ] field_seq Remaining path segments (without top).
+      # @param [ Object ] value The leaf value to assign.
+      #
+      # @return [ Hash ] The updated top-level hash value.
+      def _set_nested(top_field, field_seq, value)
+        old_value = attributes[top_field]
+        old_value = {} unless old_value.is_a?(Hash)
+        cur_value = old_value
+        while field_seq.length > 1
+          cur_key = field_seq.shift
+          cur_value[cur_key] = {} unless cur_value[cur_key].is_a?(Hash)
+          cur_value = cur_value[cur_key]
+        end
+        cur_value[field_seq.shift] = value
+        old_value
       end
     end
   end

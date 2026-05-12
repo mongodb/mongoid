@@ -17,15 +17,33 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def unset(*fields)
-        prepare_atomic_operation do |ops|
-          fields.flatten.each do |field|
-            normalized = database_field_name(field)
-            process_attribute normalized, nil
-            remove_change(normalized)
-            ops[atomic_attribute_name(normalized)] = true
-          end
-          { '$unset' => ops }
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        ops = {}
+        fields.flatten.each do |field|
+          normalized = database_field_name(field)
+          process_attribute normalized, nil
+          remove_change(normalized)
+          ops[atomic_attribute_name(normalized)] = true
         end
+
+        return self if ops.empty?
+
+        selector = atomic_selector
+        Mongoid.changeset do
+          Mongoid.current_changeset.add(
+            Changeset::Entry.new(
+              type: :update,
+              collection: collection(_root),
+              selector: selector,
+              payload: positionally(selector, { '$unset' => ops }),
+              document: self,
+              session: _session
+            )
+          )
+        end
+        self
       end
     end
   end

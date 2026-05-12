@@ -17,17 +17,35 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def mul(factors)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(factors) do |field, value|
-            factor = value.is_a?(BigDecimal) ? value.to_f : value
-            current = attributes[field]
-            new_value = (current || 0) * factor
-            process_attribute field, new_value
-            attributes[field] = new_value
-            ops[atomic_attribute_name(field)] = factor
-          end
-          { '$mul' => ops } unless ops.empty?
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        ops = {}
+        factors.each do |field, value|
+          access = database_field_name(field)
+          factor = value.is_a?(BigDecimal) ? value.to_f : value
+          current = attributes[access]
+          attributes[access] = (current || 0) * factor
+          remove_change(access)
+          ops[atomic_attribute_name(access)] = factor
         end
+
+        return self if ops.empty?
+
+        selector = atomic_selector
+        Mongoid.changeset do
+          Mongoid.current_changeset.add(
+            Changeset::Entry.new(
+              type: :update,
+              collection: collection(_root),
+              selector: selector,
+              payload: positionally(selector, { '$mul' => ops }),
+              document: self,
+              session: _session
+            )
+          )
+        end
+        self
       end
     end
   end

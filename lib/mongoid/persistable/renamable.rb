@@ -17,15 +17,35 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def rename(renames)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(renames) do |old_field, new_field|
-            new_name = new_field.to_s
-            attributes[new_name] = attributes.delete(old_field)
-            remove_change(new_name)
-            ops[atomic_attribute_name(old_field)] = atomic_attribute_name(new_name)
-          end
-          { '$rename' => ops }
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        ops = {}
+        renames.each do |old_field, new_field|
+          old_access = database_field_name(old_field)
+          new_name = new_field.to_s
+          attributes[new_name] = attributes.delete(old_access)
+          remove_change(old_access)
+          remove_change(new_name)
+          ops[atomic_attribute_name(old_access)] = atomic_attribute_name(new_name)
         end
+
+        return self if ops.empty?
+
+        selector = atomic_selector
+        Mongoid.changeset do
+          Mongoid.current_changeset.add(
+            Changeset::Entry.new(
+              type: :update,
+              collection: collection(_root),
+              selector: selector,
+              payload: positionally(selector, { '$rename' => ops }),
+              document: self,
+              session: _session
+            )
+          )
+        end
+        self
       end
     end
   end

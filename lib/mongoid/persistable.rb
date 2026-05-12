@@ -128,60 +128,6 @@ module Mongoid
       true
     end
 
-    # Prepare an atomic persistence operation. Yields an empty hash to be sent
-    # to the update, then stages the result in the current changeset.
-    #
-    # @api private
-    #
-    # @example Prepare the atomic operation.
-    #   document.prepare_atomic_operation do |ops|
-    #     ...
-    #   end
-    #
-    # @return [ Document ] self.
-    def prepare_atomic_operation
-      raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
-
-      operations = yield({})
-      return self unless operations && !operations.empty?
-
-      selector = atomic_selector
-      Mongoid.changeset do
-        Mongoid.current_changeset.add(
-          Changeset::Entry.new(
-            type: :update,
-            collection: collection(_root),
-            selector: selector,
-            payload: positionally(selector, operations),
-            document: self,
-            session: _session
-          )
-        )
-      end
-      self
-    end
-
-    # Process the atomic operations — iterates each op, resolves the aliased
-    # field name, yields, and removes the dirty change.
-    #
-    # @api private
-    #
-    # @example Process the atomic operations.
-    #   document.process_atomic_operations(pulls) do |field, value|
-    #     ...
-    #   end
-    #
-    # @param [ Hash ] operations The atomic operations.
-    #
-    # @return [ Hash ] The operations.
-    def process_atomic_operations(operations)
-      operations.each do |field, value|
-        access = database_field_name(field)
-        yield(access, value)
-        remove_change(access)
-      end
-    end
-
     # Persist the atomic operations by staging an update entry in the current
     # changeset. Called by touchable on the root document.
     #
