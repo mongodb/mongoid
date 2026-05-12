@@ -3542,4 +3542,23 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       expect(contract.signature_ids).to eq([ signature.id ])
     end
   end
+
+  describe 'HABTM changeset staging' do
+    let!(:person) { Person.create! }
+    let!(:pref1)  { Preference.create!(name: 'Dark Mode') }
+    let!(:pref2)  { Preference.create!(name: 'Notifications') }
+
+    it 'persists the foreign key on the base document' do
+      person.preferences << pref1
+      expect(person.reload.preference_ids).to include(pref1.id)
+    end
+
+    it 'stages the base document when inside a changeset' do
+      Mongoid.changeset do
+        person.preferences << pref1
+        expect(person).to be_staged
+      end
+      expect(person.reload.preference_ids).to include(pref1.id)
+    end
+  end
 end
