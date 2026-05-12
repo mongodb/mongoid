@@ -3546,7 +3546,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
   describe 'HABTM changeset staging' do
     let!(:person) { Person.create! }
     let!(:pref1)  { Preference.create!(name: 'Dark Mode') }
-    let!(:pref2)  { Preference.create!(name: 'Notifications') }
+    let(:pref2)   { Preference.create!(name: 'Notifications') }
 
     it 'persists the foreign key on the base document' do
       person.preferences << pref1
@@ -3559,6 +3559,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         expect(person).to be_staged
       end
       expect(person.reload.preference_ids).to include(pref1.id)
+    end
+
+    it 'raises when appending an invalid document' do
+      invalid_pref = Preference.new(name: 'x') # length 1, fails validates_length_of minimum: 2
+      expect { person.preferences << invalid_pref }.to raise_error(Mongoid::Errors::Validations)
     end
   end
 end
