@@ -62,7 +62,7 @@ module Mongoid
           Mongoid.changeset do
             Mongoid.current_changeset.add(
               Changeset::Entry.new(
-                type: :update,
+                type: :embedded_delete,
                 collection: _root.collection,
                 selector: selector,
                 payload: positionally(selector, atomic_deletes),

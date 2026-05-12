@@ -11,7 +11,7 @@ module Mongoid
     # For :delete entries, payload is nil.
     # For :update_many/:delete_many entries, document is nil.
     Entry = Struct.new(
-      :type,        # Symbol: :insert | :update | :delete | :update_many | :delete_many
+      :type,        # Symbol: :insert | :embedded_insert | :update | :embedded_delete | :delete | :update_many | :delete_many
       :collection,  # Mongo::Collection
       :selector,    # Hash - MongoDB filter
       :payload,     # Hash | nil

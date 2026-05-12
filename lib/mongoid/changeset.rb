@@ -114,7 +114,7 @@ module Mongoid
       case entry.type
       when :insert
         entry.collection.insert_one(entry.payload, **opts)
-      when :update, :embedded_insert
+      when :update, :embedded_insert, :embedded_delete
         entry.collection.find(entry.selector).update_one(entry.payload, **opts)
       when :update_many
         entry.collection.find(entry.selector).update_many(entry.payload, **opts)
@@ -137,7 +137,7 @@ module Mongoid
       case entry.type
       when :insert
         { insert_one: entry.payload }
-      when :update, :embedded_insert
+      when :update, :embedded_insert, :embedded_delete
         { update_one: { filter: entry.selector, update: entry.payload } }
       when :update_many
         { update_many: { filter: entry.selector, update: entry.payload } }
@@ -159,7 +159,7 @@ module Mongoid
         doc.flag_descendants_persisted
       when :update, :update_many
         # no per-document state change needed for updates
-      when :delete
+      when :embedded_delete, :delete
         doc.destroyed = true
       end
     end
