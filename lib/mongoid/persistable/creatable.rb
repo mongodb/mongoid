@@ -36,8 +36,8 @@ module Mongoid
       # Stage an insert entry on the current changeset.
       #
       # For root documents, adds an :insert entry. For embedded documents,
-      # adds an :update entry against the root document's collection. If
-      # the parent is itself a new record, inserts the parent first.
+      # adds an :embedded_insert entry against the root document's collection.
+      # If the parent is itself a new record, inserts the parent first.
       #
       # @api private
       def _stage_insert
@@ -85,7 +85,7 @@ module Mongoid
         end
 
         entry = Changeset::Entry.new(
-          type: :update,
+          type: :embedded_insert,
           collection: _root.collection,
           selector: _parent.atomic_selector,
           payload: positionally(_parent.atomic_selector, operations),
@@ -116,6 +116,10 @@ module Mongoid
             run_callbacks(:persist_parent, with_children: false) do
               _mongoid_run_child_callbacks(:save) do
                 _mongoid_run_child_callbacks(:create) do
+                  # Dirty state is cleared inside the changeset block, before
+                  # the driver write, by design. If the flush raises, the
+                  # document should be reloaded from the database — in-memory
+                  # dirty state cannot be reliably restored.
                   Mongoid.changeset do
                     _stage_insert
                     post_process_persist(true, options)
