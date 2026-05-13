@@ -1414,6 +1414,189 @@ describe Mongoid::Criteria::Includable do
     # 4.4 lookup does not support the lookup pipeline as it is currently written
     min_server_version '5.0'
     it_behaves_like 'eager loading', :eager_load
+
+    context 'when the association is defined on a subclass of the queried class' do
+      before(:all) do
+        class Machine
+          include Mongoid::Document
+        end
+
+        class Peripheral
+          include Mongoid::Document
+        end
+
+        class Webcam < Peripheral
+        end
+
+        class Mouse < Peripheral
+          belongs_to :machine
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Mouse)
+        Object.send(:remove_const, :Webcam)
+        Object.send(:remove_const, :Peripheral)
+        Object.send(:remove_const, :Machine)
+      end
+
+      let!(:machine) { Machine.create! }
+      let!(:webcam) { Webcam.create! }
+      let!(:mouse) { Mouse.create!(machine: machine) }
+
+      it 'eager-loads it through the queried superclass' do
+        expect_query(1) do
+          loaded = Peripheral.eager_load(:machine).detect { |doc| doc.is_a?(Mouse) }
+          expect(loaded.machine).to eq(machine)
+        end
+      end
+    end
+
+    context 'when the association is defined on a subclass of an associated class' do
+      before(:all) do
+        class Brand
+          include Mongoid::Document
+        end
+
+        class Machine
+          include Mongoid::Document
+        end
+
+        class Laptop < Machine
+          belongs_to :brand
+        end
+
+        class Peripheral
+          include Mongoid::Document
+        end
+
+        class Mouse < Peripheral
+          belongs_to :machine
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Mouse)
+        Object.send(:remove_const, :Peripheral)
+        Object.send(:remove_const, :Laptop)
+        Object.send(:remove_const, :Machine)
+        Object.send(:remove_const, :Brand)
+      end
+
+      let!(:brand) { Brand.create! }
+      let!(:laptop) { Laptop.create!(brand: brand) }
+      let!(:mouse) { Mouse.create!(machine: laptop) }
+
+      it 'eager-loads it through the parent association' do
+        expect_query(1) do
+          loaded = Peripheral.eager_load(machine: :brand).first
+          expect(loaded.machine).to eq(laptop)
+          expect(loaded.machine.brand).to eq(brand)
+        end
+      end
+    end
+
+    context 'when a has_many is defined only on a subclass' do
+      before(:all) do
+        class Gadget
+          include Mongoid::Document
+        end
+
+        class Speaker < Gadget
+          has_many :cables
+        end
+
+        class Cable
+          include Mongoid::Document
+
+          belongs_to :speaker
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Cable)
+        Object.send(:remove_const, :Speaker)
+        Object.send(:remove_const, :Gadget)
+      end
+
+      let!(:speaker) { Speaker.create! }
+      let!(:cable) { Cable.create!(speaker: speaker) }
+
+      it 'eager-loads it through the queried superclass' do
+        expect_query(1) do
+          loaded = Gadget.eager_load(:cables).first
+          expect(loaded.cables).to eq([ cable ])
+        end
+      end
+    end
+
+    context 'when a has_one is defined only on a subclass' do
+      before(:all) do
+        class Gadget
+          include Mongoid::Document
+        end
+
+        class Speaker < Gadget
+          has_one :cable
+        end
+
+        class Cable
+          include Mongoid::Document
+
+          belongs_to :speaker
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Cable)
+        Object.send(:remove_const, :Speaker)
+        Object.send(:remove_const, :Gadget)
+      end
+
+      let!(:speaker) { Speaker.create! }
+      let!(:cable) { Cable.create!(speaker: speaker) }
+
+      it 'eager-loads it through the queried superclass' do
+        expect_query(1) do
+          loaded = Gadget.eager_load(:cable).first
+          expect(loaded.cable).to eq(cable)
+        end
+      end
+    end
+
+    context 'when a has_and_belongs_to_many is defined only on a subclass' do
+      before(:all) do
+        class Cable
+          include Mongoid::Document
+
+          has_and_belongs_to_many :speakers
+        end
+
+        class Gadget
+          include Mongoid::Document
+        end
+
+        class Speaker < Gadget
+          has_and_belongs_to_many :cables
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Speaker)
+        Object.send(:remove_const, :Gadget)
+        Object.send(:remove_const, :Cable)
+      end
+
+      let!(:cable) { Cable.create! }
+      let!(:speaker) { Speaker.create!(cables: [ cable ]) }
+
+      it 'eager-loads it through the queried superclass' do
+        expect_query(1) do
+          loaded = Gadget.eager_load(:cables).first
+          expect(loaded.cables).to eq([ cable ])
+        end
+      end
+    end
   end
 
   describe '#inclusions' do

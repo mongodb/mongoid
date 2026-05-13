@@ -104,31 +104,22 @@ module Mongoid
       #   The associations to load.
       # @param [ Array<Mongoid::Document> ] docs The documents.
       def preload_for_lookup(criteria)
-        assoc_map = criteria.inclusions.group_by(&:inverse_class_name)
+        inclusions = criteria.inclusions
+        assoc_map = inclusions.group_by(&:inverse_class_name)
 
         # match first
         pipeline = criteria.selector.to_pipeline
         # then sort, skip, limit
         pipeline.concat(criteria.options.to_pipeline_for_lookup)
 
-        # account for single-collection inheritance
-        root_class = klass.root_class
-
-        if assoc_map[klass.to_s]
-          assoc_map[klass.to_s].each do |assoc|
-            # Create a copy of the mapping for each top-level association to avoid mutation issues
-            pipeline << create_pipeline(assoc, assoc_map.dup)
-          end
+        # Emit a $lookup for each top-level inclusion, in declaration order.
+        # Nested inclusions are emitted inside their parent's $lookup
+        # sub-pipeline by create_pipeline.
+        inclusions.select { |assoc| assoc.parent_inclusions.empty? }.each do |assoc|
+          pipeline << create_pipeline(assoc, assoc_map.dup)
         end
 
-        if klass != root_class && assoc_map[root_class.to_s]
-          assoc_map[root_class.to_s].each do |assoc|
-            # Create a copy of the mapping for each top-level association to avoid mutation issues
-            pipeline << create_pipeline(assoc, assoc_map.dup)
-          end
-        end
-
-        Eager.new(criteria.inclusions, [], true, pipeline).run
+        Eager.new(inclusions, [], true, pipeline).run
       end
 
       private
@@ -193,14 +184,14 @@ module Mongoid
           pipeline_stages << { '$sort' => { '_id' => 1 } }
         end
 
-        # Add nested lookups for child associations
-        # Child associations don't need the embedded_path prefix since they're referenced from the looked-up document
-        # Remove this class from the mapping to prevent infinite loops with circular references
-        class_name = current_assoc.klass.to_s
-        if child_assocs = mapping.delete(class_name)
-          child_assocs.each do |child|
-            pipeline_stages << create_pipeline(child, mapping)
-          end
+        # Add nested lookups for child associations declared on the looked-up
+        # class or any of its subclasses, so subclass-only nested associations
+        # are reached too. Deleting each class from the mapping prevents
+        # infinite loops with circular references.
+        [ current_assoc.klass, *current_assoc.klass.descendants ].each do |child_class|
+          next unless child_assocs = mapping.delete(child_class.to_s)
+
+          child_assocs.each { |child| pipeline_stages << create_pipeline(child, mapping) }
         end
 
         # Always add pipeline since we always have at least $sort
