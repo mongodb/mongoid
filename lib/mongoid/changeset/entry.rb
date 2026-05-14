@@ -18,6 +18,7 @@ module Mongoid
       :document,    # Mongoid::Document | nil (nil for criteria-level entries)
       :session,     # Mongo::Session | nil
       :opts,        # Hash | nil - driver-level options (e.g. array_filters)
+      :result,      # driver result object, set after execution (for bulk ops that return counts)
       keyword_init: true
     )
   end

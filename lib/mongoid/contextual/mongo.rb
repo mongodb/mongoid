@@ -111,7 +111,7 @@ module Mongoid
       # @return [ nil ] Nil.
       def delete
         entry_opts = _view_opts
-        Mongoid.changeset do |cs|
+        entry = Mongoid.changeset do |cs|
           cs.add(
             type: :delete_many,
             collection: collection,
@@ -122,7 +122,9 @@ module Mongoid
             opts: entry_opts.empty? ? nil : entry_opts
           )
         end
-        nil
+        return nil unless entry.is_a?(Changeset::Entry) && entry.result
+
+        acknowledged_write? ? entry.result.deleted_count : 0
       end
       alias delete_all delete
 

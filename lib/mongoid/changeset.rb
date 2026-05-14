@@ -30,7 +30,7 @@ module Mongoid
       flush if @depth.zero?
       result
     rescue StandardError
-      discard if @depth.zero?
+      discard if @depth.zero? && !terminated?
       raise
     end
 
@@ -44,6 +44,7 @@ module Mongoid
       raise Errors::InvalidChangesetOperation.new('Changeset is terminated') if terminated?
 
       @entries << entry
+      entry
     end
 
     # Executes all entries against the driver in registration order, then
@@ -129,7 +130,7 @@ module Mongoid
       when :delete
         entry.collection.find(entry.selector).delete_one(**driver_opts)
       when :delete_many
-        entry.collection.find(entry.selector).delete_many(**driver_opts)
+        entry.result = entry.collection.find(entry.selector).delete_many(**driver_opts)
       when :upsert
         entry.collection.find(entry.selector).update_one(entry.payload, upsert: true, **driver_opts)
       when :upsert_replace
