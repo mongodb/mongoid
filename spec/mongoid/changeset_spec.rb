@@ -310,7 +310,7 @@ describe Mongoid::Changeset do
         expect { cs.flush }.to raise_error(Mongo::Error::OperationFailure)
       end
 
-      it 'does not mark the changeset terminated when the error escapes flush directly' do
+      it 'marks the changeset terminated even when the flush is aborted by an error' do
         allow(coll).to receive(:insert_one).and_raise(Mongo::Error::OperationFailure.new('write failed'))
         cs.add(make_entry(type: :insert))
         begin
@@ -318,7 +318,7 @@ describe Mongoid::Changeset do
         rescue Mongo::Error::OperationFailure
           nil
         end
-        expect(cs).not_to be_terminated
+        expect(cs).to be_terminated
       end
     end
 

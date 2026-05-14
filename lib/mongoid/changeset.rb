@@ -42,11 +42,13 @@ module Mongoid
     end
 
     # Executes all entries against the driver in registration order, then
-    # marks the changeset terminated. Full implementation in Task 6.
+    # marks the changeset terminated. Terminates even if the flush is aborted
+    # by an exception — a partially-flushed changeset is not resumable.
     def flush
       raise Errors::InvalidOperation.new('Changeset is terminated') if terminated?
 
       _flush_entries
+    ensure
       @terminated = true
     end
 
