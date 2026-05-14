@@ -34,12 +34,12 @@ module Mongoid
     module ClassMethods
       # Register a callback to run before flush (as part of a batch write).
       def before_flush(*args, &block)
-        set_callback(:before_flush, :after, *args, &block)
+        set_callback(:flush, :before, *args, &block)
       end
 
       # Register a callback to run after flush (as part of a batch write).
       def after_flush(*args, &block)
-        set_callback(:after_flush, :after, *args, &block)
+        set_callback(:flush, :after, *args, &block)
       end
     end
 
@@ -60,8 +60,7 @@ module Mongoid
                        only: :after,
                        scope: %i[kind name]
 
-      define_callbacks :before_flush, :after_flush,
-                       only: :after,
+      define_callbacks :flush,
                        scope: %i[kind name]
 
       attr_accessor :before_callback_halted

@@ -75,7 +75,7 @@ module Mongoid
     def _flush_entries
       _build_batches(@entries).each do |batch|
         batch.each do |entry|
-          entry.document&.run_callbacks(:before_flush)
+          entry.document&.run_before_callbacks(:flush)
         end
 
         if batch.size == 1
@@ -86,7 +86,7 @@ module Mongoid
 
         batch.each do |entry|
           _update_document_state(entry)
-          entry.document&.run_callbacks(:after_flush)
+          entry.document&.run_after_callbacks(:flush)
         end
       end
 
