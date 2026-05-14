@@ -66,7 +66,8 @@ module Mongoid
               selector: selector,
               payload: positionally(selector, atomic_deletes),
               document: self,
-              session: _session
+              session: _session,
+              skip_callbacks: true
             )
           end
         end
@@ -89,7 +90,8 @@ module Mongoid
             selector: atomic_selector,
             payload: nil,
             document: self,
-            session: _session
+            session: _session,
+            skip_callbacks: true
           )
         end
         true

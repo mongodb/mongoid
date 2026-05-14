@@ -206,14 +206,15 @@ describe Mongoid::Changeset do
     let(:selector) { { '_id' => BSON::ObjectId.new } }
     let(:payload) { { 'name' => 'Alice' } }
 
-    def make_entry(type:, collection: coll, sel: selector, pay: payload, doc: nil, session: nil)
+    def make_entry(type:, **opts)
       Mongoid::Changeset::Entry.new(
         type: type,
-        collection: collection,
-        selector: sel,
-        payload: pay,
-        document: doc,
-        session: session
+        collection: opts.fetch(:collection, coll),
+        selector: opts.fetch(:sel, selector),
+        payload: opts.fetch(:pay, payload),
+        document: opts[:doc],
+        session: opts[:session],
+        skip_callbacks: opts[:skip_callbacks]
       )
     end
 
@@ -337,6 +338,106 @@ describe Mongoid::Changeset do
           nil
         end
         expect(cs).to be_terminated
+      end
+    end
+
+    context 'skip_callbacks flag' do
+      let(:doc) { klass.new(name: 'Alice') }
+      let(:view) { instance_double(Mongo::Collection::View) }
+
+      before do
+        allow(coll).to receive(:find).and_return(view)
+        allow(view).to receive(:update_one)
+        allow(coll).to receive(:bulk_write)
+      end
+
+      context 'when a single entry has skip_callbacks: true' do
+        before { cs.add_entry(make_entry(type: :update, doc: doc, skip_callbacks: true)) }
+
+        it 'does not fire before_flush' do
+          fired = false
+          klass.before_flush { fired = true }
+          cs.flush
+          expect(fired).to be(false)
+        end
+
+        it 'does not fire after_flush' do
+          fired = false
+          klass.after_flush { fired = true }
+          cs.flush
+          expect(fired).to be(false)
+        end
+
+        it 'does not fire after_commit' do
+          fired = false
+          klass.after_commit { fired = true }
+          cs.flush
+          expect(fired).to be(false)
+        end
+
+        context 'when the entry has a session that is in a transaction' do
+          let(:session) { instance_double(Mongo::Session, in_transaction?: true) }
+
+          before do
+            cs.entries.clear
+            cs.add_entry(make_entry(type: :update, doc: doc, session: session, skip_callbacks: true))
+            allow(Mongoid::Threaded).to receive(:add_modified_document)
+          end
+
+          it 'still calls add_modified_document for transaction tracking' do
+            cs.flush
+            expect(Mongoid::Threaded).to have_received(:add_modified_document).with(session, doc)
+          end
+        end
+      end
+
+      context 'when a skip_callbacks entry precedes a non-skip entry for the same document' do
+        before do
+          cs.add_entry(make_entry(type: :update, doc: doc, skip_callbacks: true))
+          cs.add_entry(make_entry(type: :update, doc: doc))
+        end
+
+        it 'fires before_flush exactly once' do
+          count = 0
+          klass.before_flush { count += 1 }
+          cs.flush
+          expect(count).to eq(1)
+        end
+
+        it 'fires after_flush exactly once' do
+          count = 0
+          klass.after_flush { count += 1 }
+          cs.flush
+          expect(count).to eq(1)
+        end
+
+        it 'fires after_commit exactly once' do
+          count = 0
+          klass.after_commit { count += 1 }
+          cs.flush
+          expect(count).to eq(1)
+        end
+      end
+
+      context 'when a non-skip entry precedes a skip_callbacks entry for the same document' do
+        before do
+          cs.add_entry(make_entry(type: :update, doc: doc))
+          cs.add_entry(make_entry(type: :update, doc: doc, skip_callbacks: true))
+        end
+
+        it 'fires after_flush exactly once' do
+          count = 0
+          klass.after_flush { count += 1 }
+          cs.flush
+          expect(count).to eq(1)
+        end
+
+        it 'fires after_commit exactly once' do
+          count = 0
+          klass.after_commit { count += 1 }
+          cs.flush
+          expect(count).to eq(1)
+        end
       end
     end
 

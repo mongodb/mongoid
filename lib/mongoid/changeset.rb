@@ -74,34 +74,50 @@ module Mongoid
     private
 
     def _flush_entries
+      @entries.reject(&:skip_callbacks)
+              .filter_map(&:document)
+              .uniq { |d| d.object_id }
+              .each { |doc| doc.run_before_callbacks(:flush) }
+
       _build_batches(@entries).each do |batch|
-        batch.each do |entry|
-          entry.document&.run_before_callbacks(:flush)
-        end
-
-        if batch.size == 1
-          _execute_single(batch.first)
-        else
-          _execute_bulk(batch)
-        end
-
-        batch.each do |entry|
-          _update_document_state(entry)
-          entry.document&.run_after_callbacks(:flush)
-        end
+        (batch.size == 1) ? _execute_single(batch.first) : _execute_bulk(batch)
+        _finalize_batch(batch)
       end
 
-      @entries.each { |entry| _dispatch_commit(entry) }
+      _dispatch_commits
     end
 
-    def _dispatch_commit(entry)
-      doc = entry.document
-      return unless doc
+    def _finalize_batch(batch)
+      per_doc = {}.compare_by_identity
+      batch.each do |entry|
+        next unless entry.document
 
-      if entry.session&.in_transaction?
-        Mongoid::Threaded.add_modified_document(entry.session, doc)
-      else
-        doc.run_callbacks(:commit)
+        per_doc[entry.document] ||= { entry: entry, callbacks: false }
+        per_doc[entry.document][:callbacks] ||= !entry.skip_callbacks
+      end
+
+      per_doc.each_value do |data|
+        _update_document_state(data[:entry])
+        data[:entry].document.run_after_callbacks(:flush) if data[:callbacks]
+      end
+    end
+
+    def _dispatch_commits
+      seen = {}.compare_by_identity
+      @entries.each do |entry|
+        next unless entry.document
+
+        rec = (seen[entry.document] ||= { session: nil, callbacks: false })
+        rec[:session] ||= entry.session
+        rec[:callbacks] ||= !entry.skip_callbacks
+      end
+
+      seen.each do |doc, data|
+        if data[:session]&.in_transaction?
+          Mongoid::Threaded.add_modified_document(data[:session], doc)
+        elsif data[:callbacks]
+          doc.run_callbacks(:commit)
+        end
       end
     end
 

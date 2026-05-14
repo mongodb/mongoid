@@ -70,7 +70,8 @@ module Mongoid
             selector: selector,
             payload: positionally(selector, { '$set' => ops }),
             document: self,
-            session: _session
+            session: _session,
+            skip_callbacks: true
           )
         end
         self

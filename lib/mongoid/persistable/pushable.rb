@@ -47,7 +47,8 @@ module Mongoid
             selector: selector,
             payload: positionally(selector, { '$addToSet' => ops }),
             document: self,
-            session: _session
+            session: _session,
+            skip_callbacks: true
           )
         end
         self
@@ -91,7 +92,8 @@ module Mongoid
             selector: selector,
             payload: positionally(selector, { '$push' => ops }),
             document: self,
-            session: _session
+            session: _session,
+            skip_callbacks: true
           )
         end
         self
