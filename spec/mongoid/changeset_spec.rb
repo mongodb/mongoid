@@ -35,7 +35,7 @@ describe Mongoid::Changeset do
       before { cs.discard }
 
       it 'raises' do
-        expect { cs.add_entry(entry) }.to raise_error(Mongoid::Errors::InvalidOperation)
+        expect { cs.add_entry(entry) }.to raise_error(Mongoid::Errors::InvalidChangesetOperation)
       end
     end
   end
@@ -54,7 +54,7 @@ describe Mongoid::Changeset do
       cs.discard
       expect do
         cs.add(type: :update, collection: coll, selector: {}, payload: {}, document: nil, session: nil)
-      end.to raise_error(Mongoid::Errors::InvalidOperation)
+      end.to raise_error(Mongoid::Errors::InvalidChangesetOperation)
     end
   end
 
@@ -108,7 +108,7 @@ describe Mongoid::Changeset do
       before { cs.discard }
 
       it 'raises' do
-        expect { cs.discard }.to raise_error(Mongoid::Errors::InvalidOperation)
+        expect { cs.discard }.to raise_error(Mongoid::Errors::InvalidChangesetOperation)
       end
     end
   end
@@ -127,7 +127,7 @@ describe Mongoid::Changeset do
   describe '#run' do
     it 'raises when terminated' do
       cs.discard
-      expect { cs.run { nil } }.to raise_error(Mongoid::Errors::InvalidOperation)
+      expect { cs.run { nil } }.to raise_error(Mongoid::Errors::InvalidChangesetOperation)
     end
 
     it 'discards on error at outermost depth' do

@@ -24,7 +24,7 @@ module Mongoid
     # When depth returns to zero (outermost scope), flushes. On error at
     # the outermost scope, discards.
     def run(&block)
-      raise Errors::InvalidOperation.new('Changeset is terminated') if terminated?
+      raise Errors::InvalidChangesetOperation.new('Changeset is terminated') if terminated?
 
       result = build(&block)
       flush if @depth.zero?
@@ -41,7 +41,7 @@ module Mongoid
 
     # Appends a pre-built Entry to the list.
     def add_entry(entry)
-      raise Errors::InvalidOperation.new('Changeset is terminated') if terminated?
+      raise Errors::InvalidChangesetOperation.new('Changeset is terminated') if terminated?
 
       @entries << entry
     end
@@ -50,7 +50,7 @@ module Mongoid
     # marks the changeset terminated. Terminates even if the flush is aborted
     # by an exception — a partially-flushed changeset is not resumable.
     def flush
-      raise Errors::InvalidOperation.new('Changeset is terminated') if terminated?
+      raise Errors::InvalidChangesetOperation.new('Changeset is terminated') if terminated?
 
       _flush_entries
     ensure
@@ -59,7 +59,7 @@ module Mongoid
 
     # Clears all staged entries without executing them, then marks terminated.
     def discard
-      raise Errors::InvalidOperation.new('Changeset is terminated') if terminated?
+      raise Errors::InvalidChangesetOperation.new('Changeset is terminated') if terminated?
 
       @entries.clear
       @terminated = true
