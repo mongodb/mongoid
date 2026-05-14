@@ -108,7 +108,8 @@ module Mongoid
       # @example Delete all the documents.
       #   context.delete
       #
-      # @return [ nil ] Nil.
+      # @return [ Integer | nil ] The number of documents deleted, or nil if the
+      #    delete was performed within a changeset (and was thus deferred).
       def delete
         entry_opts = _view_opts
         entry = Mongoid.changeset do |cs|
