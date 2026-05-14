@@ -2781,4 +2781,46 @@ describe Mongoid::Contextual::Memory do
       end
     end
   end
+
+  describe 'Mongoid.changeset deferral' do
+    let(:person) { Person.create! }
+    let!(:hobrecht) { person.addresses.create!(street: 'hobrecht') }
+    let!(:friedel) { person.addresses.create!(street: 'friedel') }
+
+    describe '#delete inside a changeset block' do
+      let(:criteria) do
+        Address.where(street: 'hobrecht').tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end
+      end
+
+      let(:context) { described_class.new(criteria) }
+
+      it 'defers the delete until the block exits' do
+        Mongoid.changeset do
+          context.delete
+          expect(person.reload.addresses.count).to eq(2)
+        end
+        expect(person.reload.addresses.count).to eq(1)
+      end
+    end
+
+    describe '#update_all inside a changeset block' do
+      let(:criteria) do
+        Address.where(street: 'hobrecht').tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end
+      end
+
+      let(:context) { described_class.new(criteria) }
+
+      it 'defers the update until the block exits' do
+        Mongoid.changeset do
+          context.update_all(number: 42)
+          expect(hobrecht.reload.number).to be_nil
+        end
+        expect(hobrecht.reload.number).to eq(42)
+      end
+    end
+  end
 end

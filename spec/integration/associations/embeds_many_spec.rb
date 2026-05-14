@@ -329,6 +329,56 @@ describe 'embeds_many associations' do
     end
   end
 
+  context 'inside a Mongoid.changeset block' do
+    let!(:person) { Person.create! }
+
+    context 'batch_insert (via push)' do
+      it 'defers the insert until the block exits' do
+        Mongoid.changeset do
+          person.addresses.push(Address.new(street: 'Main St'))
+          expect(person.reload.addresses.count).to eq(0)
+        end
+        expect(person.reload.addresses.count).to eq(1)
+      end
+    end
+
+    context 'batch_clear (via clear)' do
+      before { person.addresses.create!(street: 'Main St') }
+
+      it 'defers the clear until the block exits' do
+        Mongoid.changeset do
+          person.addresses.clear
+          expect(person.reload.addresses.count).to eq(1)
+        end
+        expect(person.reload.addresses.count).to eq(0)
+      end
+    end
+
+    context 'batch_remove (via delete_all)' do
+      before { person.addresses.create!(street: 'Main St') }
+
+      it 'defers the removal until the block exits' do
+        Mongoid.changeset do
+          person.addresses.delete_all
+          expect(person.reload.addresses.count).to eq(1)
+        end
+        expect(person.reload.addresses.count).to eq(0)
+      end
+    end
+
+    context 'batch_replace (via assignment)' do
+      before { person.addresses.create!(street: 'Old St') }
+
+      it 'defers the replace until the block exits' do
+        Mongoid.changeset do
+          person.addresses = [ Address.new(street: 'New St') ]
+          expect(person.reload.addresses.map(&:street)).to eq([ 'Old St' ])
+        end
+        expect(person.reload.addresses.map(&:street)).to eq([ 'New St' ])
+      end
+    end
+  end
+
   context 'when a hash is provided instead of an array for an embeds_many association' do
     let(:post) { EmbedsManySpec::Post.new(title: 'Broken post', comments: { content: 'Comment' }) }
 

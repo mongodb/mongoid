@@ -33,10 +33,16 @@ module Mongoid
         def batch_clear(docs)
           pre_process_batch_remove(docs, :delete)
           unless docs.empty?
-            collection.find(selector).update_one(
-              positionally(selector, '$unset' => { path => true }),
-              session: _session
-            )
+            Mongoid.changeset do
+              Mongoid.current_changeset.add(
+                type: :update,
+                collection: collection,
+                selector: selector,
+                payload: positionally(selector, '$unset' => { path => true }),
+                document: nil,
+                session: _session
+              )
+            end
             # This solves the case in which a user sets, clears and resets an
             # embedded document. Previously, since the embedded document was
             # already marked not a "new_record", it wouldn't be persisted to
@@ -67,22 +73,38 @@ module Mongoid
           end
 
           if docs.empty?
-            collection.find(selector).update_one(
-              positionally(selector, '$set' => { path => [] }),
-              session: _session
-            )
-          else
-            unless pulls.empty?
-              collection.find(selector).update_one(
-                positionally(selector, '$pull' => { path => { '_id' => { '$in' => pulls.pluck('_id') } } }),
+            Mongoid.changeset do
+              Mongoid.current_changeset.add(
+                type: :update,
+                collection: collection,
+                selector: selector,
+                payload: positionally(selector, '$set' => { path => [] }),
+                document: nil,
                 session: _session
               )
             end
-            unless pull_alls.empty?
-              collection.find(selector).update_one(
-                positionally(selector, '$pullAll' => { path => pull_alls }),
-                session: _session
-              )
+          else
+            Mongoid.changeset do
+              unless pulls.empty?
+                Mongoid.current_changeset.add(
+                  type: :update,
+                  collection: collection,
+                  selector: selector,
+                  payload: positionally(selector, '$pull' => { path => { '_id' => { '$in' => pulls.pluck('_id') } } }),
+                  document: nil,
+                  session: _session
+                )
+              end
+              unless pull_alls.empty?
+                Mongoid.current_changeset.add(
+                  type: :update,
+                  collection: collection,
+                  selector: selector,
+                  payload: positionally(selector, '$pullAll' => { path => pull_alls }),
+                  document: nil,
+                  session: _session
+                )
+              end
             end
             post_process_batch_remove(docs, method)
           end
@@ -154,10 +176,16 @@ module Mongoid
           self.inserts_valid = true
           inserts = pre_process_batch_insert(docs)
           if insertable?
-            collection.find(selector).update_one(
-              positionally(selector, '$set' => { path => inserts }),
-              session: _session
-            )
+            Mongoid.changeset do
+              Mongoid.current_changeset.add(
+                type: :update,
+                collection: collection,
+                selector: selector,
+                payload: positionally(selector, '$set' => { path => inserts }),
+                document: nil,
+                session: _session
+              )
+            end
             post_process_batch_insert(docs)
           end
           inserts
@@ -177,10 +205,16 @@ module Mongoid
           self.inserts_valid = true
           pushes = pre_process_batch_insert(docs)
           if insertable?
-            collection.find(selector).update_one(
-              positionally(selector, '$push' => { path => { '$each' => pushes } }),
-              session: _session
-            )
+            Mongoid.changeset do
+              Mongoid.current_changeset.add(
+                type: :update,
+                collection: collection,
+                selector: selector,
+                payload: positionally(selector, '$push' => { path => { '$each' => pushes } }),
+                document: nil,
+                session: _session
+              )
+            end
             post_process_batch_insert(docs)
           end
           pushes
