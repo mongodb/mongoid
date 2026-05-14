@@ -113,15 +113,13 @@ module Mongoid
         entry_opts = _view_opts
         Mongoid.changeset do
           Mongoid.current_changeset.add(
-            Changeset::Entry.new(
-              type: :delete_many,
-              collection: collection,
-              selector: view.filter,
-              payload: nil,
-              document: nil,
-              session: _session,
-              opts: entry_opts.empty? ? nil : entry_opts
-            )
+            type: :delete_many,
+            collection: collection,
+            selector: view.filter,
+            payload: nil,
+            document: nil,
+            session: _session,
+            opts: entry_opts.empty? ? nil : entry_opts
           )
         end
         nil
@@ -535,15 +533,13 @@ module Mongoid
         entry_opts = _view_opts.merge(opts)
         Mongoid.changeset do
           Mongoid.current_changeset.add(
-            Changeset::Entry.new(
-              type: :update_many,
-              collection: collection,
-              selector: view.filter,
-              payload: prepared,
-              document: nil,
-              session: _session,
-              opts: entry_opts.empty? ? nil : entry_opts
-            )
+            type: :update_many,
+            collection: collection,
+            selector: view.filter,
+            payload: prepared,
+            document: nil,
+            session: _session,
+            opts: entry_opts.empty? ? nil : entry_opts
           )
         end
         nil

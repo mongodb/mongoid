@@ -19,7 +19,7 @@ describe Mongoid::Changeset do
     end
   end
 
-  describe '#add' do
+  describe '#add_entry' do
     let(:entry) do
       Mongoid::Changeset::Entry.new(
         type: :update, collection: instance_double(Mongo::Collection), selector: {}, payload: {}, document: nil, session: nil
@@ -27,7 +27,7 @@ describe Mongoid::Changeset do
     end
 
     it 'appends the entry' do
-      cs.add(entry)
+      cs.add_entry(entry)
       expect(cs.entries).to eq([ entry ])
     end
 
@@ -35,8 +35,26 @@ describe Mongoid::Changeset do
       before { cs.discard }
 
       it 'raises' do
-        expect { cs.add(entry) }.to raise_error(Mongoid::Errors::InvalidOperation)
+        expect { cs.add_entry(entry) }.to raise_error(Mongoid::Errors::InvalidOperation)
       end
+    end
+  end
+
+  describe '#add' do
+    let(:coll) { instance_double(Mongo::Collection) }
+
+    it 'constructs an Entry from keyword arguments and appends it' do
+      cs.add(type: :update, collection: coll, selector: {}, payload: {}, document: nil, session: nil)
+      expect(cs.entries.size).to eq(1)
+      expect(cs.entries.first).to be_a(Mongoid::Changeset::Entry)
+      expect(cs.entries.first.type).to eq(:update)
+    end
+
+    it 'raises when terminated' do
+      cs.discard
+      expect do
+        cs.add(type: :update, collection: coll, selector: {}, payload: {}, document: nil, session: nil)
+      end.to raise_error(Mongoid::Errors::InvalidOperation)
     end
   end
 
@@ -73,7 +91,7 @@ describe Mongoid::Changeset do
       entry = Mongoid::Changeset::Entry.new(
         type: :insert, collection: instance_double(Mongo::Collection), selector: {}, payload: {}, document: nil, session: nil
       )
-      cs.add(entry)
+      cs.add_entry(entry)
     end
 
     it 'clears entries' do
@@ -202,7 +220,7 @@ describe Mongoid::Changeset do
     context 'with a single :insert entry' do
       it 'calls insert_one on the collection' do
         allow(coll).to receive(:insert_one)
-        cs.add(make_entry(type: :insert))
+        cs.add_entry(make_entry(type: :insert))
         cs.flush
         expect(coll).to have_received(:insert_one).with(payload)
       end
@@ -213,7 +231,7 @@ describe Mongoid::Changeset do
         view = instance_double(Mongo::Collection::View)
         allow(coll).to receive(:find).with(selector).and_return(view)
         allow(view).to receive(:update_one)
-        cs.add(make_entry(type: :update))
+        cs.add_entry(make_entry(type: :update))
         cs.flush
         expect(view).to have_received(:update_one).with(payload)
       end
@@ -224,7 +242,7 @@ describe Mongoid::Changeset do
         view = instance_double(Mongo::Collection::View)
         allow(coll).to receive(:find).with(selector).and_return(view)
         allow(view).to receive(:delete_one)
-        cs.add(make_entry(type: :delete, pay: nil))
+        cs.add_entry(make_entry(type: :delete, pay: nil))
         cs.flush
         expect(view).to have_received(:delete_one)
       end
@@ -237,8 +255,8 @@ describe Mongoid::Changeset do
       # `client[name]` returns a fresh Collection object on every call.
       it 'calls bulk_write once' do
         allow(coll).to receive(:bulk_write)
-        cs.add(make_entry(type: :insert, pay: { 'name' => 'Alice' }))
-        cs.add(make_entry(type: :insert, pay: { 'name' => 'Bob' }))
+        cs.add_entry(make_entry(type: :insert, pay: { 'name' => 'Alice' }))
+        cs.add_entry(make_entry(type: :insert, pay: { 'name' => 'Bob' }))
         cs.flush
         expect(coll).to have_received(:bulk_write).once
       end
@@ -246,8 +264,8 @@ describe Mongoid::Changeset do
       it 'does not call insert_one' do
         allow(coll).to receive(:bulk_write)
         allow(coll).to receive(:insert_one)
-        cs.add(make_entry(type: :insert, pay: { 'name' => 'Alice' }))
-        cs.add(make_entry(type: :insert, pay: { 'name' => 'Bob' }))
+        cs.add_entry(make_entry(type: :insert, pay: { 'name' => 'Alice' }))
+        cs.add_entry(make_entry(type: :insert, pay: { 'name' => 'Bob' }))
         cs.flush
         expect(coll).not_to have_received(:insert_one)
       end
@@ -259,8 +277,8 @@ describe Mongoid::Changeset do
       it 'makes two separate driver calls, not a cross-collection bulk_write' do
         allow(coll).to receive(:insert_one)
         allow(coll2).to receive(:insert_one)
-        cs.add(make_entry(type: :insert, collection: coll))
-        cs.add(make_entry(type: :insert, collection: coll2))
+        cs.add_entry(make_entry(type: :insert, collection: coll))
+        cs.add_entry(make_entry(type: :insert, collection: coll2))
         cs.flush
         expect(coll).to have_received(:insert_one).once
         expect(coll2).to have_received(:insert_one).once
@@ -271,8 +289,8 @@ describe Mongoid::Changeset do
         allow(coll).to receive(:bulk_write)
         allow(coll2).to receive(:insert_one)
         allow(coll2).to receive(:bulk_write)
-        cs.add(make_entry(type: :insert, collection: coll))
-        cs.add(make_entry(type: :insert, collection: coll2))
+        cs.add_entry(make_entry(type: :insert, collection: coll))
+        cs.add_entry(make_entry(type: :insert, collection: coll2))
         cs.flush
         expect(coll).not_to have_received(:bulk_write)
         expect(coll2).not_to have_received(:bulk_write)
@@ -285,7 +303,7 @@ describe Mongoid::Changeset do
         doc = klass.new(name: 'Alice')
         klass.before_flush { log << :callback }
         allow(coll).to receive(:insert_one) { log << :driver }
-        cs.add(make_entry(type: :insert, doc: doc))
+        cs.add_entry(make_entry(type: :insert, doc: doc))
         cs.flush
         expect(log).to eq(%i[callback driver])
       end
@@ -297,7 +315,7 @@ describe Mongoid::Changeset do
         doc = klass.new(name: 'Alice')
         klass.after_flush { log << :callback }
         allow(coll).to receive(:insert_one) { log << :driver }
-        cs.add(make_entry(type: :insert, doc: doc))
+        cs.add_entry(make_entry(type: :insert, doc: doc))
         cs.flush
         expect(log).to eq(%i[driver callback])
       end
@@ -306,13 +324,13 @@ describe Mongoid::Changeset do
     context 'on driver error' do
       it 'propagates the exception' do
         allow(coll).to receive(:insert_one).and_raise(Mongo::Error::OperationFailure.new('write failed'))
-        cs.add(make_entry(type: :insert))
+        cs.add_entry(make_entry(type: :insert))
         expect { cs.flush }.to raise_error(Mongo::Error::OperationFailure)
       end
 
       it 'marks the changeset terminated even when the flush is aborted by an error' do
         allow(coll).to receive(:insert_one).and_raise(Mongo::Error::OperationFailure.new('write failed'))
-        cs.add(make_entry(type: :insert))
+        cs.add_entry(make_entry(type: :insert))
         begin
           cs.flush
         rescue Mongo::Error::OperationFailure
@@ -327,7 +345,7 @@ describe Mongoid::Changeset do
         doc = klass.new(name: 'Alice')
         expect(doc.new_record?).to be(true)
         allow(coll).to receive(:insert_one)
-        cs.add(make_entry(type: :insert, doc: doc))
+        cs.add_entry(make_entry(type: :insert, doc: doc))
         cs.flush
         expect(doc.new_record?).to be(false)
       end
@@ -338,7 +356,7 @@ describe Mongoid::Changeset do
         view = instance_double(Mongo::Collection::View)
         allow(coll).to receive(:find).with(selector).and_return(view)
         allow(view).to receive(:delete_one)
-        cs.add(make_entry(type: :delete, pay: nil, doc: doc))
+        cs.add_entry(make_entry(type: :delete, pay: nil, doc: doc))
         cs.flush
         expect(doc.destroyed?).to be(true)
       end

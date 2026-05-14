@@ -61,14 +61,12 @@ module Mongoid
           selector = _parent.atomic_selector
           Mongoid.changeset do
             Mongoid.current_changeset.add(
-              Changeset::Entry.new(
-                type: :embedded_delete,
-                collection: _root.collection,
-                selector: selector,
-                payload: positionally(selector, atomic_deletes),
-                document: self,
-                session: _session
-              )
+              type: :embedded_delete,
+              collection: _root.collection,
+              selector: selector,
+              payload: positionally(selector, atomic_deletes),
+              document: self,
+              session: _session
             )
           end
         end
@@ -86,14 +84,12 @@ module Mongoid
       def delete_as_root
         Mongoid.changeset do
           Mongoid.current_changeset.add(
-            Changeset::Entry.new(
-              type: :delete,
-              collection: collection,
-              selector: atomic_selector,
-              payload: nil,
-              document: self,
-              session: _session
-            )
+            type: :delete,
+            collection: collection,
+            selector: atomic_selector,
+            payload: nil,
+            document: self,
+            session: _session
           )
         end
         true

@@ -34,8 +34,13 @@ module Mongoid
       raise
     end
 
-    # Appends an entry to the list.
-    def add(entry)
+    # Constructs an Entry from the given keyword arguments and appends it.
+    def add(**kwargs)
+      add_entry(Entry.new(**kwargs))
+    end
+
+    # Appends a pre-built Entry to the list.
+    def add_entry(entry)
       raise Errors::InvalidOperation.new('Changeset is terminated') if terminated?
 
       @entries << entry

@@ -33,14 +33,12 @@ module Mongoid
         selector = atomic_selector
         Mongoid.changeset do
           Mongoid.current_changeset.add(
-            Changeset::Entry.new(
-              type: :update,
-              collection: collection(_root),
-              selector: selector,
-              payload: positionally(selector, { '$unset' => ops }),
-              document: self,
-              session: _session
-            )
+            type: :update,
+            collection: collection(_root),
+            selector: selector,
+            payload: positionally(selector, { '$unset' => ops }),
+            document: self,
+            session: _session
           )
         end
         self

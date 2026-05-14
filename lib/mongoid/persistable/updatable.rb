@@ -133,14 +133,12 @@ module Mongoid
             payload = positionally(selector, updates)
 
             Mongoid.current_changeset.add(
-              Changeset::Entry.new(
-                type: :update,
-                collection: collection(_root),
-                selector: selector,
-                payload: payload,
-                document: self,
-                session: _session
-              )
+              type: :update,
+              collection: collection(_root),
+              selector: selector,
+              payload: payload,
+              document: self,
+              session: _session
             )
 
             # Conflict updates are applied in separate entries to avoid MongoDB
@@ -151,14 +149,12 @@ module Mongoid
               conflicting_change_groups = changes.group_by { |key, _| key.split('.', 2).first }.values
               while batched = conflicting_change_groups.map(&:pop).compact.to_h.presence
                 Mongoid.current_changeset.add(
-                  Changeset::Entry.new(
-                    type: :update,
-                    collection: collection(_root),
-                    selector: selector,
-                    payload: positionally(selector, modifier => batched),
-                    document: self,
-                    session: _session
-                  )
+                  type: :update,
+                  collection: collection(_root),
+                  selector: selector,
+                  payload: positionally(selector, modifier => batched),
+                  document: self,
+                  session: _session
                 )
               end
             end

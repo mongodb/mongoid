@@ -52,7 +52,7 @@ module Mongoid
       #
       # @api private
       def _stage_insert_as_root
-        entry = Changeset::Entry.new(
+        Mongoid.current_changeset.add(
           type: :insert,
           collection: collection,
           selector: { '_id' => _id },
@@ -60,7 +60,6 @@ module Mongoid
           document: self,
           session: _session
         )
-        Mongoid.current_changeset.add(entry)
       end
 
       # Stage an update entry for an embedded document.
@@ -84,7 +83,7 @@ module Mongoid
           end
         end
 
-        entry = Changeset::Entry.new(
+        Mongoid.current_changeset.add(
           type: :embedded_insert,
           collection: _root.collection,
           selector: _parent.atomic_selector,
@@ -92,7 +91,6 @@ module Mongoid
           document: self,
           session: _session
         )
-        Mongoid.current_changeset.add(entry)
       end
 
       # Prepare the insert for execution. Validates and runs callbacks, etc.
