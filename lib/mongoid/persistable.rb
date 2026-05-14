@@ -124,7 +124,7 @@ module Mongoid
     def post_process_persist(result, options = {})
       post_persist unless result == false
       errors.clear unless performing_validations?(options)
-      Threaded.add_modified_document(_session, self) if in_transaction? && !Mongoid.current_changeset
+      Threaded.add_modified_document(_session, self) if in_transaction? && !Threaded.current_changeset
       true
     end
 
@@ -141,8 +141,8 @@ module Mongoid
       return unless persisted? && operations && !operations.empty?
 
       selector = atomic_selector
-      Mongoid.changeset do
-        Mongoid.current_changeset.add(
+      Mongoid.changeset do |cs|
+        cs.add(
           type: :update,
           collection: collection(_root),
           selector: selector,
@@ -158,12 +158,12 @@ module Mongoid
     #
     # @api private
     def _atomically_independent(&block)
-      outer = Mongoid.current_changeset
-      Mongoid::Threaded.current_changeset = nil
+      outer = Threaded.current_changeset
+      Threaded.current_changeset = nil
       begin
         Mongoid.changeset(&block)
       ensure
-        Mongoid::Threaded.current_changeset = outer
+        Threaded.current_changeset = outer
       end
     end
   end

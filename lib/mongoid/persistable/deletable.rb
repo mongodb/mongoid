@@ -59,8 +59,8 @@ module Mongoid
         _parent.remove_child(self) if notifying_parent?(options)
         if _parent.persisted?
           selector = _parent.atomic_selector
-          Mongoid.changeset do
-            Mongoid.current_changeset.add(
+          Mongoid.changeset do |cs|
+            cs.add(
               type: :embedded_delete,
               collection: _root.collection,
               selector: selector,
@@ -82,8 +82,8 @@ module Mongoid
       #
       # @return [ true ] If the document was removed.
       def delete_as_root
-        Mongoid.changeset do
-          Mongoid.current_changeset.add(
+        Mongoid.changeset do |cs|
+          cs.add(
             type: :delete,
             collection: collection,
             selector: atomic_selector,

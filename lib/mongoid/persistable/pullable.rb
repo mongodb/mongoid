@@ -31,8 +31,8 @@ module Mongoid
         return self if ops.empty?
 
         selector = atomic_selector
-        Mongoid.changeset do
-          Mongoid.current_changeset.add(
+        Mongoid.changeset do |cs|
+          cs.add(
             type: :update,
             collection: collection(_root),
             selector: selector,
@@ -68,8 +68,8 @@ module Mongoid
         return self if ops.empty?
 
         selector = atomic_selector
-        Mongoid.changeset do
-          Mongoid.current_changeset.add(
+        Mongoid.changeset do |cs|
+          cs.add(
             type: :update,
             collection: collection(_root),
             selector: selector,

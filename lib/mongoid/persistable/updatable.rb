@@ -132,7 +132,7 @@ module Mongoid
             selector = atomic_selector
             payload = positionally(selector, updates)
 
-            Mongoid.current_changeset.add(
+            Threaded.current_changeset.add(
               type: :update,
               collection: collection(_root),
               selector: selector,
@@ -148,7 +148,7 @@ module Mongoid
             conflicts.each_pair do |modifier, changes|
               conflicting_change_groups = changes.group_by { |key, _| key.split('.', 2).first }.values
               while batched = conflicting_change_groups.map(&:pop).compact.to_h.presence
-                Mongoid.current_changeset.add(
+                Threaded.current_changeset.add(
                   type: :update,
                   collection: collection(_root),
                   selector: selector,

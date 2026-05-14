@@ -33,8 +33,8 @@ module Mongoid
         def batch_clear(docs)
           pre_process_batch_remove(docs, :delete)
           unless docs.empty?
-            Mongoid.changeset do
-              Mongoid.current_changeset.add(
+            Mongoid.changeset do |cs|
+              cs.add(
                 type: :update,
                 collection: collection,
                 selector: selector,
@@ -73,8 +73,8 @@ module Mongoid
           end
 
           if docs.empty?
-            Mongoid.changeset do
-              Mongoid.current_changeset.add(
+            Mongoid.changeset do |cs|
+              cs.add(
                 type: :update,
                 collection: collection,
                 selector: selector,
@@ -84,9 +84,9 @@ module Mongoid
               )
             end
           else
-            Mongoid.changeset do
+            Mongoid.changeset do |cs|
               unless pulls.empty?
-                Mongoid.current_changeset.add(
+                cs.add(
                   type: :update,
                   collection: collection,
                   selector: selector,
@@ -96,7 +96,7 @@ module Mongoid
                 )
               end
               unless pull_alls.empty?
-                Mongoid.current_changeset.add(
+                cs.add(
                   type: :update,
                   collection: collection,
                   selector: selector,
@@ -176,8 +176,8 @@ module Mongoid
           self.inserts_valid = true
           inserts = pre_process_batch_insert(docs)
           if insertable?
-            Mongoid.changeset do
-              Mongoid.current_changeset.add(
+            Mongoid.changeset do |cs|
+              cs.add(
                 type: :update,
                 collection: collection,
                 selector: selector,
@@ -205,8 +205,8 @@ module Mongoid
           self.inserts_valid = true
           pushes = pre_process_batch_insert(docs)
           if insertable?
-            Mongoid.changeset do
-              Mongoid.current_changeset.add(
+            Mongoid.changeset do |cs|
+              cs.add(
                 type: :update,
                 collection: collection,
                 selector: selector,

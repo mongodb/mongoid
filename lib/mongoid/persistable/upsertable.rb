@@ -45,7 +45,7 @@ module Mongoid
       # @api private
       def _stage_upsert(options)
         if options[:replace]
-          Mongoid.current_changeset.add(
+          Threaded.current_changeset.add(
             type: :upsert_replace,
             collection: collection,
             selector: atomic_selector,
@@ -56,7 +56,7 @@ module Mongoid
         else
           attrs = { '$set' => as_attributes }
           attrs['$setOnInsert'] = options[:set_on_insert] if options[:set_on_insert]
-          Mongoid.current_changeset.add(
+          Threaded.current_changeset.add(
             type: :upsert,
             collection: collection,
             selector: atomic_selector,

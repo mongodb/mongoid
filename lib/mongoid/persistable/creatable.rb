@@ -52,7 +52,7 @@ module Mongoid
       #
       # @api private
       def _stage_insert_as_root
-        Mongoid.current_changeset.add(
+        Threaded.current_changeset.add(
           type: :insert,
           collection: collection,
           selector: { '_id' => _id },
@@ -83,7 +83,7 @@ module Mongoid
           end
         end
 
-        Mongoid.current_changeset.add(
+        Threaded.current_changeset.add(
           type: :embedded_insert,
           collection: _root.collection,
           selector: _parent.atomic_selector,

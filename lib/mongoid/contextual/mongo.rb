@@ -111,8 +111,8 @@ module Mongoid
       # @return [ nil ] Nil.
       def delete
         entry_opts = _view_opts
-        Mongoid.changeset do
-          Mongoid.current_changeset.add(
+        Mongoid.changeset do |cs|
+          cs.add(
             type: :delete_many,
             collection: collection,
             selector: view.filter,
@@ -531,8 +531,8 @@ module Mongoid
 
         prepared = AtomicUpdatePreparer.prepare(attributes, klass)
         entry_opts = _view_opts.merge(opts)
-        Mongoid.changeset do
-          Mongoid.current_changeset.add(
+        Mongoid.changeset do |cs|
+          cs.add(
             type: :update_many,
             collection: collection,
             selector: view.filter,

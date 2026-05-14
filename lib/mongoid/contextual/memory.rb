@@ -49,8 +49,8 @@ module Mongoid
           doc.send(:as_attributes)
         end
         unless removed.empty?
-          Mongoid.changeset do
-            Mongoid.current_changeset.add(
+          Mongoid.changeset do |cs|
+            cs.add(
               type: :update,
               collection: collection,
               selector: selector,
@@ -572,8 +572,8 @@ module Mongoid
         end
         return if updates['$set'].empty?
 
-        Mongoid.changeset do
-          Mongoid.current_changeset.add(
+        Mongoid.changeset do |cs|
+          cs.add(
             type: :update,
             collection: collection,
             selector: selector,

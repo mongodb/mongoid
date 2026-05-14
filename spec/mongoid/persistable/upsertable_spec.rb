@@ -186,17 +186,17 @@ describe Mongoid::Persistable::Upsertable do
 
       it 'stages a :upsert entry for a non-replace upsert' do
         band = Band.new(name: 'Deftones')
-        Mongoid.changeset do
+        Mongoid.changeset do |cs|
           band.upsert
-          expect(Mongoid.current_changeset.entries.last.type).to eq(:upsert)
+          expect(cs.entries.last.type).to eq(:upsert)
         end
       end
 
       it 'stages a :upsert_replace entry for a replace upsert' do
         band = Band.new(name: 'Deftones')
-        Mongoid.changeset do
+        Mongoid.changeset do |cs|
           band.upsert(replace: true)
-          expect(Mongoid.current_changeset.entries.last.type).to eq(:upsert_replace)
+          expect(cs.entries.last.type).to eq(:upsert_replace)
         end
       end
     end

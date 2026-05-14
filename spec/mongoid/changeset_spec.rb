@@ -157,37 +157,37 @@ describe Mongoid::Changeset do
 
     it 'creates a new changeset if none is active' do
       cs = nil
-      Mongoid.changeset { cs = Mongoid.current_changeset }
+      Mongoid.changeset { |c| cs = c }
       expect(cs).to be_a(Mongoid::Changeset)
     end
 
     it 'reuses an existing changeset when nested' do
       outer_cs = nil
       inner_cs = nil
-      Mongoid.changeset do
-        outer_cs = Mongoid.current_changeset
-        Mongoid.changeset { inner_cs = Mongoid.current_changeset }
+      Mongoid.changeset do |c|
+        outer_cs = c
+        Mongoid.changeset { |ic| inner_cs = ic }
       end
       expect(inner_cs).to equal(outer_cs)
     end
 
-    it 'clears current_changeset after the block exits' do
+    it 'clears the changeset after the block exits' do
       Mongoid.changeset { nil }
-      expect(Mongoid.current_changeset).to be_nil
+      expect(Mongoid::Threaded.current_changeset).to be_nil
     end
 
-    it 'clears current_changeset after a block error' do
+    it 'clears the changeset after a block error' do
       begin
         Mongoid.changeset { raise 'boom' }
       rescue StandardError
         nil
       end
-      expect(Mongoid.current_changeset).to be_nil
+      expect(Mongoid::Threaded.current_changeset).to be_nil
     end
 
-    it 'exposes Mongoid.current_changeset inside the block' do
+    it 'yields the changeset to the block' do
       captured = nil
-      Mongoid.changeset { captured = Mongoid.current_changeset }
+      Mongoid.changeset { |cs| captured = cs }
       expect(captured).to be_a(Mongoid::Changeset)
     end
   end

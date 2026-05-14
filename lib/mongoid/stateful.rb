@@ -153,7 +153,7 @@ module Mongoid
     #
     # @return [ true | false ] Whether this document has staged entries.
     def staged?
-      cs = Mongoid.current_changeset
+      cs = Threaded.current_changeset
       return false unless cs && !cs.terminated?
 
       cs.entries.any? { |e| e.document.equal?(self) }
@@ -167,7 +167,7 @@ module Mongoid
     #
     # @return [ Array<Mongoid::Changeset::Entry> ] The staged entries.
     def staged
-      cs = Mongoid.current_changeset
+      cs = Threaded.current_changeset
       return [] unless cs && !cs.terminated?
 
       cs.entries.select { |e| e.document.equal?(self) }
