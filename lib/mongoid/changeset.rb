@@ -130,6 +130,10 @@ module Mongoid
         entry.collection.find(entry.selector).delete_one(**driver_opts)
       when :delete_many
         entry.collection.find(entry.selector).delete_many(**driver_opts)
+      when :upsert
+        entry.collection.find(entry.selector).update_one(entry.payload, upsert: true, **driver_opts)
+      when :upsert_replace
+        entry.collection.find(entry.selector).replace_one(entry.payload, upsert: true, **driver_opts)
       end
     end
 
@@ -154,6 +158,17 @@ module Mongoid
         { delete_one: { filter: entry.selector }.merge(inner_opts) }
       when :delete_many
         { delete_many: { filter: entry.selector }.merge(inner_opts) }
+      else
+        _bulk_op_for_upsert(entry, inner_opts)
+      end
+    end
+
+    def _bulk_op_for_upsert(entry, inner_opts)
+      case entry.type
+      when :upsert
+        { update_one: { filter: entry.selector, update: entry.payload, upsert: true }.merge(inner_opts) }
+      when :upsert_replace
+        { replace_one: { filter: entry.selector, replacement: entry.payload, upsert: true }.merge(inner_opts) }
       end
     end
 
@@ -162,7 +177,7 @@ module Mongoid
       return unless doc
 
       case entry.type
-      when :insert, :embedded_insert
+      when :insert, :embedded_insert, :upsert, :upsert_replace
         doc.new_record = false
         doc.remember_storage_options!
         doc.flag_descendants_persisted

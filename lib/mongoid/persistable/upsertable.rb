@@ -32,24 +32,40 @@ module Mongoid
       # @return [ true ] True.
       def upsert(options = {})
         prepare_upsert(options) do
-          if options[:replace]
-            raise ArgumentError, 'cannot specify :set_on_insert with `replace: true`' if options[:set_on_insert]
+          raise ArgumentError, 'cannot specify :set_on_insert with `replace: true`' if options[:replace] && options[:set_on_insert]
 
-            collection.find(atomic_selector).replace_one(
-              as_attributes, upsert: true, session: _session
-            )
-          else
-            attrs = { '$set' => as_attributes }
-            attrs['$setOnInsert'] = options[:set_on_insert] if options[:set_on_insert]
-
-            collection.find(atomic_selector).update_one(
-              attrs, upsert: true, session: _session
-            )
-          end
+          _stage_upsert(options)
         end
       end
 
       private
+
+      # Stage the upsert entry on the current changeset.
+      #
+      # @api private
+      def _stage_upsert(options)
+        if options[:replace]
+          Mongoid.current_changeset.add(
+            type: :upsert_replace,
+            collection: collection,
+            selector: atomic_selector,
+            payload: as_attributes,
+            document: self,
+            session: _session
+          )
+        else
+          attrs = { '$set' => as_attributes }
+          attrs['$setOnInsert'] = options[:set_on_insert] if options[:set_on_insert]
+          Mongoid.current_changeset.add(
+            type: :upsert,
+            collection: collection,
+            selector: atomic_selector,
+            payload: attrs,
+            document: self,
+            session: _session
+          )
+        end
+      end
 
       # Prepare the upsert for execution.
       #
@@ -69,12 +85,13 @@ module Mongoid
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return false if performing_validations?(options) && invalid?(:upsert)
 
-        result = run_callbacks(:upsert) do
-          yield(self)
+        run_callbacks(:upsert) do
+          Mongoid.changeset do
+            yield(self)
+            post_process_persist(true, options)
+          end
           true
         end
-        self.new_record = false
-        post_process_persist(result, options) and result
       end
     end
   end
