@@ -34,22 +34,7 @@ module Mongoid
           ops[atomic_attribute_name(old_access)] = atomic_attribute_name(new_name)
         end
 
-        return self if ops.empty?
-
-        selector = atomic_selector
-        Mongoid.changeset do |cs|
-          cs.add(
-            type: :update,
-            collection: collection(_root),
-            selector: selector,
-            payload: positionally(selector, { '$rename' => ops }),
-            document: self,
-            session: _session,
-            skip_callbacks: true,
-            dirty_fields: dirty
-          )
-        end
-        self
+        _stage_atomic_update('$rename', ops, dirty: dirty)
       end
     end
   end

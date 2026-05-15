@@ -37,21 +37,8 @@ module Mongoid
         end
 
         return self unless persisted?
-        return self if ops.empty?
 
-        selector = atomic_selector
-        Mongoid.changeset do |cs|
-          cs.add(
-            type: :update,
-            collection: collection(_root),
-            selector: selector,
-            payload: positionally(selector, { '$addToSet' => ops }),
-            document: self,
-            session: _session,
-            skip_callbacks: true
-          )
-        end
-        self
+        _stage_atomic_update('$addToSet', ops)
       end
 
       # Push a single value or multiple values onto arrays.
@@ -82,21 +69,8 @@ module Mongoid
         end
 
         return self unless persisted?
-        return self if ops.empty?
 
-        selector = atomic_selector
-        Mongoid.changeset do |cs|
-          cs.add(
-            type: :update,
-            collection: collection(_root),
-            selector: selector,
-            payload: positionally(selector, { '$push' => ops }),
-            document: self,
-            session: _session,
-            skip_callbacks: true
-          )
-        end
-        self
+        _stage_atomic_update('$push', ops)
       end
     end
   end

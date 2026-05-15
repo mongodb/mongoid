@@ -28,21 +28,7 @@ module Mongoid
           ops[atomic_attribute_name(access)] = value
         end
 
-        return self if ops.empty?
-
-        selector = atomic_selector
-        Mongoid.changeset do |cs|
-          cs.add(
-            type: :update,
-            collection: collection(_root),
-            selector: selector,
-            payload: positionally(selector, { '$pull' => ops }),
-            document: self,
-            session: _session,
-            skip_callbacks: true
-          )
-        end
-        self
+        _stage_atomic_update('$pull', ops)
       end
 
       # Pull multiple values from the provided array fields.
@@ -66,21 +52,7 @@ module Mongoid
           ops[atomic_attribute_name(access)] = value
         end
 
-        return self if ops.empty?
-
-        selector = atomic_selector
-        Mongoid.changeset do |cs|
-          cs.add(
-            type: :update,
-            collection: collection(_root),
-            selector: selector,
-            payload: positionally(selector, { '$pullAll' => ops }),
-            document: self,
-            session: _session,
-            skip_callbacks: true
-          )
-        end
-        self
+        _stage_atomic_update('$pullAll', ops)
       end
     end
   end

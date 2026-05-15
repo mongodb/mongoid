@@ -60,22 +60,7 @@ module Mongoid
           ops[atomic_attribute_name(top_field)] = attributes[top_field] unless relations.include?(top_field)
         end
 
-        return self if ops.empty?
-
-        selector = atomic_selector
-        Mongoid.changeset do |cs|
-          cs.add(
-            type: :update,
-            collection: collection(_root),
-            selector: selector,
-            payload: positionally(selector, { '$set' => ops }),
-            document: self,
-            session: _session,
-            skip_callbacks: true,
-            dirty_fields: dirty
-          )
-        end
-        self
+        _stage_atomic_update('$set', ops, dirty: dirty)
       end
 
       private

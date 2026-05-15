@@ -202,5 +202,37 @@ module Mongoid
     def _track_dirty_field(dirty, access)
       dirty ? dirty << access : remove_change(access)
     end
+
+    # Stage an atomic :update entry in the current changeset.
+    # Used by the atomic operation modules (inc, bit, set, unset, etc.)
+    # after they have computed their MongoDB operator payload.
+    #
+    # @api private
+    #
+    # @param [ String ] operator The MongoDB update operator, e.g. '$inc'.
+    # @param [ Hash ] ops The field/value pairs for the operator.
+    # @param [ Array | nil ] dirty Accumulated dirty field names from an
+    #   #atomically context, or nil when not inside one.
+    #
+    # @return [ Document ] self
+    def _stage_atomic_update(operator, ops, dirty: nil)
+      return self if ops.empty?
+
+      selector = atomic_selector
+      Mongoid.changeset do |cs|
+        entry = {
+          type: :update,
+          collection: collection(_root),
+          selector: selector,
+          payload: positionally(selector, { operator => ops }),
+          document: self,
+          session: _session,
+          skip_callbacks: true
+        }
+        entry[:dirty_fields] = dirty unless dirty.nil?
+        cs.add(**entry)
+      end
+      self
+    end
   end
 end

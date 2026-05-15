@@ -32,22 +32,9 @@ module Mongoid
           ops[atomic_attribute_name(access)] = increment
         end
 
-        return self if ops.empty? || !persisted?
+        return self unless persisted?
 
-        selector = atomic_selector
-        Mongoid.changeset do |cs|
-          cs.add(
-            type: :update,
-            collection: collection(_root),
-            selector: selector,
-            payload: positionally(selector, { '$inc' => ops }),
-            document: self,
-            session: _session,
-            skip_callbacks: true,
-            dirty_fields: dirty
-          )
-        end
-        self
+        _stage_atomic_update('$inc', ops, dirty: dirty)
       end
     end
   end

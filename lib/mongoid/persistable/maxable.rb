@@ -33,22 +33,7 @@ module Mongoid
           ops[atomic_attribute_name(access)] = value
         end
 
-        return self if ops.empty?
-
-        selector = atomic_selector
-        Mongoid.changeset do |cs|
-          cs.add(
-            type: :update,
-            collection: collection(_root),
-            selector: selector,
-            payload: positionally(selector, { '$max' => ops }),
-            document: self,
-            session: _session,
-            skip_callbacks: true,
-            dirty_fields: dirty
-          )
-        end
-        self
+        _stage_atomic_update('$max', ops, dirty: dirty)
       end
       alias clamp_lower_bound set_max
     end
