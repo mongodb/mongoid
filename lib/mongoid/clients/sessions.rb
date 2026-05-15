@@ -81,6 +81,8 @@ module Mongoid
         #
         # @yield Provided block will be executed inside a transaction.
         def transaction(options = {}, session_options: {}, &block)
+          raise Errors::TransactionInChangeset.new if Threaded.current_changeset
+
           with_session(session_options) do |session|
             session.with_transaction(options, &block).tap { run_commit_callbacks(session) }
           rescue *transactions_not_supported_exceptions

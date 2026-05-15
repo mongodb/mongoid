@@ -1329,4 +1329,24 @@ describe Mongoid::Clients::Sessions do
       end
     end
   end
+
+  context 'when called inside a changeset' do
+    after { Mongoid::Threaded.current_changeset = nil }
+
+    it 'raises TransactionInChangeset on a model class' do
+      expect do
+        Mongoid.changeset do
+          TransactionsSpecPerson.transaction { nil }
+        end
+      end.to raise_error(Mongoid::Errors::TransactionInChangeset)
+    end
+
+    it 'raises TransactionInChangeset on the Mongoid module' do
+      expect do
+        Mongoid.changeset do
+          Mongoid.transaction { nil }
+        end
+      end.to raise_error(Mongoid::Errors::TransactionInChangeset)
+    end
+  end
 end

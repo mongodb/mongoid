@@ -67,7 +67,7 @@ module Mongoid
               payload: positionally(selector, atomic_deletes),
               document: self,
               session: _session,
-              skip_callbacks: true
+              skip_callbacks: !flagged_for_destroy?
             )
           end
         end
@@ -91,7 +91,7 @@ module Mongoid
             payload: nil,
             document: self,
             session: _session,
-            skip_callbacks: true
+            skip_callbacks: !flagged_for_destroy?
           )
         end
         true
