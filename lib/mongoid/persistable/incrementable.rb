@@ -19,13 +19,16 @@ module Mongoid
       def inc(increments)
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
 
+        dirty = _atomic_dirty_fields_init
         ops = {}
+
         increments.each do |field, value|
           access = database_field_name(field)
           increment = value.is_a?(BigDecimal) ? value.to_f : value
           current = attributes[access]
+          _mark_dirty_field(dirty, access, current)
           attributes[access] = (current || 0) + increment
-          remove_change(access)
+          _track_dirty_field(dirty, access)
           ops[atomic_attribute_name(access)] = increment
         end
 
@@ -40,7 +43,8 @@ module Mongoid
             payload: positionally(selector, { '$inc' => ops }),
             document: self,
             session: _session,
-            skip_callbacks: true
+            skip_callbacks: true,
+            dirty_fields: dirty
           )
         end
         self

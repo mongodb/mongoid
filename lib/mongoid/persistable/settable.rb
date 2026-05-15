@@ -47,16 +47,16 @@ module Mongoid
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return self unless persisted?
 
+        dirty = _atomic_dirty_fields_init
         ops = {}
+
         setters.each do |field, value|
           access = database_field_name(field)
           field_seq = access.to_s.split('.')
           top_field = field_seq.shift
-          if field_seq.length > 0
-            value = _set_nested(top_field, field_seq, value)
-          end
+          value = _set_nested(top_field, field_seq, value) if field_seq.length > 0
           process_attribute(top_field, value)
-          remove_change(top_field)
+          _track_dirty_field(dirty, top_field)
           ops[atomic_attribute_name(top_field)] = attributes[top_field] unless relations.include?(top_field)
         end
 
@@ -71,7 +71,8 @@ module Mongoid
             payload: positionally(selector, { '$set' => ops }),
             document: self,
             session: _session,
-            skip_callbacks: true
+            skip_callbacks: true,
+            dirty_fields: dirty
           )
         end
         self

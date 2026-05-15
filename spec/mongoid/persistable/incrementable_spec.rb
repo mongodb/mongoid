@@ -213,11 +213,18 @@ describe Mongoid::Persistable::Incrementable do
         Person.create!(age: 10, score: 100)
       end
 
-      it 'stages the operation and clears dirty tracking immediately' do
+      it 'marks dirty changes for the incremented fields during the block' do
         person.atomically do
           person.inc age: 15, score: 2
-          expect(person.changes).to be_empty
+          expect(person.changes).to eq({ 'age' => [ 10, 25 ], 'score' => [ 100, 102 ] })
         end
+      end
+
+      it 'clears dirty changes after the block' do
+        person.atomically do
+          person.inc age: 15, score: 2
+        end
+        expect(person.changes).to be_empty
       end
     end
 

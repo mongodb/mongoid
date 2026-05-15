@@ -129,11 +129,16 @@ describe Mongoid::Persistable::Renamable do
         Person.create!(title: 'sir')
       end
 
-      it 'stages the operation and clears dirty tracking immediately' do
+      it 'marks dirty changes for renamed fields during the block' do
         person.atomically do
           person.rename title: :salutation
-          expect(person.changes).to be_empty
+          expect(person.changes).to eq({ 'title' => [ 'sir', nil ], 'salutation' => [ nil, 'sir' ] })
         end
+      end
+
+      it 'clears dirty changes after the block' do
+        person.atomically { person.rename title: :salutation }
+        expect(person.changes).to be_empty
       end
     end
 

@@ -20,13 +20,17 @@ module Mongoid
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return self unless persisted?
 
+        dirty = _atomic_dirty_fields_init
         ops = {}
+
         renames.each do |old_field, new_field|
           old_access = database_field_name(old_field)
           new_name = new_field.to_s
+          _mark_dirty_field(dirty, old_access, attributes[old_access])
+          _mark_dirty_field(dirty, new_name, nil)
           attributes[new_name] = attributes.delete(old_access)
-          remove_change(old_access)
-          remove_change(new_name)
+          _track_dirty_field(dirty, old_access)
+          _track_dirty_field(dirty, new_name)
           ops[atomic_attribute_name(old_access)] = atomic_attribute_name(new_name)
         end
 
@@ -41,7 +45,8 @@ module Mongoid
             payload: positionally(selector, { '$rename' => ops }),
             document: self,
             session: _session,
-            skip_callbacks: true
+            skip_callbacks: true,
+            dirty_fields: dirty
           )
         end
         self

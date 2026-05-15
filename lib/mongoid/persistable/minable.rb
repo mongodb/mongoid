@@ -21,14 +21,15 @@ module Mongoid
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return self unless persisted?
 
+        dirty = _atomic_dirty_fields_init
         ops = {}
+
         fields.each do |field, value|
           access = database_field_name(field)
-          current_value = attributes[access]
-          next unless value < current_value
+          next unless value < attributes[access]
 
           process_attribute access, value
-          remove_change(access)
+          _track_dirty_field(dirty, access)
           ops[atomic_attribute_name(access)] = value
         end
 
@@ -43,7 +44,8 @@ module Mongoid
             payload: positionally(selector, { '$min' => ops }),
             document: self,
             session: _session,
-            skip_callbacks: true
+            skip_callbacks: true,
+            dirty_fields: dirty
           )
         end
         self

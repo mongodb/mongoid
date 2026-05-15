@@ -76,10 +76,21 @@ module Mongoid
         Mongoid::Warnings.warn_join_context_false_deprecated
         if block_given?
           doc = self
-          _atomically_independent { yield doc }
+          _atomically_independent do |cs|
+            cs.enter_atomically_context
+            yield doc
+          end
         end
       elsif block_given?
-        Mongoid.changeset { yield self }
+        Mongoid.changeset do |cs|
+          was_atomic = cs.atomically_context?
+          cs.enter_atomically_context unless was_atomic
+          begin
+            yield self
+          ensure
+            cs.exit_atomically_context unless was_atomic
+          end
+        end
       end
       true
     end
@@ -165,6 +176,31 @@ module Mongoid
       ensure
         Threaded.current_changeset = outer
       end
+    end
+
+    # Returns an empty array when currently inside an #atomically block (to
+    # accumulate dirty field names for cleanup after flush), or nil otherwise.
+    #
+    # @api private
+    def _atomic_dirty_fields_init
+      [] if Threaded.current_changeset&.atomically_context?
+    end
+
+    # Stores the original value of a field in changed_attributes before an
+    # atomic operation mutates it directly, so dirty tracking reflects the
+    # change during the #atomically block.
+    #
+    # @api private
+    def _mark_dirty_field(dirty, access, original)
+      changed_attributes[access] ||= original if dirty
+    end
+
+    # Appends the field to the dirty accumulator when inside #atomically, or
+    # removes the change when not (the field was already persisted atomically).
+    #
+    # @api private
+    def _track_dirty_field(dirty, access)
+      dirty ? dirty << access : remove_change(access)
     end
   end
 end

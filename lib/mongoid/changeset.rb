@@ -6,10 +6,23 @@ module Mongoid
   class Changeset
     attr_reader :entries, :depth
 
+    def atomically_context?
+      @atomically_context
+    end
+
+    def enter_atomically_context
+      @atomically_context = true
+    end
+
+    def exit_atomically_context
+      @atomically_context = false
+    end
+
     def initialize
-      @entries    = []
-      @depth      = 0
-      @terminated = false
+      @entries           = []
+      @depth             = 0
+      @terminated        = false
+      @atomically_context = false
     end
 
     # Manages nesting depth. Inner calls accumulate without flushing.
@@ -92,12 +105,14 @@ module Mongoid
       batch.each do |entry|
         next unless entry.document
 
-        per_doc[entry.document] ||= { entry: entry, callbacks: false }
+        per_doc[entry.document] ||= { entry: entry, callbacks: false, dirty_fields: [] }
         per_doc[entry.document][:callbacks] ||= !entry.skip_callbacks
+        per_doc[entry.document][:dirty_fields].concat(entry.dirty_fields) if entry.dirty_fields
       end
 
       per_doc.each_value do |data|
         _update_document_state(data[:entry])
+        data[:dirty_fields].each { |f| data[:entry].document.remove_change(f) }
         data[:entry].document.run_after_callbacks(:flush) if data[:callbacks]
       end
     end

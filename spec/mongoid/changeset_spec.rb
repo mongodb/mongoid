@@ -17,6 +17,23 @@ describe Mongoid::Changeset do
     it 'is not terminated' do
       expect(cs).not_to be_terminated
     end
+
+    it 'is not in atomically context' do
+      expect(cs).not_to be_atomically_context
+    end
+  end
+
+  describe '#enter_atomically_context / #exit_atomically_context' do
+    it 'sets atomically_context when entered' do
+      cs.enter_atomically_context
+      expect(cs).to be_atomically_context
+    end
+
+    it 'clears atomically_context when exited' do
+      cs.enter_atomically_context
+      cs.exit_atomically_context
+      expect(cs).not_to be_atomically_context
+    end
   end
 
   describe '#add_entry' do
@@ -214,7 +231,8 @@ describe Mongoid::Changeset do
         payload: opts.fetch(:pay, payload),
         document: opts[:doc],
         session: opts[:session],
-        skip_callbacks: opts[:skip_callbacks]
+        skip_callbacks: opts[:skip_callbacks],
+        dirty_fields: opts[:dirty_fields]
       )
     end
 
@@ -438,6 +456,39 @@ describe Mongoid::Changeset do
           cs.flush
           expect(count).to eq(1)
         end
+      end
+    end
+
+    context 'dirty_fields cleanup' do
+      let(:doc) { klass.new(name: 'Alice') }
+      let(:view) { instance_double(Mongo::Collection::View) }
+
+      before do
+        allow(coll).to receive(:find).and_return(view)
+        allow(view).to receive(:update_one)
+      end
+
+      it 'removes named fields from changed_attributes after flush' do
+        doc.changed_attributes['name'] = 'Bob'
+        cs.add_entry(make_entry(type: :update, doc: doc, skip_callbacks: true, dirty_fields: [ 'name' ]))
+        cs.flush
+        expect(doc.changed_attributes).not_to have_key('name')
+      end
+
+      it 'accumulates dirty_fields across multiple entries for the same document' do
+        allow(coll).to receive(:bulk_write)
+        doc.changed_attributes['name'] = 'Bob'
+        doc.changed_attributes['age'] = 0
+        cs.add_entry(make_entry(type: :update, doc: doc, skip_callbacks: true, dirty_fields: [ 'name' ]))
+        cs.add_entry(make_entry(type: :update, doc: doc, skip_callbacks: true, dirty_fields: [ 'age' ]))
+        cs.flush
+        expect(doc.changed_attributes).not_to have_key('name')
+        expect(doc.changed_attributes).not_to have_key('age')
+      end
+
+      it 'ignores nil dirty_fields' do
+        cs.add_entry(make_entry(type: :update, doc: doc, skip_callbacks: true))
+        expect { cs.flush }.not_to raise_error
       end
     end
 

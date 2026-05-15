@@ -161,11 +161,16 @@ describe Mongoid::Persistable::Settable do
         Person.create!(title: 'sir', age: 30)
       end
 
-      it 'stages the operation and clears dirty tracking immediately' do
+      it 'marks dirty changes for the set fields during the block' do
         person.atomically do
           person.set title: 'miss', age: 21
-          expect(person.changes).to be_empty
+          expect(person.changes).to eq({ 'title' => %w[sir miss], 'age' => [ 30, 21 ] })
         end
+      end
+
+      it 'clears dirty changes after the block' do
+        person.atomically { person.set title: 'miss', age: 21 }
+        expect(person.changes).to be_empty
       end
     end
 

@@ -19,16 +19,20 @@ module Mongoid
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return self unless persisted?
 
+        dirty = _atomic_dirty_fields_init
         ops = {}
+
         operations.each do |field, values|
           access = database_field_name(field)
-          value = attributes[access]
+          current = attributes[access]
+          _mark_dirty_field(dirty, access, current)
+          value = current
           values.each do |op, val|
             value &= val if op.to_s == 'and'
             value |= val if op.to_s == 'or'
           end
           attributes[access] = value
-          remove_change(access)
+          _track_dirty_field(dirty, access)
           ops[atomic_attribute_name(access)] = values
         end
 
@@ -43,7 +47,8 @@ module Mongoid
             payload: positionally(selector, { '$bit' => ops }),
             document: self,
             session: _session,
-            skip_callbacks: true
+            skip_callbacks: true,
+            dirty_fields: dirty
           )
         end
         self

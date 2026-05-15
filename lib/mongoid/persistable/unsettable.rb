@@ -20,11 +20,13 @@ module Mongoid
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return self unless persisted?
 
+        dirty = _atomic_dirty_fields_init
         ops = {}
+
         fields.flatten.each do |field|
           normalized = database_field_name(field)
           process_attribute normalized, nil
-          remove_change(normalized)
+          _track_dirty_field(dirty, normalized)
           ops[atomic_attribute_name(normalized)] = true
         end
 
@@ -39,7 +41,8 @@ module Mongoid
             payload: positionally(selector, { '$unset' => ops }),
             document: self,
             session: _session,
-            skip_callbacks: true
+            skip_callbacks: true,
+            dirty_fields: dirty
           )
         end
         self

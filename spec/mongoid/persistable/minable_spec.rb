@@ -123,11 +123,16 @@ describe Mongoid::Persistable::Minable do
       context 'when executing atomically' do
         let(:band) { Band.create!(member_count: 10, name: 'Manhattan Transfer') }
 
-        it 'stages the operation and clears dirty tracking immediately' do
+        it 'marks dirty changes for fields that actually changed during the block' do
           band.atomically do
             band.send(min_method, member_count: 5, name: 'Manhattan Transfer')
-            expect(band.changes).to be_empty
+            expect(band.changes).to eq({ 'member_count' => [ 10, 5 ] })
           end
+        end
+
+        it 'clears dirty changes after the block' do
+          band.atomically { band.send(min_method, member_count: 5, name: 'Manhattan Transfer') }
+          expect(band.changes).to be_empty
         end
       end
     end

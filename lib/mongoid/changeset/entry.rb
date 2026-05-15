@@ -20,6 +20,7 @@ module Mongoid
       :opts,           # Hash | nil - driver-level options (e.g. array_filters)
       :result,         # driver result object, set after execution (for bulk ops that return counts)
       :skip_callbacks, # Boolean | nil - when true, suppresses :flush and :commit callbacks
+      :dirty_fields,   # Array<String> | nil - fields to remove from dirty tracking after flush
       keyword_init: true
     )
   end
