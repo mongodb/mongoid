@@ -2599,18 +2599,18 @@ describe Mongoid::Interceptable do
 
     let(:doc) { klass.new }
 
-    it 'fires before_flush callbacks via run_callbacks(:before_flush)' do
-      doc.run_callbacks(:before_flush)
+    it 'fires before_flush callbacks via run_before_callbacks(:flush)' do
+      doc.run_before_callbacks(:flush)
       expect(doc.log).to eq([ :before_flush ])
     end
 
-    it 'fires after_flush callbacks via run_callbacks(:after_flush)' do
-      doc.run_callbacks(:after_flush)
+    it 'fires after_flush callbacks via run_after_callbacks(:flush)' do
+      doc.run_after_callbacks(:flush)
       expect(doc.log).to eq([ :after_flush ])
     end
 
     it 'does not fire after_flush when running before_flush' do
-      doc.run_callbacks(:before_flush)
+      doc.run_before_callbacks(:flush)
       expect(doc.log).not_to include(:after_flush)
     end
   end
