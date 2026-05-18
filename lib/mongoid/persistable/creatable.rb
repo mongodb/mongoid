@@ -60,6 +60,15 @@ module Mongoid
           document: self,
           session: _session
         )
+        # State transitions (new_record, dirty tracking) are applied at stage time,
+        # before the driver write, by design. If the flush raises, the document
+        # should be reloaded from the database — in-memory state cannot be reliably
+        # restored after a partial write.
+        # Mirrors Changeset#_update_document_state for :insert entries.
+        self.new_record = false
+        remember_storage_options!
+        flag_descendants_persisted
+        _reset_memoized_descendants!
       end
 
       # Stage an update entry for an embedded document.
@@ -109,16 +118,12 @@ module Mongoid
                        invalid?(options[:context] || :create)
 
         ensure_client_compatibility!
-        run_callbacks(:save, with_children: false) do
-          run_callbacks(:create, with_children: false) do
-            run_callbacks(:persist_parent, with_children: false) do
-              _mongoid_run_child_callbacks(:save) do
-                _mongoid_run_child_callbacks(:create) do
-                  # Dirty state is cleared inside the changeset block, before
-                  # the driver write, by design. If the flush raises, the
-                  # document should be reloaded from the database — in-memory
-                  # dirty state cannot be reliably restored.
-                  Mongoid.changeset do
+        Mongoid.changeset do
+          run_callbacks(:save, with_children: false) do
+            run_callbacks(:create, with_children: false) do
+              run_callbacks(:persist_parent, with_children: false) do
+                _mongoid_run_child_callbacks(:save) do
+                  _mongoid_run_child_callbacks(:create) do
                     _stage_insert
                     post_process_persist(true, options)
                   end

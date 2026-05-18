@@ -85,12 +85,12 @@ module Mongoid
         raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
         return false if performing_validations?(options) && invalid?(:upsert)
 
-        run_callbacks(:upsert) do
-          Mongoid.changeset do
+        Mongoid.changeset do
+          run_callbacks(:upsert) do
             yield(self)
             post_process_persist(true, options)
+            true
           end
-          true
         end
       end
     end
