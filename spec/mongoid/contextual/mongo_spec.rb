@@ -279,8 +279,8 @@ describe Mongoid::Contextual::Mongo do
           expect(Band.count).to eq(1)
         end
 
-        it 'returns nil' do
-          expect(deleted).to be_nil
+        it 'returns the number of deleted documents' do
+          expect(deleted).to eq(1)
         end
 
         context 'when the criteria has a collation' do
@@ -304,8 +304,8 @@ describe Mongoid::Contextual::Mongo do
             expect(Band.count).to eq(1)
           end
 
-          it 'returns nil' do
-            expect(deleted).to be_nil
+          it 'returns the number of deleted documents' do
+            expect(deleted).to eq(1)
           end
         end
       end
@@ -336,6 +336,18 @@ describe Mongoid::Contextual::Mongo do
         let!(:deleted) do
           criteria.with(write: { w: 0 }) do |crit|
             crit.send(method)
+          end
+        end
+
+        it 'returns 0' do
+          expect(deleted).to eq(0)
+        end
+      end
+
+      context 'when inside a containing changeset' do
+        let!(:deleted) do
+          Mongoid.changeset do
+            Band.where(name: 'Depeche Mode').send(method)
           end
         end
 
