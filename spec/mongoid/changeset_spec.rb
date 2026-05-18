@@ -316,6 +316,28 @@ describe Mongoid::Changeset do
       end
     end
 
+    context 'with same-collection entries carrying different sessions' do
+      let(:session1) { instance_double(Mongo::Session) }
+      let(:session2) { instance_double(Mongo::Session) }
+
+      it 'makes two separate driver calls rather than one bulk_write' do
+        allow(coll).to receive(:insert_one)
+        cs.add_entry(make_entry(type: :insert, pay: { 'name' => 'Alice' }, session: session1))
+        cs.add_entry(make_entry(type: :insert, pay: { 'name' => 'Bob' },   session: session2))
+        cs.flush
+        expect(coll).to have_received(:insert_one).twice
+      end
+
+      it 'does not bulk_write across the session boundary' do
+        allow(coll).to receive(:insert_one)
+        allow(coll).to receive(:bulk_write)
+        cs.add_entry(make_entry(type: :insert, pay: { 'name' => 'Alice' }, session: session1))
+        cs.add_entry(make_entry(type: :insert, pay: { 'name' => 'Bob' },   session: session2))
+        cs.flush
+        expect(coll).not_to have_received(:bulk_write)
+      end
+    end
+
     context 'before_flush callback' do
       it 'fires before the driver call' do
         log = []

@@ -140,7 +140,8 @@ module Mongoid
     def _build_batches(entries)
       batches = []
       entries.each do |entry|
-        if batches.last&.first&.collection == entry.collection
+        last = batches.last&.first
+        if last&.collection == entry.collection && last&.session.equal?(entry.session)
           batches.last << entry
         else
           batches << [ entry ]
