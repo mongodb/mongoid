@@ -512,6 +512,23 @@ describe Mongoid::Changeset do
         cs.flush
         expect(doc.destroyed?).to be(true)
       end
+
+      it 'applies all state transitions in order when a document has multiple entries in one batch' do
+        doc = klass.new(name: 'Alice')
+        expect(doc.new_record?).to be(true)
+        view = instance_double(Mongo::Collection::View)
+        allow(coll).to receive(:insert_one)
+        allow(coll).to receive(:bulk_write)
+        allow(coll).to receive(:find).with(selector).and_return(view)
+        allow(view).to receive(:update_one)
+        allow(view).to receive(:delete_one)
+        cs.add_entry(make_entry(type: :insert, doc: doc))
+        cs.add_entry(make_entry(type: :update, doc: doc))
+        cs.add_entry(make_entry(type: :delete, pay: nil, doc: doc))
+        cs.flush
+        expect(doc.new_record?).to be(false)
+        expect(doc.destroyed?).to be(true)
+      end
     end
   end
 end

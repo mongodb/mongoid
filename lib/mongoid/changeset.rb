@@ -105,15 +105,16 @@ module Mongoid
       batch.each do |entry|
         next unless entry.document
 
-        per_doc[entry.document] ||= { entry: entry, callbacks: false, dirty_fields: [] }
+        per_doc[entry.document] ||= { entries: [], callbacks: false, dirty_fields: [] }
+        per_doc[entry.document][:entries] << entry
         per_doc[entry.document][:callbacks] ||= !entry.skip_callbacks
         per_doc[entry.document][:dirty_fields].concat(entry.dirty_fields) if entry.dirty_fields
       end
 
-      per_doc.each_value do |data|
-        _update_document_state(data[:entry])
-        data[:dirty_fields].each { |f| data[:entry].document.remove_change(f) }
-        data[:entry].document.run_after_callbacks(:flush) if data[:callbacks]
+      per_doc.each do |doc, data|
+        data[:entries].each { |e| _update_document_state(e) }
+        data[:dirty_fields].each { |f| doc.remove_change(f) }
+        doc.run_after_callbacks(:flush) if data[:callbacks]
       end
     end
 
