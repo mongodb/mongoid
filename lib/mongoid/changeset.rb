@@ -215,6 +215,7 @@ module Mongoid
         doc.new_record = false
         doc.remember_storage_options!
         doc.flag_descendants_persisted
+        doc._reset_memoized_descendants!
       when :update, :update_many
         # no per-document state change needed for updates
       when :embedded_delete, :delete
