@@ -100,6 +100,15 @@ module Mongoid
           document: self,
           session: _session
         )
+        # State transitions (new_record, dirty tracking) are applied at stage time,
+        # before the driver write, by design. If the flush raises, the document
+        # should be reloaded from the database — in-memory state cannot be reliably
+        # restored after a partial write.
+        # Mirrors Changeset#_update_document_state for :embedded_insert entries.
+        self.new_record = false
+        remember_storage_options!
+        flag_descendants_persisted
+        _reset_memoized_descendants!
       end
 
       # Prepare the insert for execution. Validates and runs callbacks, etc.
