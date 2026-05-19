@@ -45,7 +45,7 @@ module Mongoid
               raise_mixed if klass.embedded? && !klass.cyclic?
               characterize_one(_target)
               bind_one
-              _target.save if persistable?
+              _target.save! if persistable?
             end
           end
 

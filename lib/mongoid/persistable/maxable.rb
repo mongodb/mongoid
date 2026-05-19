@@ -18,16 +18,22 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def set_max(fields)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(fields) do |field, value|
-            current_value = attributes[field]
-            if value > current_value
-              process_attribute field, value
-              ops[atomic_attribute_name(field)] = value
-            end
-          end
-          { '$max' => ops } unless ops.empty?
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        dirty = _atomic_dirty_fields_init
+        ops = {}
+
+        fields.each do |field, value|
+          access = database_field_name(field)
+          next unless value > attributes[access]
+
+          process_attribute access, value
+          _track_dirty_field(dirty, access)
+          ops[atomic_attribute_name(access)] = value
         end
+
+        _stage_atomic_update('$max', ops, dirty: dirty)
       end
       alias clamp_lower_bound set_max
     end

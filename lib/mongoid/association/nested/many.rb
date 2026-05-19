@@ -160,11 +160,7 @@ module Mongoid
         # @param [ Hash ] attrs The attributes.
         def update_document(doc, attrs)
           delete_id(attrs)
-          if association.embedded?
-            doc.assign_attributes(attrs)
-          else
-            doc.update_attributes(attrs)
-          end
+          doc.assign_attributes(attrs)
         end
 
         # Update nested association.

@@ -185,10 +185,10 @@ describe Mongoid::Persistable::Pushable do
         Person.create!(test_array: [ 1, 2, 3 ])
       end
 
-      it 'marks a dirty change for the modified fields' do
+      it 'stages the operation and clears dirty tracking immediately' do
         person.atomically do
           person.add_to_set test_array: [ 1, 4 ]
-          expect(person.changes).to eq({ 'test_array' => [ [ 1, 2, 3 ], [ 1, 2, 3, 4 ] ] })
+          expect(person.changes).to be_empty
         end
       end
     end
@@ -355,10 +355,10 @@ describe Mongoid::Persistable::Pushable do
         Person.create!(test_array: [ 1, 2, 3 ])
       end
 
-      it 'marks a dirty change for the pushed fields' do
+      it 'stages the operation and clears dirty tracking immediately' do
         person.atomically do
           person.push test_array: [ 1, 4 ]
-          expect(person.changes).to eq({ 'test_array' => [ [ 1, 2, 3 ], [ 1, 2, 3, 1, 4 ] ] })
+          expect(person.changes).to be_empty
         end
       end
     end

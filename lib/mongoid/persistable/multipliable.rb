@@ -17,17 +17,23 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def mul(factors)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(factors) do |field, value|
-            factor = value.is_a?(BigDecimal) ? value.to_f : value
-            current = attributes[field]
-            new_value = (current || 0) * factor
-            process_attribute field, new_value if executing_atomically?
-            attributes[field] = new_value
-            ops[atomic_attribute_name(field)] = factor
-          end
-          { '$mul' => ops } unless ops.empty?
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        dirty = _atomic_dirty_fields_init
+        ops = {}
+
+        factors.each do |field, value|
+          access = database_field_name(field)
+          factor = value.is_a?(BigDecimal) ? value.to_f : value
+          current = attributes[access]
+          _mark_dirty_field(dirty, access, current)
+          attributes[access] = (current || 0) * factor
+          _track_dirty_field(dirty, access)
+          ops[atomic_attribute_name(access)] = factor
         end
+
+        _stage_atomic_update('$mul', ops, dirty: dirty)
       end
     end
   end

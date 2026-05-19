@@ -49,10 +49,16 @@ module Mongoid
           doc.send(:as_attributes)
         end
         unless removed.empty?
-          collection.find(selector).update_one(
-            positionally(selector, '$pullAll' => { path => removed }),
-            session: _session
-          )
+          Mongoid.changeset do |cs|
+            cs.add(
+              type: :update,
+              collection: collection,
+              selector: selector,
+              payload: positionally(selector, '$pullAll' => { path => removed }),
+              document: nil,
+              session: _session
+            )
+          end
         end
         deleted
       end
@@ -564,7 +570,18 @@ module Mongoid
           updates['$set'].merge!(doc.atomic_updates['$set'] || {})
           doc.move_changes
         end
-        collection.find(selector).update_one(updates, session: _session) unless updates['$set'].empty?
+        return if updates['$set'].empty?
+
+        Mongoid.changeset do |cs|
+          cs.add(
+            type: :update,
+            collection: collection,
+            selector: selector,
+            payload: updates,
+            document: nil,
+            session: _session
+          )
+        end
       end
 
       # Get the limiting value.

@@ -17,18 +17,20 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def unset(*fields)
-        prepare_atomic_operation do |ops|
-          fields.flatten.each do |field|
-            normalized = database_field_name(field)
-            if executing_atomically?
-              process_attribute normalized, nil
-            else
-              attributes.delete(normalized)
-            end
-            ops[atomic_attribute_name(normalized)] = true
-          end
-          { '$unset' => ops }
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        dirty = _atomic_dirty_fields_init
+        ops = {}
+
+        fields.flatten.each do |field|
+          normalized = database_field_name(field)
+          process_attribute normalized, nil
+          _track_dirty_field(dirty, normalized)
+          ops[atomic_attribute_name(normalized)] = true
         end
+
+        _stage_atomic_update('$unset', ops, dirty: dirty)
       end
     end
   end

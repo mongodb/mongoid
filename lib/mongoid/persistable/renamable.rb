@@ -17,19 +17,24 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def rename(renames)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(renames) do |old_field, new_field|
-            new_name = new_field.to_s
-            if executing_atomically?
-              process_attribute new_name, attributes[old_field]
-              process_attribute old_field, nil
-            else
-              attributes[new_name] = attributes.delete(old_field)
-            end
-            ops[atomic_attribute_name(old_field)] = atomic_attribute_name(new_name)
-          end
-          { '$rename' => ops }
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        dirty = _atomic_dirty_fields_init
+        ops = {}
+
+        renames.each do |old_field, new_field|
+          old_access = database_field_name(old_field)
+          new_name = new_field.to_s
+          _mark_dirty_field(dirty, old_access, attributes[old_access])
+          _mark_dirty_field(dirty, new_name, nil)
+          attributes[new_name] = attributes.delete(old_access)
+          _track_dirty_field(dirty, old_access)
+          _track_dirty_field(dirty, new_name)
+          ops[atomic_attribute_name(old_access)] = atomic_attribute_name(new_name)
         end
+
+        _stage_atomic_update('$rename', ops, dirty: dirty)
       end
     end
   end

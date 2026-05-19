@@ -109,10 +109,10 @@ describe Mongoid::Persistable::Poppable do
         Person.create!(test_array: [ 1, 2, 3 ])
       end
 
-      it 'marks a dirty change for the popped fields' do
+      it 'stages the operation and clears dirty tracking immediately' do
         person.atomically do
           person.pop test_array: 1
-          expect(person.changes).to eq({ 'test_array' => [ [ 1, 2, 3 ], [ 1, 2 ] ] })
+          expect(person.changes).to be_empty
         end
       end
     end

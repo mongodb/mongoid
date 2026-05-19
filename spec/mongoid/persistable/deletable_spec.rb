@@ -186,6 +186,20 @@ describe Mongoid::Persistable::Deletable do
       end
     end
 
+    context 'inside a Mongoid.changeset block' do
+      it 'defers the embedded delete until block exit' do
+        person = Person.create!(title: 'Mr')
+        address = person.addresses.create!(street: 'Test St')
+        Mongoid.changeset do
+          address.delete
+          # Still present in DB during the block
+          expect(person.reload.addresses.count).to eq(1)
+        end
+        # Gone after flush
+        expect(person.reload.addresses.count).to eq(0)
+      end
+    end
+
     context 'when deleting subclasses' do
       let!(:firefox) do
         Firefox.create!(name: 'firefox')

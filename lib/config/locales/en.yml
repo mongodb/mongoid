@@ -413,6 +413,10 @@ en:
           message: "A transaction was started while another transaction was being used on this client."
           summary: "Transactions cannot be nested. Only one transaction can be used in a thread per client."
           resolution: "Only use one transaction per client at a time; transactions cannot be nested."
+        transaction_in_changeset:
+          message: "Cannot start a transaction inside a changeset."
+          summary: "A changeset defers all writes and flushes them as a batch when the outermost block exits. Starting a transaction inside a changeset would have no effect, because the operations inside the transaction block are queued rather than executed immediately."
+          resolution: "Do not nest a transaction inside a changeset."
         inverse_not_found:
           message: "When adding a(n) %{klass} to %{base}#%{name}, Mongoid could
             not determine the inverse foreign key to set. The attempted key was

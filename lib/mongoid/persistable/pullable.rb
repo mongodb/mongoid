@@ -17,13 +17,18 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def pull(pulls)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(pulls) do |field, value|
-            (send(field) || []).delete(value)
-            ops[atomic_attribute_name(field)] = value
-          end
-          { '$pull' => ops }
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        ops = {}
+        pulls.each do |field, value|
+          access = database_field_name(field)
+          (send(access) || []).delete(value)
+          remove_change(access)
+          ops[atomic_attribute_name(access)] = value
         end
+
+        _stage_atomic_update('$pull', ops)
       end
 
       # Pull multiple values from the provided array fields.
@@ -35,14 +40,19 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def pull_all(pulls)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(pulls) do |field, value|
-            existing = send(field) || []
-            value.each { |val| existing.delete(val) }
-            ops[atomic_attribute_name(field)] = value
-          end
-          { '$pullAll' => ops }
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        ops = {}
+        pulls.each do |field, value|
+          access = database_field_name(field)
+          existing = send(access) || []
+          value.each { |val| existing.delete(val) }
+          remove_change(access)
+          ops[atomic_attribute_name(access)] = value
         end
+
+        _stage_atomic_update('$pullAll', ops)
       end
     end
   end

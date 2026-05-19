@@ -28,6 +28,7 @@ require 'mongoid/tasks/database'
 require 'mongoid/tasks/encryption'
 require 'mongoid/warnings'
 require 'mongoid/utils'
+require 'mongoid/changeset'
 
 # If we are using Rails then we will include the Mongoid railtie.
 # This configures initializers required to integrate Mongoid with Rails.
@@ -105,6 +106,23 @@ module Mongoid
   # @return [ true ] True.
   def reconnect_clients
     Clients.reconnect
+  end
+
+  # Creates or reuses the current changeset, yields it to the block, and
+  # flushes when the outermost scope exits. When nested inside an existing
+  # changeset block, the inner call accumulates without flushing.
+  #
+  # @example Explicit outer scope — flush happens once at block exit.
+  #   Mongoid.changeset do |cs|
+  #     parent.save
+  #     child.save
+  #   end
+  def changeset
+    outermost = Threaded.current_changeset.nil?
+    cs = Threaded.current_changeset || (Threaded.current_changeset = Changeset.new)
+    cs.run { yield cs }
+  ensure
+    Threaded.current_changeset = nil if outermost
   end
 
   # Convenience method for getting a named client.

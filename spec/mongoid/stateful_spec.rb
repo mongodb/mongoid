@@ -120,6 +120,77 @@ describe Mongoid::Stateful do
     end
   end
 
+  describe '#staged?' do
+    let(:person) { Person.new }
+
+    context 'when no changeset is active' do
+      it 'returns false' do
+        expect(person.staged?).to be false
+      end
+    end
+
+    context 'when inside a changeset block' do
+      it 'returns false before the document is saved' do
+        Mongoid.changeset do
+          expect(person.staged?).to be false
+        end
+      end
+
+      it 'returns true after the document is saved' do
+        Mongoid.changeset do
+          person.save!
+          expect(person.staged?).to be true
+        end
+      end
+
+      it 'returns false after the changeset block exits' do
+        Mongoid.changeset do
+          person.save!
+        end
+        expect(person.staged?).to be false
+      end
+    end
+  end
+
+  describe '#staged' do
+    let(:person) { Person.new }
+
+    context 'when no changeset is active' do
+      it 'returns an empty array' do
+        expect(person.staged).to eq([])
+      end
+    end
+
+    context 'when inside a changeset block' do
+      it 'returns one entry after one save' do
+        Mongoid.changeset do
+          person.save!
+          expect(person.staged.length).to eq(1)
+          expect(person.staged.first.document).to equal(person)
+        end
+      end
+
+      it 'returns two entries after two saves inside a changeset block' do
+        person.save! # persist first so subsequent saves are staged updates, not inserts
+        Mongoid.changeset do
+          person.title = 'First'
+          person.save!
+          person.title = 'Second'
+          person.save!
+          expect(person.staged.length).to eq(2)
+          expect(person.staged.all? { |e| e.document.equal?(person) }).to be true
+        end
+      end
+
+      it 'returns an empty array after the changeset block exits' do
+        Mongoid.changeset do
+          person.save!
+        end
+        expect(person.staged).to eq([])
+      end
+    end
+  end
+
   describe '#readonly?' do
     let(:document) do
       Band.new

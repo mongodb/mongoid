@@ -16,13 +16,7 @@ module Mongoid
       #
       # @return [ Document ] The persisted document.
       def insert(options = {})
-        prepare_insert(options) do
-          if embedded?
-            insert_as_embedded
-          else
-            insert_as_root
-          end
-        end
+        prepare_insert(options)
       end
 
       private
@@ -39,70 +33,82 @@ module Mongoid
         { atomic_insert_modifier => { atomic_position => as_attributes } }
       end
 
-      # Insert the embedded document.
+      # Stage an insert entry on the current changeset.
       #
-      # When the parent association is touchable (which is the default for
-      # +embedded_in+), the touch timestamp updates are merged into the
-      # same +update_one+ call that performs the insert. This avoids a
-      # second round-trip that the +after_save+ touch callback would
-      # otherwise issue.
+      # For root documents, adds an :insert entry. For embedded documents,
+      # adds an :embedded_insert entry against the root document's collection.
+      # If the parent is itself a new record, inserts the parent first.
       #
       # @api private
+      def _stage_insert
+        if embedded?
+          _stage_insert_as_embedded
+        else
+          _stage_insert_as_root
+        end
+      end
+
+      # Stage an insert entry for a root document.
       #
-      # @example Insert the document as embedded.
-      #   document.insert_as_embedded
+      # @api private
+      def _stage_insert_as_root
+        Threaded.current_changeset.add(
+          type: :insert,
+          collection: collection,
+          selector: { '_id' => _id },
+          payload: as_attributes,
+          document: self,
+          session: _session
+        )
+        # State transitions (new_record, dirty tracking) are applied at stage time,
+        # before the driver write, by design. If the flush raises, the document
+        # should be reloaded from the database — in-memory state cannot be reliably
+        # restored after a partial write.
+        # Mirrors Changeset#_update_document_state for :insert entries.
+        self.new_record = false
+        remember_storage_options!
+        flag_descendants_persisted
+        _reset_memoized_descendants!
+      end
+
+      # Stage an update entry for an embedded document.
       #
-      # @return [ Document ] The document.
-      def insert_as_embedded
+      # @api private
+      def _stage_insert_as_embedded
         raise Errors::NoParent.new(self.class.name) unless _parent
 
         if _parent.new_record?
           _parent.insert
-        else
-          selector = _parent.atomic_selector
-          operations = atomic_inserts
-
-          if _touchable_parent?
-            touches = _parent._gather_touch_updates(Time.current)
-            if touches.present?
-              operations['$set'] = touches
-              Threaded.begin_touch_merged(self)
-            end
-          end
-
-          _root.collection.find(selector).update_one(
-            positionally(selector, operations),
-            session: _session
-          )
+          return
         end
-      end
 
-      # Insert the root document.
-      #
-      # @api private
-      #
-      # @example Insert the document as root.
-      #   document.insert_as_root
-      #
-      # @return [ Document ] The document.
-      def insert_as_root
-        collection.insert_one(as_attributes, session: _session)
-      end
+        operations = atomic_inserts
 
-      # Post process an insert, which sets the new record attribute to false
-      # and flags all the children as persisted.
-      #
-      # @api private
-      #
-      # @example Post process the insert.
-      #   document.post_process_insert
-      #
-      # @return [ true ] true.
-      def post_process_insert
+        if _touchable_parent?
+          touches = _parent._gather_touch_updates(Time.current)
+          if touches.present?
+            operations['$set'] = touches
+            Threaded.begin_touch_merged(self)
+          end
+        end
+
+        Threaded.current_changeset.add(
+          type: :embedded_insert,
+          collection: _root.collection,
+          selector: _parent.atomic_selector,
+          payload: positionally(_parent.atomic_selector, operations),
+          document: self,
+          session: _session
+        )
+        # State transitions (new_record, dirty tracking) are applied at stage time,
+        # before the driver write, by design. If the flush raises, the document
+        # should be reloaded from the database — in-memory state cannot be reliably
+        # restored after a partial write.
+        # Mirrors Changeset#_update_document_state for :embedded_insert entries.
         self.new_record = false
         remember_storage_options!
         flag_descendants_persisted
-        true
+        _reset_memoized_descendants!
       end
 
       # Prepare the insert for execution. Validates and runs callbacks, etc.
@@ -110,9 +116,7 @@ module Mongoid
       # @api private
       #
       # @example Prepare for insertion.
-      #   document.prepare_insert do
-      #     collection.insert(as_document)
-      #   end
+      #   document.prepare_insert
       #
       # @param [ Hash ] options The options.
       #
@@ -123,17 +127,14 @@ module Mongoid
                        invalid?(options[:context] || :create)
 
         ensure_client_compatibility!
-        run_callbacks(:commit, with_children: true, skip_if: -> { in_transaction? }) do
+        Mongoid.changeset do
           run_callbacks(:save, with_children: false) do
             run_callbacks(:create, with_children: false) do
               run_callbacks(:persist_parent, with_children: false) do
                 _mongoid_run_child_callbacks(:save) do
                   _mongoid_run_child_callbacks(:create) do
-                    result = yield(self)
-                    if !result.is_a?(Document) || result.errors.empty?
-                      post_process_insert
-                      post_process_persist(result, options)
-                    end
+                    _stage_insert
+                    post_process_persist(true, options)
                   end
                 end
               end

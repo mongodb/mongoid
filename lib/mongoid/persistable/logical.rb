@@ -16,19 +16,27 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def bit(operations)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(operations) do |field, values|
-            value = attributes[field]
-            values.each do |op, val|
-              value &= val if op.to_s == 'and'
-              value |= val if op.to_s == 'or'
-            end
-            process_attribute field, value if executing_atomically?
-            attributes[field] = value
-            ops[atomic_attribute_name(field)] = values
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        dirty = _atomic_dirty_fields_init
+        ops = {}
+
+        operations.each do |field, values|
+          access = database_field_name(field)
+          current = attributes[access]
+          _mark_dirty_field(dirty, access, current)
+          value = current
+          values.each do |op, val|
+            value &= val if op.to_s == 'and'
+            value |= val if op.to_s == 'or'
           end
-          { '$bit' => ops } unless ops.empty?
+          attributes[access] = value
+          _track_dirty_field(dirty, access)
+          ops[atomic_attribute_name(access)] = values
         end
+
+        _stage_atomic_update('$bit', ops, dirty: dirty)
       end
     end
   end

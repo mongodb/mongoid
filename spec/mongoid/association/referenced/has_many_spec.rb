@@ -1127,4 +1127,34 @@ describe Mongoid::Association::Referenced::HasMany do
       expect(student.updated_at).to eq(update_time)
     end
   end
+
+  describe 'validation on append (<<)', :integration do
+    let!(:person) { Person.create! }
+
+    context 'when appending an invalid document' do
+      let(:post) { Post.new(title: '$$$invalid') }
+
+      it 'raises Errors::Validations' do
+        expect { person.posts << post }.to raise_error(Mongoid::Errors::Validations)
+      end
+
+      it 'does not persist the invalid document' do
+        begin
+          person.posts << post
+        rescue Mongoid::Errors::Validations
+          nil
+        end
+        expect(Post.where(person_id: person.id).first).to be_nil
+      end
+    end
+
+    context 'when appending a valid document' do
+      let(:post) { Post.new(title: 'valid title') }
+
+      it 'persists the document' do
+        person.posts << post
+        expect(Post.where(person_id: person.id).first).not_to be_nil
+      end
+    end
+  end
 end

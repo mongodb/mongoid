@@ -334,4 +334,24 @@ describe Mongoid::Threaded do
       end
     end
   end
+
+  describe '.current_changeset' do
+    after { Mongoid::Threaded.current_changeset = nil }
+
+    it 'returns nil when not set' do
+      expect(Mongoid::Threaded.current_changeset).to be_nil
+    end
+
+    it 'returns the assigned changeset' do
+      cs = Mongoid::Changeset.new
+      Mongoid::Threaded.current_changeset = cs
+      expect(Mongoid::Threaded.current_changeset).to eq(cs)
+    end
+
+    it 'can be cleared by assigning nil' do
+      Mongoid::Threaded.current_changeset = Mongoid::Changeset.new
+      Mongoid::Threaded.current_changeset = nil
+      expect(Mongoid::Threaded.current_changeset).to be_nil
+    end
+  end
 end

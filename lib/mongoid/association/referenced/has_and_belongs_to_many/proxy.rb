@@ -79,8 +79,10 @@ module Mongoid
                 #    the changed_attributes hash.
                 #    See MONGOID-4843 for a longer discussion about this.
                 reset_foreign_key_changes do
-                  _base.add_to_set(foreign_key => doc.public_send(_association.primary_key))
-                  doc.save if child_persistable?(doc)
+                  Mongoid.changeset do
+                    _base.add_to_set(foreign_key => doc.public_send(_association.primary_key))
+                    doc.save! if child_persistable?(doc)
+                  end
                   reset_unloaded
                 end
               end

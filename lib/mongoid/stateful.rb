@@ -147,6 +147,32 @@ module Mongoid
       persisted? && changed?
     end
 
+    # Returns true if the document has at least one staged Entry in the current
+    # active changeset. Returns false when no changeset is active or after the
+    # changeset has flushed.
+    #
+    # @return [ true | false ] Whether this document has staged entries.
+    def staged?
+      cs = Threaded.current_changeset
+      return false unless cs && !cs.terminated?
+
+      cs.entries.any? { |e| e.document.equal?(self) }
+    end
+
+    # Returns all Entry objects currently staged for this document in the active
+    # changeset, in registration order. Returns an empty array when no changeset
+    # is active or after it has flushed.
+    #
+    # The returned entries are live objects from the changeset — do not mutate them.
+    #
+    # @return [ Array<Mongoid::Changeset::Entry> ] The staged entries.
+    def staged
+      cs = Threaded.current_changeset
+      return [] unless cs && !cs.terminated?
+
+      cs.entries.select { |e| e.document.equal?(self) }
+    end
+
     private
 
     def reset_readonly

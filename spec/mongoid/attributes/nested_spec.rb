@@ -2717,6 +2717,7 @@ describe Mongoid::Attributes::Nested do
                     '0' => { 'id' => post_one.id, 'title' => 'First' },
                     '1' => { 'id' => post_two.id, 'title' => 'Second' }
                   }
+                person.save
               end
 
               context 'when reloading the document' do
@@ -2802,6 +2803,7 @@ describe Mongoid::Attributes::Nested do
                           '0' => { 'id' => post_one.id, '_destroy' => truth },
                           '1' => { 'id' => post_two.id, 'title' => 'My Blog' }
                         }
+                      person.save
                     end
 
                     context 'when reloading the documents' do
@@ -2824,6 +2826,7 @@ describe Mongoid::Attributes::Nested do
                           '0' => { 'id' => post_one.id, '_destroy' => falsehood },
                           '1' => { 'id' => post_two.id, 'title' => 'My Blog' }
                         }
+                      person.save
                     end
 
                     context 'when reloading the document' do
@@ -2860,6 +2863,7 @@ describe Mongoid::Attributes::Nested do
                           },
                           '1' => { 'id' => post_two.id, 'title' => 'New Title' }
                         }
+                      person.save
                     end
 
                     context 'when reloading the document' do
@@ -2886,6 +2890,7 @@ describe Mongoid::Attributes::Nested do
                           '0' => { 'id' => post_one.id, '_destroy' => falsehood },
                           '1' => { 'id' => post_two.id, 'title' => 'New Title' }
                         }
+                      person.save
                     end
 
                     context 'when reloading the documents' do
@@ -2924,6 +2929,7 @@ describe Mongoid::Attributes::Nested do
                           },
                           '1' => { 'id' => post_two.id, 'title' => 'New Title' }
                         }
+                      person.save
                     end
 
                     context 'when reloading' do
@@ -2950,6 +2956,7 @@ describe Mongoid::Attributes::Nested do
                           '0' => { 'id' => post_one.id, '_destroy' => falsehood },
                           '1' => { 'id' => post_two.id, 'title' => 'New Title' }
                         }
+                      person.save
                     end
 
                     context 'when reloading' do
@@ -3408,6 +3415,7 @@ describe Mongoid::Attributes::Nested do
                     '0' => { 'id' => preference_one.id, 'name' => 'First' },
                     '1' => { 'id' => preference_two.id, 'name' => 'Second' }
                   }
+                person.save
               end
 
               context 'when reloading the document' do
@@ -3457,6 +3465,7 @@ describe Mongoid::Attributes::Nested do
                           '0' => { 'id' => preference_one.id, '_destroy' => truth },
                           '1' => { 'id' => preference_two.id, 'name' => 'My Blog' }
                         }
+                      person.save
                     end
 
                     context 'when reloading the documents' do
@@ -3479,6 +3488,7 @@ describe Mongoid::Attributes::Nested do
                           '0' => { 'id' => preference_one.id, '_destroy' => falsehood },
                           '1' => { 'id' => preference_two.id, 'name' => 'My Blog' }
                         }
+                      person.save
                     end
 
                     context 'when reloading the document' do
@@ -3515,6 +3525,7 @@ describe Mongoid::Attributes::Nested do
                           },
                           '1' => { 'id' => preference_two.id, 'name' => 'New Title' }
                         }
+                      person.save
                     end
 
                     context 'when reloading the document' do
@@ -3541,6 +3552,7 @@ describe Mongoid::Attributes::Nested do
                           '0' => { 'id' => preference_one.id, '_destroy' => falsehood },
                           '1' => { 'id' => preference_two.id, 'name' => 'New Title' }
                         }
+                      person.save
                     end
 
                     context 'when reloading the documents' do
@@ -3572,6 +3584,7 @@ describe Mongoid::Attributes::Nested do
                           },
                           '1' => { 'id' => preference_two.id, 'name' => 'New Title' }
                         }
+                      person.save
                     end
 
                     context 'when reloading' do
@@ -3598,6 +3611,7 @@ describe Mongoid::Attributes::Nested do
                           '0' => { 'id' => preference_one.id, '_destroy' => falsehood },
                           '1' => { 'id' => preference_two.id, 'name' => 'New Title' }
                         }
+                      person.save
                     end
 
                     context 'when reloading' do
@@ -4549,6 +4563,80 @@ describe Mongoid::Attributes::Nested do
         author.create_post(title: 'test')
         author.update_attributes(two_levels_params)
         expect(author.post.comments.count).to eq 1
+      end
+    end
+  end
+
+  # MONGOID-5911: nested attribute updates on referenced has_many associations
+  # must not write to the database prematurely.  All writes must be deferred
+  # until the parent is saved, so that a parent validation failure prevents
+  # any child writes from reaching the database.
+  describe 'persistence of referenced has_many nested attribute updates', :integration do
+    let!(:node) { Node.create! }
+    let!(:server) { node.servers.create!(name: 'original') }
+
+    describe 'direct setter (servers_attributes=)' do
+      before { node.servers_attributes = [ { _id: server.id, name: 'updated' } ] }
+
+      it 'does not immediately persist the child update' do
+        expect(Server.find(server.id).name).to eq('original')
+      end
+
+      it 'persists the child update when the parent is subsequently saved' do
+        node.save!
+        expect(Server.find(server.id).name).to eq('updated')
+      end
+    end
+
+    describe 'parent#update with nested attributes' do
+      context 'when the child attributes are valid' do
+        it 'returns true' do
+          result = node.update(servers_attributes: [ { _id: server.id, name: 'updated' } ])
+          expect(result).to be true
+        end
+
+        it 'persists the child update' do
+          node.update(servers_attributes: [ { _id: server.id, name: 'updated' } ])
+          expect(Server.find(server.id).name).to eq('updated')
+        end
+      end
+
+      context 'when the child attributes are invalid' do
+        it 'returns false' do
+          result = node.update(servers_attributes: [ { _id: server.id, name: '' } ])
+          expect(result).to be false
+        end
+
+        it 'does not persist the invalid child state' do
+          node.update(servers_attributes: [ { _id: server.id, name: '' } ])
+          expect(Server.find(server.id).name).to eq('original')
+        end
+
+        it 'records validation errors on the parent' do
+          node.update(servers_attributes: [ { _id: server.id, name: '' } ])
+          expect(node.errors).not_to be_empty
+        end
+      end
+
+      context 'when the parent is invalid but the child attributes would be valid' do
+        let!(:parent) { NestedValidatedParent.create!(status: 'active') }
+        let!(:item) { parent.labeled_items.create!(label: 'original') }
+
+        it 'does not persist the child update' do
+          parent.update(
+            status: 'invalid_status',
+            labeled_items_attributes: [ { _id: item.id, label: 'updated' } ]
+          )
+          expect(NestedLabeledItem.find(item.id).label).to eq('original')
+        end
+
+        it 'returns false' do
+          result = parent.update(
+            status: 'invalid_status',
+            labeled_items_attributes: [ { _id: item.id, label: 'updated' } ]
+          )
+          expect(result).to be false
+        end
       end
     end
   end

@@ -279,7 +279,7 @@ describe Mongoid::Contextual::Mongo do
           expect(Band.count).to eq(1)
         end
 
-        it 'returns the number of documents deleted' do
+        it 'returns the number of deleted documents' do
           expect(deleted).to eq(1)
         end
 
@@ -304,7 +304,7 @@ describe Mongoid::Contextual::Mongo do
             expect(Band.count).to eq(1)
           end
 
-          it 'returns the number of documents deleted' do
+          it 'returns the number of deleted documents' do
             expect(deleted).to eq(1)
           end
         end
@@ -341,6 +341,18 @@ describe Mongoid::Contextual::Mongo do
 
         it 'returns 0' do
           expect(deleted).to eq(0)
+        end
+      end
+
+      context 'when inside a containing changeset' do
+        let!(:deleted) do
+          Mongoid.changeset do
+            Band.where(name: 'Depeche Mode').send(method)
+          end
+        end
+
+        it 'returns nil' do
+          expect(deleted).to be_nil
         end
       end
     end

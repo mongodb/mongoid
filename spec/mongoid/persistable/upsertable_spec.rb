@@ -174,6 +174,33 @@ describe Mongoid::Persistable::Upsertable do
       end
     end
 
+    context 'inside a Mongoid.changeset block' do
+      it 'defers the upsert until the block exits' do
+        band = Band.new(name: 'Tool')
+        Mongoid.changeset do
+          band.upsert
+          expect(Band.count).to eq(0)
+        end
+        expect(Band.count).to eq(1)
+      end
+
+      it 'stages a :upsert entry for a non-replace upsert' do
+        band = Band.new(name: 'Deftones')
+        Mongoid.changeset do |cs|
+          band.upsert
+          expect(cs.entries.last.type).to eq(:upsert)
+        end
+      end
+
+      it 'stages a :upsert_replace entry for a replace upsert' do
+        band = Band.new(name: 'Deftones')
+        Mongoid.changeset do |cs|
+          band.upsert(replace: true)
+          expect(cs.entries.last.type).to eq(:upsert_replace)
+        end
+      end
+    end
+
     context 'when the document is readonly' do
       context 'when legacy_readonly is true' do
         config_override :legacy_readonly, true

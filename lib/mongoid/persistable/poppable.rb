@@ -21,14 +21,19 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def pop(pops)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(pops) do |field, value|
-            values = send(field)
-            (value > 0) ? values.pop : values.shift
-            ops[atomic_attribute_name(field)] = value
-          end
-          { '$pop' => ops }
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+        return self unless persisted?
+
+        ops = {}
+        pops.each do |field, value|
+          access = database_field_name(field)
+          values = send(access)
+          (value > 0) ? values.pop : values.shift
+          remove_change(access)
+          ops[atomic_attribute_name(access)] = value
         end
+
+        _stage_atomic_update('$pop', ops)
       end
     end
   end

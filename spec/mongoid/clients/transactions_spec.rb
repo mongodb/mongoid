@@ -1220,7 +1220,14 @@ describe Mongoid::Clients::Sessions do
               rescue RuntimeError
               end
 
-              it_behaves_like 'rollback callbacks are called'
+              it 'does not call any transaction callbacks' do
+                # after_save runs inside the changeset block, before the
+                # driver write. A raise from after_save aborts the changeset
+                # so no write is dispatched and the transaction has nothing
+                # to roll back. Post-write logic belongs in after_flush.
+                expect(subject.after_commit_counter.value).to eq(0)
+                expect(subject.after_rollback_counter.value).to eq(0)
+              end
             end
           end
         end
@@ -1327,6 +1334,26 @@ describe Mongoid::Clients::Sessions do
           it_behaves_like 'commit callbacks are called'
         end
       end
+    end
+  end
+
+  context 'when called inside a changeset' do
+    after { Mongoid::Threaded.current_changeset = nil }
+
+    it 'raises TransactionInChangeset on a model class' do
+      expect do
+        Mongoid.changeset do
+          TransactionsSpecPerson.transaction { nil }
+        end
+      end.to raise_error(Mongoid::Errors::TransactionInChangeset)
+    end
+
+    it 'raises TransactionInChangeset on the Mongoid module' do
+      expect do
+        Mongoid.changeset do
+          Mongoid.transaction { nil }
+        end
+      end.to raise_error(Mongoid::Errors::TransactionInChangeset)
     end
   end
 end

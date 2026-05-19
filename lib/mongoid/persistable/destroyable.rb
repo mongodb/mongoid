@@ -22,12 +22,10 @@ module Mongoid
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
 
         self.flagged_for_destroy = true
-        result = run_callbacks(:commit, skip_if: -> { in_transaction? }) do
+        result = Mongoid.changeset do
           run_callbacks(:destroy) do
             if catch(:abort) { apply_destroy_dependencies! }
-              delete(options || {}).tap do |res|
-                Threaded.add_modified_document(_session, self) if res && in_transaction?
-              end
+              delete(options || {})
             else
               false
             end

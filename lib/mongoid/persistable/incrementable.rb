@@ -17,17 +17,24 @@ module Mongoid
       #
       # @return [ Document ] The document.
       def inc(increments)
-        prepare_atomic_operation do |ops|
-          process_atomic_operations(increments) do |field, value|
-            increment = value.is_a?(BigDecimal) ? value.to_f : value
-            current = attributes[field]
-            new_value = (current || 0) + increment
-            process_attribute field, new_value if executing_atomically?
-            attributes[field] = new_value
-            ops[atomic_attribute_name(field)] = increment
-          end
-          { '$inc' => ops } unless ops.empty?
+        raise Errors::ReadonlyDocument.new(self.class) if readonly? && !Mongoid.legacy_readonly
+
+        dirty = _atomic_dirty_fields_init
+        ops = {}
+
+        increments.each do |field, value|
+          access = database_field_name(field)
+          increment = value.is_a?(BigDecimal) ? value.to_f : value
+          current = attributes[access]
+          _mark_dirty_field(dirty, access, current)
+          attributes[access] = (current || 0) + increment
+          _track_dirty_field(dirty, access)
+          ops[atomic_attribute_name(access)] = increment
         end
+
+        return self unless persisted?
+
+        _stage_atomic_update('$inc', ops, dirty: dirty)
       end
     end
   end

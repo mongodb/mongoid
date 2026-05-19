@@ -108,9 +108,24 @@ module Mongoid
       # @example Delete all the documents.
       #   context.delete
       #
-      # @return [ nil ] Nil.
+      # @return [ Integer | nil ] The number of documents deleted, or nil if the
+      #    delete was performed within a changeset (and was thus deferred).
       def delete
-        view.delete_many.deleted_count
+        entry_opts = _view_opts
+        entry = Mongoid.changeset do |cs|
+          cs.add(
+            type: :delete_many,
+            collection: collection,
+            selector: view.filter,
+            payload: nil,
+            document: nil,
+            session: _session,
+            opts: entry_opts.empty? ? nil : entry_opts
+          )
+        end
+        return nil unless entry.is_a?(Changeset::Entry) && entry.result
+
+        acknowledged_write? ? entry.result.deleted_count : 0
       end
       alias delete_all delete
 
@@ -515,7 +530,22 @@ module Mongoid
       #
       # @return [ nil | false ] False if no attributes were provided.
       def update_all(attributes = nil, opts = {})
-        update_documents(attributes, :update_many, opts)
+        return false unless attributes
+
+        prepared = AtomicUpdatePreparer.prepare(attributes, klass)
+        entry_opts = _view_opts.merge(opts)
+        Mongoid.changeset do |cs|
+          cs.add(
+            type: :update_many,
+            collection: collection,
+            selector: view.filter,
+            payload: prepared,
+            document: nil,
+            session: _session,
+            opts: entry_opts.empty? ? nil : entry_opts
+          )
+        end
+        nil
       end
 
       # Get the first document in the database for the criteria's selector.
@@ -892,6 +922,17 @@ module Mongoid
 
       def _session
         @criteria.send(:_session)
+      end
+
+      # Extract driver-level options (e.g. collation) from the current view,
+      # so they can be forwarded through a changeset entry.
+      #
+      # @api private
+      def _view_opts
+        opts = {}
+        opts[:collation] = view.options[:collation] if view.options[:collation]
+        opts[:comment] = view.options[:comment] if view.options[:comment]
+        opts
       end
 
       def acknowledged_write?

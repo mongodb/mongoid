@@ -1233,4 +1233,34 @@ describe Mongoid::Association::Referenced::HasOne do
       expect(association.create_relation(owner, target)).to be_a(BelongingObject)
     end
   end
+
+  describe 'validation on assignment', :integration do
+    let!(:person) { Person.create! }
+
+    context 'when the target fails validation' do
+      let(:game) { Game.new(name: '$$$invalid') }
+
+      it 'raises Errors::Validations when assigning an invalid target' do
+        expect { person.game = game }.to raise_error(Mongoid::Errors::Validations)
+      end
+
+      it 'does not persist the invalid document' do
+        begin
+          person.game = game
+        rescue Mongoid::Errors::Validations
+          nil
+        end
+        expect(Game.where(person_id: person.id).first).to be_nil
+      end
+    end
+
+    context 'when the target is valid' do
+      let(:game) { Game.new }
+
+      it 'persists the target' do
+        person.game = game
+        expect(Game.where(person_id: person.id).first).not_to be_nil
+      end
+    end
+  end
 end
