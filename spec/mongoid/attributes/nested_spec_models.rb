@@ -46,3 +46,21 @@ class NestedPage
   field :number, type: Integer
   embedded_in :book, class_name: 'NestedBook'
 end
+
+# Models for testing MONGOID-5911: no partial or premature writes via nested
+# attributes on referenced associations.
+class NestedValidatedParent
+  include Mongoid::Document
+
+  field :status, type: String
+  has_many :labeled_items, class_name: 'NestedLabeledItem'
+  accepts_nested_attributes_for :labeled_items
+  validates :status, inclusion: { in: %w[active inactive] }
+end
+
+class NestedLabeledItem
+  include Mongoid::Document
+
+  field :label, type: String
+  belongs_to :nested_validated_parent
+end
