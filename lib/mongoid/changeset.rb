@@ -153,21 +153,22 @@ module Mongoid
     def _execute_single(entry)
       session_opts = entry.session ? { session: entry.session } : {}
       driver_opts = entry.opts ? session_opts.merge(entry.opts) : session_opts
+      opt_args = _opt_args(driver_opts)
       case entry.type
       when :insert
-        entry.collection.insert_one(entry.payload, **driver_opts)
+        entry.collection.insert_one(entry.payload, *opt_args)
       when :update, :embedded_insert, :embedded_delete
-        entry.collection.find(entry.selector).update_one(entry.payload, **driver_opts)
+        entry.collection.find(entry.selector).update_one(entry.payload, *opt_args)
       when :update_many
-        entry.collection.find(entry.selector).update_many(entry.payload, **driver_opts)
+        entry.collection.find(entry.selector).update_many(entry.payload, *opt_args)
       when :delete
-        entry.collection.find(entry.selector).delete_one(**driver_opts)
+        entry.collection.find(entry.selector).delete_one(*opt_args)
       when :delete_many
-        entry.result = entry.collection.find(entry.selector).delete_many(**driver_opts)
+        entry.result = entry.collection.find(entry.selector).delete_many(*opt_args)
       when :upsert
-        entry.collection.find(entry.selector).update_one(entry.payload, upsert: true, **driver_opts)
+        entry.collection.find(entry.selector).update_one(entry.payload, { upsert: true }.merge(driver_opts))
       when :upsert_replace
-        entry.collection.find(entry.selector).replace_one(entry.payload, upsert: true, **driver_opts)
+        entry.collection.find(entry.selector).replace_one(entry.payload, { upsert: true }.merge(driver_opts))
       end
     end
 
@@ -176,7 +177,14 @@ module Mongoid
       session = batch.map(&:session).find { |s| s }
       opts = session ? { session: session } : {}
       ops = batch.map { |entry| _bulk_op_for(entry) }
-      collection.bulk_write(ops, **opts)
+      collection.bulk_write(ops, *_opt_args(opts))
+    end
+
+    # The mongo 2.x driver takes positional opts hashes. Passing **{} in Ruby 2.7
+    # is converted to a positional {} argument, causing RSpec argument mismatches
+    # in tests. Omit the opts argument entirely when there is nothing to pass.
+    def _opt_args(opts)
+      opts.empty? ? [] : [ opts ]
     end
 
     def _bulk_op_for(entry)
