@@ -211,7 +211,7 @@ module Mongoid
       # @api private
       def self.add_discriminator_mapping(value, klass = self)
         self.discriminator_mapping ||= {}
-        self.discriminator_mapping[value] = klass
+        discriminator_mapping[value] = klass
         superclass.add_discriminator_mapping(value, klass) if hereditary?
       end
 
@@ -225,7 +225,7 @@ module Mongoid
       #
       # @api private
       def self.get_discriminator_mapping(value)
-        self.discriminator_mapping[value] if self.discriminator_mapping
+        discriminator_mapping[value] if discriminator_mapping
       end
     end
 
