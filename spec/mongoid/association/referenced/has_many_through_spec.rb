@@ -41,6 +41,33 @@ describe Mongoid::Association::Referenced::HasManyThrough do
     it 'returns the patient belongs_to on Appointment' do
       expect(assoc.source_association).to eq(Appointment.relations['patient'])
     end
+
+    context 'when the source association is has_and_belongs_to_many' do
+      before(:all) do
+        Object.const_set(:HabtmTag, Class.new { include Mongoid::Document })
+        Object.const_set(:HabtmPost, Class.new do
+          include Mongoid::Document
+
+          has_and_belongs_to_many :habtm_tags, class_name: 'HabtmTag'
+        end)
+        Object.const_set(:HabtmBlog, Class.new do
+          include Mongoid::Document
+
+          has_many :habtm_posts, class_name: 'HabtmPost', inverse_of: :habtm_blog
+          has_many :habtm_tags, through: :habtm_posts, class_name: 'HabtmTag'
+        end)
+      end
+
+      after(:all) do
+        %w[HabtmBlog HabtmPost HabtmTag].each { |c| Object.send(:remove_const, c) }
+      end
+
+      it 'raises InvalidRelationOption' do
+        blog_assoc = HabtmBlog.relations['habtm_tags']
+        expect { blog_assoc.source_association }.to \
+          raise_error(Mongoid::Errors::InvalidRelationOption)
+      end
+    end
   end
 
   describe '#embedded?' do
@@ -54,6 +81,14 @@ describe Mongoid::Association::Referenced::HasManyThrough do
       expect do
         Physician.has_many(:foos, through: :appointments, bad_opt: true)
       end.to raise_error(Mongoid::Errors::InvalidRelationOption)
+    end
+
+    it 'accepts :order' do
+      expect do
+        Physician.has_many(:ordered_patients, through: :appointments,
+                                              class_name: 'Patient', source: :patient,
+                                              order: { _id: 1 })
+      end.not_to raise_error
     end
   end
 
@@ -178,6 +213,50 @@ describe Mongoid::Association::Referenced::HasManyThrough do
 
     it 'returns readers across all books' do
       expect(author.hm_readers.to_a).to contain_exactly(r1, r2, r3)
+    end
+  end
+
+  context 'integration — :order option', :integration do
+    before(:all) do
+      Object.const_set(:OrdPhysician, Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'ord_physicians'
+        has_many :ord_appointments, class_name: 'OrdAppointment', inverse_of: :ord_physician
+        has_many :ord_patients, through: :ord_appointments,
+                                class_name: 'OrdPatient', source: :ord_patient,
+                                order: { name: 1 }
+      end)
+      Object.const_set(:OrdAppointment, Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'ord_appointments'
+        belongs_to :ord_physician, class_name: 'OrdPhysician'
+        belongs_to :ord_patient,   class_name: 'OrdPatient'
+      end)
+      Object.const_set(:OrdPatient, Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'ord_patients'
+        field :name, type: String
+      end)
+    end
+
+    after(:all) do
+      %w[OrdPhysician OrdAppointment OrdPatient].each { |c| Object.send(:remove_const, c) }
+    end
+
+    before { [ OrdPhysician, OrdAppointment, OrdPatient ].each(&:delete_all) }
+
+    it 'returns patients in the declared order' do
+      physician = OrdPhysician.create!
+      charlie   = OrdPatient.create!(name: 'Charlie')
+      alice     = OrdPatient.create!(name: 'Alice')
+      bob       = OrdPatient.create!(name: 'Bob')
+      [ charlie, alice, bob ].each do |p|
+        OrdAppointment.create!(ord_physician: physician, ord_patient: p)
+      end
+      expect(physician.ord_patients.to_a).to eq([ alice, bob, charlie ])
     end
   end
 end

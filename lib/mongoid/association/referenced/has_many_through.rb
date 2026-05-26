@@ -14,7 +14,7 @@ module Mongoid
         # common ones.
         #
         # @return [ Array<Symbol> ] The extra valid options.
-        ASSOCIATION_OPTIONS = %i[source through scope].freeze
+        ASSOCIATION_OPTIONS = %i[order source through scope].freeze
 
         # The complete list of valid options for this association, including
         # the shared ones.
@@ -89,12 +89,21 @@ module Mongoid
         def source_association
           @source_association ||= begin
             source_name = (@options[:source] || name.to_s.singularize).to_s
-            through_association.klass.relations[source_name] ||
+            assoc = through_association.klass.relations[source_name] ||
+                    raise(
+                      Errors::InvalidRelationOption.new(
+                        @owner_class, name, :source, source_name
+                      )
+                    )
+            if assoc.is_a?(Referenced::HasAndBelongsToMany)
               raise(
                 Errors::InvalidRelationOption.new(
-                  @owner_class, name, :source, source_name
+                  @owner_class, name, :source,
+                  'has_and_belongs_to_many is not supported as a :through source'
                 )
               )
+            end
+            assoc
           end
         end
 
@@ -108,21 +117,22 @@ module Mongoid
         def criteria(base)
           through_crit = through_association.criteria(base)
 
-          if source_association.stores_foreign_key?
-            # FK is on the intermediate (e.g. appointment.patient_id -> belongs_to :patient)
-            target_pk = source_association.primary_key # '_id' on Patient
-            source_fk = source_association.foreign_key # 'patient_id' on Appointment
-            source_association.klass.where(
-              target_pk => { '$in' => through_crit.pluck(source_fk) }
-            )
-          else
-            # FK is on the source (e.g. reader.book_id -> has_many :readers on Book)
-            through_pk = through_association.primary_key # '_id' on Book
-            source_fk  = source_association.foreign_key # 'book_id' on Reader
-            source_association.klass.where(
-              source_fk => { '$in' => through_crit.pluck(through_pk) }
-            )
-          end
+          crit = if source_association.stores_foreign_key?
+                   # FK is on the intermediate (e.g. appointment.patient_id -> belongs_to :patient)
+                   target_pk = source_association.primary_key # '_id' on Patient
+                   source_fk = source_association.foreign_key # 'patient_id' on Appointment
+                   source_association.klass.where(
+                     target_pk => { '$in' => through_crit.pluck(source_fk) }
+                   )
+                 else
+                   # FK is on the source (e.g. reader.book_id -> has_many :readers on Book)
+                   through_pk = through_association.primary_key # '_id' on Book
+                   source_fk  = source_association.foreign_key # 'book_id' on Reader
+                   source_association.klass.where(
+                     source_fk => { '$in' => through_crit.pluck(through_pk) }
+                   )
+                 end
+          order ? crit.order_by(order) : crit
         end
 
         # The default for validating the association object.
