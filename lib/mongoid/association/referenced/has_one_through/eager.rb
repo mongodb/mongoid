@@ -14,7 +14,6 @@ module Mongoid
             through_assoc = @association.through_association
             source_assoc  = @association.source_association
 
-            # Step 1: load all intermediate records keyed by their FK to owner
             owner_pk   = through_assoc.primary_key
             through_fk = through_assoc.foreign_key
 
@@ -22,31 +21,34 @@ module Mongoid
             return if owner_ids.empty?
 
             intermediates = through_assoc.klass.where(through_fk => { '$in' => owner_ids }).to_a
+            intermediate_to_target = build_intermediate_to_target(intermediates, through_fk, source_assoc)
 
-            # Step 2: load all source records
+            @docs.each do |doc|
+              owner_key_val = doc.public_send(owner_pk)
+              target = intermediate_to_target[owner_key_val]
+              proxy = target ? HasOneThrough::Proxy.new(doc, target, @association) : nil
+              doc.set_relation(@association.name, proxy) unless doc.blank?
+            end
+          end
+
+          def build_intermediate_to_target(intermediates, through_fk, source_assoc)
             if source_assoc.stores_foreign_key?
               # FK is on the intermediate (e.g. belongs_to :store => intermediate.store_id)
               source_fk_values = intermediates.filter_map { |i| i.public_send(source_assoc.foreign_key) }.uniq
               targets = source_assoc.klass.where(source_assoc.primary_key => { '$in' => source_fk_values }).to_a
               targets_by_key = targets.index_by { |t| t.public_send(source_assoc.primary_key) }
-              intermediate_to_target = intermediates.to_h do |i|
+              intermediates.to_h do |i|
                 [ i.public_send(through_fk), targets_by_key[i.public_send(source_assoc.foreign_key)] ]
               end
             else
               # FK is on the source (e.g. has_one :store => store.franchise_id)
-              intermediate_pks = intermediates.filter_map { |i| i.public_send(through_assoc.primary_key) }.uniq
+              source_pk = source_assoc.primary_key
+              intermediate_pks = intermediates.filter_map { |i| i.public_send(source_pk) }.uniq
               targets = source_assoc.klass.where(source_assoc.foreign_key => { '$in' => intermediate_pks }).to_a
               targets_by_fk = targets.index_by { |t| t.public_send(source_assoc.foreign_key) }
-              intermediate_by_owner_fk = intermediates.index_by { |i| i.public_send(through_fk) }
-              intermediate_to_target = intermediate_by_owner_fk.transform_values do |i|
-                targets_by_fk[i.public_send(through_assoc.primary_key)]
+              intermediates.index_by { |i| i.public_send(through_fk) }.transform_values do |i|
+                targets_by_fk[i.public_send(source_pk)]
               end
-            end
-
-            # Step 3: set relation on each owner doc
-            @docs.each do |doc|
-              owner_key_val = doc.public_send(owner_pk)
-              set_relation(doc, intermediate_to_target[owner_key_val])
             end
           end
 

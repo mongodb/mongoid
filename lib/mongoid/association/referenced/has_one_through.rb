@@ -14,7 +14,7 @@ module Mongoid
         # common ones.
         #
         # @return [ Array<Symbol> ] The extra valid options.
-        ASSOCIATION_OPTIONS = %i[source through scope].freeze
+        ASSOCIATION_OPTIONS = %i[source through].freeze
 
         # The complete list of valid options for this association, including
         # the shared ones.
@@ -82,12 +82,21 @@ module Mongoid
         def source_association
           @source_association ||= begin
             source_name = (@options[:source] || name).to_s
-            through_association.klass.relations[source_name] ||
+            assoc = through_association.klass.relations[source_name] ||
+                    raise(
+                      Errors::InvalidRelationOption.new(
+                        @owner_class, name, :source, source_name
+                      )
+                    )
+            if assoc.is_a?(Referenced::HasAndBelongsToMany)
               raise(
                 Errors::InvalidRelationOption.new(
-                  @owner_class, name, :source, source_name
+                  @owner_class, name, :source,
+                  'has_and_belongs_to_many is not supported as a :through source'
                 )
               )
+            end
+            assoc
           end
         end
 

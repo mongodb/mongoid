@@ -14,7 +14,7 @@ module Mongoid
         # common ones.
         #
         # @return [ Array<Symbol> ] The extra valid options.
-        ASSOCIATION_OPTIONS = %i[order source through scope].freeze
+        ASSOCIATION_OPTIONS = %i[order source through].freeze
 
         # The complete list of valid options for this association, including
         # the shared ones.
@@ -126,10 +126,10 @@ module Mongoid
                    )
                  else
                    # FK is on the source (e.g. reader.book_id -> has_many :readers on Book)
-                   through_pk = through_association.primary_key # '_id' on Book
-                   source_fk  = source_association.foreign_key # 'book_id' on Reader
+                   source_pk = source_association.primary_key # '_id' on intermediate (Book)
+                   source_fk = source_association.foreign_key # 'book_id' on Reader
                    source_association.klass.where(
-                     source_fk => { '$in' => through_crit.pluck(through_pk) }
+                     source_fk => { '$in' => through_crit.pluck(source_pk) }
                    )
                  end
           order ? crit.order_by(order) : crit
