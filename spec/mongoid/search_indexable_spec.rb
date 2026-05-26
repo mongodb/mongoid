@@ -309,6 +309,148 @@ describe Mongoid::SearchIndexable do
     end
   end
 
+  describe '.vector_search_index with flat indexingMethod' do
+    it 'raises ArgumentError when flat index includes hnswOptions' do
+      expect do
+        Class.new do
+          include Mongoid::Document
+
+          store_in collection: BSON::ObjectId.new.to_s
+          vector_search_index fields: [
+            {
+              type: 'vector',
+              path: 'embedding',
+              numDimensions: 3,
+              similarity: 'cosine',
+              indexingMethod: 'flat',
+              hnswOptions: { m: 16, efConstruction: 150 }
+            }
+          ]
+        end
+      end.to raise_error(ArgumentError, /hnswOptions is only supported with indexingMethod: hnsw/)
+    end
+
+    it 'does not raise when flat index has no hnswOptions' do
+      expect do
+        Class.new do
+          include Mongoid::Document
+
+          store_in collection: BSON::ObjectId.new.to_s
+          vector_search_index fields: [
+            {
+              type: 'vector',
+              path: 'embedding',
+              numDimensions: 3,
+              similarity: 'cosine',
+              indexingMethod: 'flat'
+            }
+          ]
+        end
+      end.not_to raise_error
+    end
+
+    it 'does not raise when hnsw index has hnswOptions' do
+      expect do
+        Class.new do
+          include Mongoid::Document
+
+          store_in collection: BSON::ObjectId.new.to_s
+          vector_search_index fields: [
+            {
+              type: 'vector',
+              path: 'embedding',
+              numDimensions: 3,
+              similarity: 'cosine',
+              indexingMethod: 'hnsw',
+              hnswOptions: { m: 16, efConstruction: 150 }
+            }
+          ]
+        end
+      end.not_to raise_error
+    end
+  end
+
+  describe '.vector_search pipeline construction' do
+    let(:model) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        field :embedding, type: Array
+        vector_search_index fields: [ { type: 'vector', path: 'embedding', numDimensions: 3, similarity: 'cosine' } ]
+      end
+    end
+
+    let(:fake_collection) { instance_double(Mongo::Collection) }
+    let(:fake_cursor) { double(map: []) }
+
+    before do
+      allow(model).to receive(:collection).and_return(fake_collection)
+      allow(fake_collection).to receive(:aggregate).and_return(fake_cursor)
+    end
+
+    it 'includes numCandidates by default' do
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        vs = pipeline.find { |s| s['$vectorSearch'] }
+        expect(vs['$vectorSearch']).to have_key('numCandidates')
+        fake_cursor
+      end
+
+      model.vector_search([ 0.1, 0.2, 0.3 ], limit: 5)
+    end
+
+    it 'omits numCandidates when exact: true' do
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        vs = pipeline.find { |s| s['$vectorSearch'] }
+        expect(vs['$vectorSearch']).not_to have_key('numCandidates')
+        fake_cursor
+      end
+
+      model.vector_search([ 0.1, 0.2, 0.3 ], exact: true)
+    end
+
+    it 'uses limit * 10 as the default numCandidates' do
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        vs = pipeline.find { |s| s['$vectorSearch'] }
+        expect(vs['$vectorSearch']['numCandidates']).to eq(50)
+        fake_cursor
+      end
+
+      model.vector_search([ 0.1, 0.2, 0.3 ], limit: 5)
+    end
+  end
+
+  describe '#vector_search pipeline construction' do
+    let(:model) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        field :embedding, type: Array
+        vector_search_index fields: [ { type: 'vector', path: 'embedding', numDimensions: 3, similarity: 'cosine' } ]
+      end
+    end
+
+    let(:fake_collection) { instance_double(Mongo::Collection) }
+    let(:fake_cursor) { double(map: []) }
+    let(:doc) { model.new(embedding: [ 0.1, 0.2, 0.3 ]) }
+
+    before do
+      allow(model).to receive(:collection).and_return(fake_collection)
+      allow(fake_collection).to receive(:aggregate).and_return(fake_cursor)
+    end
+
+    it 'omits numCandidates when exact: true' do
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        vs = pipeline.find { |s| s['$vectorSearch'] }
+        expect(vs['$vectorSearch']).not_to have_key('numCandidates')
+        fake_cursor
+      end
+
+      doc.vector_search(exact: true)
+    end
+  end
+
   # Atlas integration tests — skipped when ATLAS_URI is not set.
 
   context 'Atlas integration' do

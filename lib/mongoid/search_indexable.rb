@@ -76,7 +76,7 @@ module Mongoid
     #
     # @return [ Array<Mongoid::Document> ] matching documents, each with
     #   a populated +vector_search_score+ attribute.
-    def vector_search(index: nil, path: nil, limit: 10, num_candidates: nil, filter: nil, pipeline: [])
+    def vector_search(index: nil, path: nil, limit: 10, num_candidates: nil, exact: false, filter: nil, pipeline: []) # rubocop:disable Metrics/ParameterLists
       _index, resolved_path = self.class.send(:resolve_vector_index, index, path)
       query_vector = public_send(resolved_path)
 
@@ -94,6 +94,7 @@ module Mongoid
         path: path,
         limit: limit,
         num_candidates: num_candidates,
+        exact: exact,
         filter: combined_filter,
         pipeline: pipeline
       )
@@ -253,12 +254,23 @@ module Mongoid
       #     vector_search_index :my_vector_index, { fields: [...] }
       #   end
       #
+      # @example Create a flat vector search index.
+      #   class Person
+      #     include Mongoid::Document
+      #     vector_search_index fields: [
+      #       { type: 'vector', path: 'embedding', numDimensions: 1536,
+      #         similarity: 'cosine', indexingMethod: 'flat' }
+      #     ]
+      #   end
+      #
       # @param [ Symbol | String | Hash ] name_or_defn Either the name of the index to
       #    define, or the index definition.
       # @param [ Hash ] defn The vector search index definition.
       def vector_search_index(name_or_defn, defn = nil)
         name = name_or_defn
         name, defn = nil, name if name.is_a?(Hash)
+
+        validate_vector_index_definition!(defn)
 
         spec = { type: 'vectorSearch', definition: defn }.tap { |s| s[:name] = name.to_s if name }
         search_index_specs.push(spec)
@@ -290,22 +302,24 @@ module Mongoid
       #   consider during the ANN search; defaults to limit * 10.
       # @param [ Hash | nil ] filter An optional MongoDB filter to pre-filter
       #   candidates before scoring.
+      # @param [ true | false ] exact Use exact nearest-neighbor (ENN) search
+      #   instead of ANN (default: false). When true, numCandidates is omitted.
+      #   Required when using a flat vector search index.
       # @param [ Array ] pipeline Additional aggregation stages to append after
       #   the vector search and score projection.
       #
       # @return [ Array<Mongoid::Document> ] matching documents, each with
       #   a populated +vector_search_score+ attribute.
-      def vector_search(vector, index: nil, path: nil, limit: 10, num_candidates: nil, filter: nil, pipeline: []) # rubocop:disable Metrics/ParameterLists
+      def vector_search(vector, index: nil, path: nil, limit: 10, num_candidates: nil, exact: false, filter: nil, pipeline: []) # rubocop:disable Metrics/ParameterLists
         resolved_index, resolved_path = resolve_vector_index(index, path)
-        num_candidates ||= limit * 10
 
         vs_options = {
           'index' => resolved_index,
           'path' => resolved_path,
           'queryVector' => vector,
-          'numCandidates' => num_candidates,
           'limit' => limit
         }
+        vs_options['numCandidates'] = num_candidates || (limit * 10) unless exact
         vs_options['filter'] = filter if filter
 
         agg_pipeline = [
@@ -373,6 +387,21 @@ module Mongoid
       end
 
       private
+
+      # Validates the vector index definition, raising ArgumentError for
+      # combinations that MongoDB does not support.
+      #
+      # @param [ Hash ] defn The vector search index definition.
+      def validate_vector_index_definition!(defn)
+        fields = defn[:fields] || defn['fields'] || []
+        fields.each do |field|
+          method = field[:indexingMethod] || field['indexingMethod']
+          next unless method.to_s == 'flat'
+          next unless field[:hnswOptions] || field['hnswOptions']
+
+          raise ArgumentError, 'hnswOptions is only supported with indexingMethod: hnsw'
+        end
+      end
 
       # Retrieves the index records for the indexes with the given names.
       #
