@@ -1511,5 +1511,30 @@ describe Mongoid::Touchable do
         expect(building.updated_at).to eq(original_building_updated_at)
       end
     end
+
+    context 'when creating an embeds_one document with touch: true (regression for #6128)' do
+      let(:building) do
+        TouchableSpec::Embedded::Building.create!(title: 'Tower')
+      end
+
+      it 'persists the embedded document fields after create_<assoc>' do
+        building.create_lobby(name: 'Main Lobby')
+
+        reloaded = TouchableSpec::Embedded::Building.find(building.id)
+        expect(reloaded.lobby).not_to be_nil
+        expect(reloaded.lobby.name).to eq('Main Lobby')
+      end
+
+      it 'updates the parent updated_at after create_<assoc>' do
+        original_updated_at = building.updated_at
+
+        Timecop.travel(Time.now + 10) do
+          building.create_lobby(name: 'Main Lobby')
+        end
+
+        building.reload
+        expect(building.updated_at).to be > original_updated_at
+      end
+    end
   end
 end

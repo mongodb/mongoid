@@ -172,6 +172,48 @@ describe 'Mongoid::Config.isolation_level' do
         end
       end
 
+      context 'when sibling fibers interleave execution' do
+        around do |example|
+          Mongoid::Threaded.reset!
+          example.run
+          Mongoid::Threaded.reset!
+        end
+
+        it 'does not allow one sibling fiber to corrupt another sibling fiber state' do
+          Mongoid::Threaded.set('x', 'parent')
+
+          value_seen_by_a = nil
+
+          fiber_a = Fiber.new do
+            Mongoid::Threaded.set('x', 'from_a')
+            Fiber.yield
+            value_seen_by_a = Mongoid::Threaded.get('x')
+          end
+
+          fiber_b = Fiber.new do
+            Mongoid::Threaded.set('x', 'from_b')
+          end
+
+          fiber_a.resume
+          fiber_b.resume
+          fiber_a.resume
+
+          expect(value_seen_by_a).to eq('from_a')
+        end
+
+        it 'preserves the parent fiber state after sibling fibers run' do
+          Mongoid::Threaded.set('x', 'parent')
+
+          fiber_a = Fiber.new { Mongoid::Threaded.set('x', 'from_a') }
+          fiber_b = Fiber.new { Mongoid::Threaded.set('x', 'from_b') }
+
+          fiber_a.resume
+          fiber_b.resume
+
+          expect(Mongoid::Threaded.get('x')).to eq('parent')
+        end
+      end
+
       describe '#reset!' do
         context 'when operating in nested fibers' do
           let(:result) do

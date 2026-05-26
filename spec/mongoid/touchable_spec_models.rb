@@ -10,6 +10,16 @@ module TouchableSpec
 
       embeds_many :entrances, class_name: 'TouchableSpec::Embedded::Entrance'
       embeds_many :floors, class_name: 'TouchableSpec::Embedded::Floor'
+      embeds_one :lobby, class_name: 'TouchableSpec::Embedded::Lobby'
+    end
+
+    class Lobby
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      field :name, type: String
+
+      embedded_in :building, touch: true, class_name: 'TouchableSpec::Embedded::Building'
     end
 
     class Entrance

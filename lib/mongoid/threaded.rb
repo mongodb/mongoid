@@ -10,6 +10,10 @@ module Mongoid
     # symbol because keys for fiber-local storage must be symbols.
     STORAGE_KEY = :'[mongoid]'
 
+    # Tracks which fiber owns the storage hash, to detect when a fiber has
+    # inherited (rather than created) its storage from a parent fiber.
+    STORAGE_OWNER_KEY = :'[mongoid]:owner'
+
     DATABASE_OVERRIDE_KEY = 'db-override'
 
     # The key to override the client.
@@ -51,7 +55,8 @@ module Mongoid
       when :thread
         Thread.current.thread_variable_set(STORAGE_KEY, nil)
       when :fiber
-        Fiber[STORAGE_KEY] = nil
+        Fiber[STORAGE_KEY] = {}
+        Fiber[STORAGE_OWNER_KEY] = Fiber.current.object_id
       else
         raise "Unknown isolation level: #{Config.real_isolation_level.inspect}"
       end
@@ -587,7 +592,17 @@ module Mongoid
         storage_hash
 
       when :fiber
-        Fiber[STORAGE_KEY] ||= {}
+        # Fiber[] storage is inherited by child fibers, so multiple sibling
+        # fibers would otherwise share a single mutable hash. We detect
+        # inheritance by comparing the stored owner ID to the current fiber;
+        # on first access by a new fiber we copy the inherited state so each
+        # fiber starts with a snapshot of its parent's state rather than a
+        # shared reference.
+        if Fiber[STORAGE_OWNER_KEY] != Fiber.current.object_id
+          Fiber[STORAGE_KEY] = (Fiber[STORAGE_KEY] || {}).dup
+          Fiber[STORAGE_OWNER_KEY] = Fiber.current.object_id
+        end
+        Fiber[STORAGE_KEY]
 
       else
         raise "Unknown isolation level: #{Config.real_isolation_level.inspect}"
