@@ -103,7 +103,7 @@ describe Mongoid::Association::Referenced::HasManyThrough do
     end
   end
 
-  context 'integration — belongs_to source (join table)', :integration do
+  context 'integration - belongs_to source (join table)', :integration do
     before(:all) do
       Object.const_set(:JtPhysician, Class.new do
         include Mongoid::Document
@@ -173,7 +173,7 @@ describe Mongoid::Association::Referenced::HasManyThrough do
     end
   end
 
-  context 'integration — has_many source', :integration do
+  context 'integration - has_many source', :integration do
     before(:all) do
       Object.const_set(:HmAuthor, Class.new do
         include Mongoid::Document
@@ -216,7 +216,7 @@ describe Mongoid::Association::Referenced::HasManyThrough do
     end
   end
 
-  context 'integration — :order option', :integration do
+  context 'integration - :order option', :integration do
     before(:all) do
       Object.const_set(:OrdPhysician, Class.new do
         include Mongoid::Document
