@@ -399,10 +399,11 @@ describe Mongoid::SearchIndexable do
       model.vector_search([ 0.1, 0.2, 0.3 ], limit: 5)
     end
 
-    it 'omits numCandidates when exact: true' do
+    it 'omits numCandidates and sends exact: true when exact: true' do
       expect(fake_collection).to receive(:aggregate) do |pipeline|
         vs = pipeline.find { |s| s['$vectorSearch'] }
         expect(vs['$vectorSearch']).not_to have_key('numCandidates')
+        expect(vs['$vectorSearch']['exact']).to be true
         fake_cursor
       end
 
@@ -440,10 +441,11 @@ describe Mongoid::SearchIndexable do
       allow(fake_collection).to receive(:aggregate).and_return(fake_cursor)
     end
 
-    it 'omits numCandidates when exact: true' do
+    it 'omits numCandidates and sends exact: true when exact: true' do
       expect(fake_collection).to receive(:aggregate) do |pipeline|
         vs = pipeline.find { |s| s['$vectorSearch'] }
         expect(vs['$vectorSearch']).not_to have_key('numCandidates')
+        expect(vs['$vectorSearch']['exact']).to be true
         fake_cursor
       end
 

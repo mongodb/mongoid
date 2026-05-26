@@ -69,6 +69,9 @@ module Mongoid
     # @param [ Integer ] limit The maximum number of results (default: 10).
     # @param [ Integer | nil ] num_candidates The number of candidates to
     #   consider during the ANN search; defaults to limit * 10.
+    # @param [ true | false ] exact Use exact nearest-neighbor (ENN) search
+    #   instead of ANN (default: false). When true, numCandidates is omitted.
+    #   Required when using a flat vector search index.
     # @param [ Hash | nil ] filter An optional MongoDB filter to pre-filter
     #   candidates before scoring.
     # @param [ Array ] pipeline Additional aggregation stages to append after
@@ -320,6 +323,7 @@ module Mongoid
           'limit' => limit
         }
         vs_options['numCandidates'] = num_candidates || (limit * 10) unless exact
+        vs_options['exact'] = true if exact
         vs_options['filter'] = filter if filter
 
         agg_pipeline = [
