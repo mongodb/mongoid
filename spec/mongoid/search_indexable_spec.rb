@@ -36,6 +36,14 @@ class SearchIndexHelper
     end
   end
 
+  # Atlas normalizes latestDefinition by adding "fields"=>{} inside mappings
+  # even when no fields were declared. Strip it before comparing against specs.
+  def normalize_definition(defn)
+    return defn unless defn.is_a?(Hash) && defn['mappings'].is_a?(Hash)
+
+    defn.merge('mappings' => defn['mappings'].reject { |k, v| k.to_s == 'fields' && v == {} })
+  end
+
   private
 
   def timeboxed_wait(step: 5, max: 300)
@@ -57,7 +65,7 @@ class SearchIndexHelper
   end
 
   def filter_results(result, names)
-    result.select { |index| names.include?(index['name']) }
+    names.filter_map { |name| result.find { |index| index['name'] == name } }
   end
 end
 
@@ -479,7 +487,7 @@ describe Mongoid::SearchIndexable do
       let(:requested_definitions) { model.search_index_specs.map { |spec| spec[:definition].with_indifferent_access } }
       let(:index_names) { model.create_search_indexes }
       let(:actual_indexes) { helper.wait_for(*index_names) }
-      let(:actual_definitions) { actual_indexes.map { |i| i['latestDefinition'] } }
+      let(:actual_definitions) { actual_indexes.map { |i| helper.normalize_definition(i['latestDefinition']) } }
 
       describe '.create_search_indexes' do
         it 'creates the indexes' do
@@ -490,10 +498,10 @@ describe Mongoid::SearchIndexable do
       describe '.search_indexes' do
         before { actual_indexes } # wait for the indices to be created
 
-        let(:queried_definitions) { model.search_indexes.map { |i| i['latestDefinition'] } }
+        let(:queried_definitions) { model.search_indexes.map { |i| helper.normalize_definition(i['latestDefinition']) } }
 
         it 'queries the available search indexes' do
-          expect(queried_definitions).to eq requested_definitions
+          expect(queried_definitions).to match_array(requested_definitions)
         end
       end
 
