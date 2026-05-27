@@ -17,10 +17,10 @@ class SearchIndexHelper
 
   # Wait for all of the indexes with the given names to be ready; then return
   # the list of index definitions corresponding to those names.
-  def wait_for(*names, &condition)
+  def wait_for(*names, timeout: 300, &condition)
     names.flatten!
 
-    timeboxed_wait do
+    timeboxed_wait(max: timeout) do
       result = collection.search_indexes
       return filter_results(result, names) if names.all? { |name| ready?(result, name, &condition) }
     end
@@ -390,11 +390,19 @@ describe Mongoid::SearchIndexable do
       let(:vector_helper) { SearchIndexHelper.new(vector_model) }
 
       # Three orthogonal unit vectors as a minimal, predictable dataset.
-      let!(:doc_a) { vector_model.create!(embedding: [ 1.0, 0.0, 0.0 ]) }
-      let!(:doc_b) { vector_model.create!(embedding: [ 0.0, 1.0, 0.0 ]) }
-      let!(:doc_c) { vector_model.create!(embedding: [ 0.0, 0.0, 1.0 ]) }
+      let(:doc_a) { vector_model.create!(embedding: [ 1.0, 0.0, 0.0 ]) }
+      let(:doc_b) { vector_model.create!(embedding: [ 0.0, 1.0, 0.0 ]) }
+      let(:doc_c) { vector_model.create!(embedding: [ 0.0, 0.0, 1.0 ]) }
 
       before do
+        vector_helper # force collection to be dropped, created
+
+        # once the collection has been recreated, populate it with documents
+        doc_a
+        doc_b
+        doc_c
+
+        # prepare the search indexes
         names = vector_model.create_search_indexes
         vector_helper.wait_for(*names)
       end
