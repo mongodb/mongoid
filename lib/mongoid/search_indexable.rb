@@ -87,13 +87,14 @@ module Mongoid
 
       self_exclusion = { '$match' => { '_id' => { '$ne' => _id } } }
       post_pipeline = [ self_exclusion, { '$limit' => limit }, *Array(pipeline) ]
+      effective_candidates = num_candidates || (limit * 10)
 
       self.class.vector_search(
         query_vector,
         index: index,
         path: path,
         limit: limit + 1,
-        num_candidates: num_candidates,
+        num_candidates: effective_candidates,
         filter: filter,
         pipeline: post_pipeline
       )
@@ -131,13 +132,14 @@ module Mongoid
 
       self_exclusion = { '$match' => { '_id' => { '$ne' => _id } } }
       post_pipeline = [ self_exclusion, { '$limit' => limit }, *Array(pipeline) ]
+      effective_candidates = num_candidates || (limit * 10)
 
       self.class.auto_embed_search(
         text,
         index: index,
         path: path,
         limit: limit + 1,
-        num_candidates: num_candidates,
+        num_candidates: effective_candidates,
         filter: filter,
         exact: exact,
         model: model,
