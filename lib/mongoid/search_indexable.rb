@@ -85,17 +85,18 @@ module Mongoid
               "#{resolved_path} is nil on this document; cannot perform vector search"
       end
 
-      self_filter = { '_id' => { '$ne' => _id } }
-      combined_filter = filter ? { '$and' => [ self_filter, filter ] } : self_filter
+      self_exclusion = { '$match' => { '_id' => { '$ne' => _id } } }
+      post_pipeline = [ self_exclusion, { '$limit' => limit }, *Array(pipeline) ]
+      effective_candidates = num_candidates || (limit * 10)
 
       self.class.vector_search(
         query_vector,
         index: index,
         path: path,
-        limit: limit,
-        num_candidates: num_candidates,
-        filter: combined_filter,
-        pipeline: pipeline
+        limit: limit + 1,
+        num_candidates: effective_candidates,
+        filter: filter,
+        pipeline: post_pipeline
       )
     end
 
@@ -129,19 +130,20 @@ module Mongoid
               "#{resolved_path} is nil on this document; cannot perform auto-embed search"
       end
 
-      self_filter = { '_id' => { '$ne' => _id } }
-      combined_filter = filter ? { '$and' => [ self_filter, filter ] } : self_filter
+      self_exclusion = { '$match' => { '_id' => { '$ne' => _id } } }
+      post_pipeline = [ self_exclusion, { '$limit' => limit }, *Array(pipeline) ]
+      effective_candidates = num_candidates || (limit * 10)
 
       self.class.auto_embed_search(
         text,
         index: index,
         path: path,
-        limit: limit,
-        num_candidates: num_candidates,
-        filter: combined_filter,
+        limit: limit + 1,
+        num_candidates: effective_candidates,
+        filter: filter,
         exact: exact,
         model: model,
-        pipeline: pipeline
+        pipeline: post_pipeline
       )
     end
 
