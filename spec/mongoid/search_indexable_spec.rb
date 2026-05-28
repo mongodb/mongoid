@@ -17,10 +17,10 @@ class SearchIndexHelper
 
   # Wait for all of the indexes with the given names to be ready; then return
   # the list of index definitions corresponding to those names.
-  def wait_for(*names, &condition)
+  def wait_for(*names, timeout: 300, &condition)
     names.flatten!
 
-    timeboxed_wait do
+    timeboxed_wait(max: timeout) do
       result = collection.search_indexes
       return filter_results(result, names) if names.all? { |name| ready?(result, name, &condition) }
     end
@@ -34,6 +34,14 @@ class SearchIndexHelper
         break if collection.search_indexes(name: name).empty?
       end
     end
+  end
+
+  # Atlas normalizes latestDefinition by adding "fields"=>{} inside mappings
+  # even when no fields were declared. Strip it before comparing against specs.
+  def normalize_definition(defn)
+    return defn unless defn.is_a?(Hash) && defn['mappings'].is_a?(Hash)
+
+    defn.merge('mappings' => defn['mappings'].reject { |k, v| k.to_s == 'fields' && v == {} })
   end
 
   private
@@ -57,7 +65,7 @@ class SearchIndexHelper
   end
 
   def filter_results(result, names)
-    result.select { |index| names.include?(index['name']) }
+    names.filter_map { |name| result.find { |index| index['name'] == name } }
   end
 end
 
@@ -451,6 +459,132 @@ describe Mongoid::SearchIndexable do
 
       doc.vector_search(exact: true)
     end
+
+    it 'passes limit + 1 to $vectorSearch so the post-filter never short-counts' do
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        vs = pipeline.find { |s| s['$vectorSearch'] }
+        expect(vs['$vectorSearch']['limit']).to eq 6
+        fake_cursor
+      end
+
+      doc.vector_search(limit: 5)
+    end
+
+    it 'does not use filter in $vectorSearch for self-exclusion' do
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        vs = pipeline.find { |s| s['$vectorSearch'] }
+        expect(vs['$vectorSearch']).not_to have_key('filter')
+        fake_cursor
+      end
+
+      doc.vector_search(limit: 5)
+    end
+
+    it 'adds a $match stage after $vectorSearch to exclude self' do
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        match = pipeline.find { |s| s['$match'] }
+        expect(match).to eq({ '$match' => { '_id' => { '$ne' => doc.id } } })
+        fake_cursor
+      end
+
+      doc.vector_search(limit: 5)
+    end
+
+    it 'adds a $limit stage after $match to cap results at the requested limit' do
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        match_idx = pipeline.index { |s| s['$match'] }
+        limit_stage = pipeline[match_idx + 1]
+        expect(limit_stage).to eq({ '$limit' => 5 })
+        fake_cursor
+      end
+
+      doc.vector_search(limit: 5)
+    end
+
+    it 'passes a user-provided filter through to $vectorSearch' do
+      user_filter = { 'status' => 'published' }
+
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        vs = pipeline.find { |s| s['$vectorSearch'] }
+        expect(vs['$vectorSearch']['filter']).to eq user_filter
+        fake_cursor
+      end
+
+      doc.vector_search(limit: 5, filter: user_filter)
+    end
+  end
+
+  describe '#auto_embed_search pipeline construction' do
+    let(:model) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        auto_embed_field :description, model: 'voyage-4'
+      end
+    end
+
+    let(:fake_collection) { instance_double(Mongo::Collection) }
+    let(:fake_cursor) { double(map: []) }
+    let(:doc) { model.new(description: 'hello world') }
+
+    before do
+      allow(model).to receive(:collection).and_return(fake_collection)
+      allow(fake_collection).to receive(:aggregate).and_return(fake_cursor)
+    end
+
+    it 'passes limit + 1 to $vectorSearch so the post-filter never short-counts' do
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        vs = pipeline.find { |s| s['$vectorSearch'] }
+        expect(vs['$vectorSearch']['limit']).to eq 6
+        fake_cursor
+      end
+
+      doc.auto_embed_search(limit: 5)
+    end
+
+    it 'does not use filter in $vectorSearch for self-exclusion' do
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        vs = pipeline.find { |s| s['$vectorSearch'] }
+        expect(vs['$vectorSearch']).not_to have_key('filter')
+        fake_cursor
+      end
+
+      doc.auto_embed_search(limit: 5)
+    end
+
+    it 'adds a $match stage after $vectorSearch to exclude self' do
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        match = pipeline.find { |s| s['$match'] }
+        expect(match).to eq({ '$match' => { '_id' => { '$ne' => doc.id } } })
+        fake_cursor
+      end
+
+      doc.auto_embed_search(limit: 5)
+    end
+
+    it 'adds a $limit stage after $match to cap results at the requested limit' do
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        match_idx = pipeline.index { |s| s['$match'] }
+        limit_stage = pipeline[match_idx + 1]
+        expect(limit_stage).to eq({ '$limit' => 5 })
+        fake_cursor
+      end
+
+      doc.auto_embed_search(limit: 5)
+    end
+
+    it 'passes a user-provided filter through to $vectorSearch' do
+      user_filter = { 'status' => 'published' }
+
+      expect(fake_collection).to receive(:aggregate) do |pipeline|
+        vs = pipeline.find { |s| s['$vectorSearch'] }
+        expect(vs['$vectorSearch']['filter']).to eq user_filter
+        fake_cursor
+      end
+
+      doc.auto_embed_search(limit: 5, filter: user_filter)
+    end
   end
 
   # Atlas integration tests — skipped when ATLAS_URI is not set.
@@ -476,7 +610,7 @@ describe Mongoid::SearchIndexable do
       let(:requested_definitions) { model.search_index_specs.map { |spec| spec[:definition].with_indifferent_access } }
       let(:index_names) { model.create_search_indexes }
       let(:actual_indexes) { helper.wait_for(*index_names) }
-      let(:actual_definitions) { actual_indexes.map { |i| i['latestDefinition'] } }
+      let(:actual_definitions) { actual_indexes.map { |i| helper.normalize_definition(i['latestDefinition']) } }
 
       describe '.create_search_indexes' do
         it 'creates the indexes' do
@@ -487,10 +621,10 @@ describe Mongoid::SearchIndexable do
       describe '.search_indexes' do
         before { actual_indexes } # wait for the indices to be created
 
-        let(:queried_definitions) { model.search_indexes.map { |i| i['latestDefinition'] } }
+        let(:queried_definitions) { model.search_indexes.map { |i| helper.normalize_definition(i['latestDefinition']) } }
 
         it 'queries the available search indexes' do
-          expect(queried_definitions).to eq requested_definitions
+          expect(queried_definitions).to match_array(requested_definitions)
         end
       end
 
@@ -534,11 +668,19 @@ describe Mongoid::SearchIndexable do
       let(:vector_helper) { SearchIndexHelper.new(vector_model) }
 
       # Three orthogonal unit vectors as a minimal, predictable dataset.
-      let!(:doc_a) { vector_model.create!(embedding: [ 1.0, 0.0, 0.0 ]) }
-      let!(:doc_b) { vector_model.create!(embedding: [ 0.0, 1.0, 0.0 ]) }
-      let!(:doc_c) { vector_model.create!(embedding: [ 0.0, 0.0, 1.0 ]) }
+      let(:doc_a) { vector_model.create!(embedding: [ 1.0, 0.0, 0.0 ]) }
+      let(:doc_b) { vector_model.create!(embedding: [ 0.0, 1.0, 0.0 ]) }
+      let(:doc_c) { vector_model.create!(embedding: [ 0.0, 0.0, 1.0 ]) }
 
       before do
+        vector_helper # force collection to be dropped, created
+
+        # once the collection has been recreated, populate it with documents
+        doc_a
+        doc_b
+        doc_c
+
+        # prepare the search indexes
         names = vector_model.create_search_indexes
         vector_helper.wait_for(*names)
       end
