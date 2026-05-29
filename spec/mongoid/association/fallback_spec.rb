@@ -352,6 +352,32 @@ describe 'associations with the :fallback option' do
     end
   end
 
+  context 'when serialized with an included association' do
+    before(:all) do
+      class Composer
+        include Mongoid::Document
+      end
+
+      class Symphony
+        include Mongoid::Document
+
+        belongs_to :composer, fallback: -> { Anonymous.new }
+      end
+    end
+
+    after(:all) do
+      Object.send(:remove_const, :Symphony)
+      Object.send(:remove_const, :Composer)
+    end
+
+    it 'omits the fallback when the real association is nil' do
+      symphony = Symphony.new
+
+      expect { symphony.serializable_hash(include: :composer) }.not_to raise_error
+      expect(symphony.serializable_hash(include: :composer)).not_to have_key('composer')
+    end
+  end
+
   context 'validation of the :fallback option' do
     it 'rejects a declaration that combines :fallback with :autobuild' do
       expect do
