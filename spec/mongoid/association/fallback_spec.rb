@@ -177,6 +177,118 @@ describe 'associations with the :fallback option' do
     end
   end
 
+  context 'with a dependent strategy and no real associated document' do
+    before(:all) do
+      class Composer
+        include Mongoid::Document
+      end
+    end
+
+    after(:all) do
+      Object.send(:remove_const, :Composer)
+    end
+
+    context 'when the strategy is :destroy' do
+      before(:all) do
+        class Symphony
+          include Mongoid::Document
+
+          has_one :composer, dependent: :destroy, fallback: -> { Anonymous.new }
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Symphony)
+      end
+
+      it 'does not apply the strategy to the fallback when destroying the owner' do
+        symphony = Symphony.create!
+
+        expect { symphony.destroy }.not_to raise_error
+      end
+    end
+
+    context 'when the strategy is :nullify' do
+      before(:all) do
+        class Symphony
+          include Mongoid::Document
+
+          has_one :composer, dependent: :nullify, fallback: -> { Anonymous.new }
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Symphony)
+      end
+
+      it 'does not apply the strategy to the fallback when destroying the owner' do
+        symphony = Symphony.create!
+
+        expect { symphony.destroy }.not_to raise_error
+      end
+    end
+
+    context 'when the strategy is :delete_all' do
+      before(:all) do
+        class Symphony
+          include Mongoid::Document
+
+          has_one :composer, dependent: :delete_all, fallback: -> { Anonymous.new }
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Symphony)
+      end
+
+      it 'does not apply the strategy to the fallback when destroying the owner' do
+        symphony = Symphony.create!
+
+        expect { symphony.destroy }.not_to raise_error
+      end
+    end
+
+    context 'when the strategy is :restrict_with_exception' do
+      before(:all) do
+        class Symphony
+          include Mongoid::Document
+
+          has_one :composer, dependent: :restrict_with_exception, fallback: -> { Anonymous.new }
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Symphony)
+      end
+
+      it 'does not apply the strategy to the fallback when destroying the owner' do
+        symphony = Symphony.create!
+
+        expect { symphony.destroy }.not_to raise_error
+      end
+    end
+
+    context 'when the strategy is :restrict_with_error' do
+      before(:all) do
+        class Symphony
+          include Mongoid::Document
+
+          has_one :composer, dependent: :restrict_with_error, fallback: -> { Anonymous.new }
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Symphony)
+      end
+
+      it 'does not block destroying the owner because of the fallback' do
+        symphony = Symphony.create!
+
+        expect(symphony.destroy).to be_truthy
+      end
+    end
+  end
+
   context 'validation of the :fallback option' do
     it 'rejects a declaration that combines :fallback with :autobuild' do
       expect do
