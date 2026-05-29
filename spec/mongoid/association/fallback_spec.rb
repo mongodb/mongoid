@@ -321,6 +321,37 @@ describe 'associations with the :fallback option' do
     end
   end
 
+  context 'with nested attributes' do
+    before(:all) do
+      class Composer
+        include Mongoid::Document
+
+        field :name
+
+        embedded_in :symphony
+      end
+
+      class Symphony
+        include Mongoid::Document
+
+        embeds_one :composer, fallback: -> { Anonymous.new }
+        accepts_nested_attributes_for :composer
+      end
+    end
+
+    after(:all) do
+      Object.send(:remove_const, :Symphony)
+      Object.send(:remove_const, :Composer)
+    end
+
+    it 'builds the nested document instead of operating on the fallback' do
+      symphony = Symphony.new
+
+      expect { symphony.composer_attributes = { name: 'Mahler' } }.not_to raise_error
+      expect(symphony.composer.name).to eq('Mahler')
+    end
+  end
+
   context 'validation of the :fallback option' do
     it 'rejects a declaration that combines :fallback with :autobuild' do
       expect do
