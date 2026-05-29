@@ -344,7 +344,10 @@ module Mongoid
         association.inverse_class.tap do |klass|
           klass.re_define_method("#{name}=") do |object|
             without_autobuild do
-              object = nil if association.fallback? && !object.is_a?(association.relation_class)
+              if association.fallback?
+                klass = association.polymorphic? ? Mongoid::Document : association.relation_class
+                object = nil unless object.is_a?(klass)
+              end
 
               if value = get_relation(name, association, object)
                 value = __build__(name, value, association) unless value.respond_to?(:substitute)

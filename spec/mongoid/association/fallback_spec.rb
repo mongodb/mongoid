@@ -289,6 +289,38 @@ describe 'associations with the :fallback option' do
     end
   end
 
+  context 'on a polymorphic belongs_to' do
+    before(:all) do
+      class Composer
+        include Mongoid::Document
+      end
+
+      class Symphony
+        include Mongoid::Document
+
+        belongs_to :author, polymorphic: true, fallback: -> { Anonymous.new }
+      end
+    end
+
+    after(:all) do
+      Object.send(:remove_const, :Symphony)
+      Object.send(:remove_const, :Composer)
+    end
+
+    it 'does not raise when assigning a real document' do
+      symphony = Symphony.new
+
+      expect { symphony.author = Composer.new }.not_to raise_error
+    end
+
+    it 'treats a null object assignment as nil' do
+      symphony = Symphony.new
+
+      expect { symphony.author = Anonymous.new }.not_to raise_error
+      expect(symphony.author_id).to be_nil
+    end
+  end
+
   context 'validation of the :fallback option' do
     it 'rejects a declaration that combines :fallback with :autobuild' do
       expect do
