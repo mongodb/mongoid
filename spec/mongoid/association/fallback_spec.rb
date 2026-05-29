@@ -360,7 +360,7 @@ describe 'associations with the :fallback option' do
 
           belongs_to :composer, fallback: -> { Object.new }, autobuild: true
         end
-      end.to raise_error(Mongoid::Errors::InvalidRelationOption)
+      end.to raise_error(ArgumentError, /cannot be combined with :autobuild/)
     end
 
     it 'rejects a non-callable :fallback value' do

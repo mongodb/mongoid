@@ -421,7 +421,9 @@ module Mongoid
           end
 
           if @options.key?(:autobuild)
-            raise Errors::InvalidRelationOption.new(@owner_class, name, :fallback, self.class::VALID_OPTIONS)
+            raise ArgumentError,
+                  "The :fallback option for association '#{name}' on " \
+                  "#{@owner_class} cannot be combined with :autobuild."
           end
         end
 
