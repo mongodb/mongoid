@@ -378,6 +378,29 @@ describe 'associations with the :fallback option' do
     end
   end
 
+  context 'with a counter cache' do
+    before(:all) do
+      class Composer
+        include Mongoid::Document
+      end
+
+      class Symphony
+        include Mongoid::Document
+
+        belongs_to :composer, counter_cache: true, fallback: -> { Anonymous.new }
+      end
+    end
+
+    after(:all) do
+      Object.send(:remove_const, :Symphony)
+      Object.send(:remove_const, :Composer)
+    end
+
+    it 'does not update the counter on the fallback' do
+      expect { Symphony.create! }.not_to raise_error
+    end
+  end
+
   context 'validation of the :fallback option' do
     it 'rejects a declaration that combines :fallback with :autobuild' do
       expect do

@@ -110,7 +110,7 @@ module Mongoid
                   end
                 end
 
-                if (record = __send__(name)) && !current.nil?
+                if (record = without_autobuild { __send__(name) }) && !current.nil?
                   record[cache_column] = (record[cache_column] || 0) + 1
                   record.class.with(record.persistence_context) do |_class|
                     _class.increment_counter(cache_column, current) if record.persisted?
@@ -120,7 +120,7 @@ module Mongoid
             end
 
             klass.after_create do
-              if record = __send__(name)
+              if record = without_autobuild { __send__(name) }
                 record[cache_column] = (record[cache_column] || 0) + 1
 
                 if record.persisted?
@@ -133,7 +133,7 @@ module Mongoid
             end
 
             klass.before_destroy do
-              if record = __send__(name)
+              if record = without_autobuild { __send__(name) }
                 record[cache_column] = (record[cache_column] || 0) - 1 unless record.frozen?
 
                 if record.persisted?
