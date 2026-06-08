@@ -189,6 +189,29 @@ describe Mongoid::Attributes::Nested do
             expect(person2.posts.map(&:title)).to eq([ 'Reparented!' ])
           end
         end
+
+        context 'when _destroy is true for a document not in the relation' do
+          config_override :allow_reparenting_via_nested_attributes, true
+
+          before do
+            Person.send(:undef_method, :posts_attributes=)
+            Person.accepts_nested_attributes_for :posts, allow_destroy: true
+          end
+
+          let(:person3) do
+            Person.create!(
+              posts_attributes: { '0' => { id: post.id, _destroy: '1' } }
+            )
+          end
+
+          it 'does not raise UnknownAttribute' do
+            expect { person3 }.not_to raise_error
+          end
+
+          it 'does not add the document to the relation' do
+            expect(person3.posts).to be_empty
+          end
+        end
       end
     end
 
@@ -224,6 +247,27 @@ describe Mongoid::Attributes::Nested do
             preferences_attributes: { 0 => { id: preference.id, name: preference_name } }
           )
           expect(person.preferences.map(&:name)).to eq([ preference_name ])
+        end
+
+        context 'when _destroy is true for a document not in the relation' do
+          before do
+            Person.send(:undef_method, :preferences_attributes=)
+            Person.accepts_nested_attributes_for :preferences, allow_destroy: true
+          end
+
+          let(:person) do
+            Person.new(
+              preferences_attributes: { 0 => { id: preference.id, _destroy: '1' } }
+            )
+          end
+
+          it 'does not raise UnknownAttribute' do
+            expect { person }.not_to raise_error
+          end
+
+          it 'does not add the document to the relation' do
+            expect(person.preferences).to be_empty
+          end
         end
       end
     end
