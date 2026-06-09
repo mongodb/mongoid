@@ -44,6 +44,20 @@ module Mongoid
           return eager_load(docs_for_lookup_fallback)
         end
 
+        through_inclusions = criteria.inclusions.select do |assoc|
+          assoc.is_a?(Association::Referenced::HasOneThrough) ||
+            assoc.is_a?(Association::Referenced::HasManyThrough)
+        end
+
+        if through_inclusions.any?
+          names = through_inclusions.map { |a| ":#{a.name}" }.join(', ')
+          Mongoid.logger.warn(
+            "#{names} are :through associations and do not support $lookup-based eager " \
+            'loading. All inclusions for this query will be preloaded using separate queries.'
+          )
+          return eager_load(docs_for_lookup_fallback)
+        end
+
         preload_for_lookup(criteria)
       end
 

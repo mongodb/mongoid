@@ -1027,4 +1027,30 @@ describe Mongoid::Association::Macros do
       end
     end
   end
+
+  context 'with :through option' do
+    let(:klass) do
+      Class.new do
+        include Mongoid::Document
+      end
+    end
+
+    it 'creates a HasManyThrough for has_many with :through' do
+      klass.has_many(:patients, through: :appointments)
+      assoc = klass.relations['patients']
+      expect(assoc).to be_a(Mongoid::Association::Referenced::HasManyThrough)
+    end
+
+    it 'creates a HasOneThrough for has_one with :through' do
+      klass.has_one(:store, through: :franchise)
+      assoc = klass.relations['store']
+      expect(assoc).to be_a(Mongoid::Association::Referenced::HasOneThrough)
+    end
+
+    it 'raises when :through is used with belongs_to' do
+      expect do
+        klass.belongs_to(:something, through: :other)
+      end.to raise_error(Mongoid::Errors::InvalidRelationOption)
+    end
+  end
 end

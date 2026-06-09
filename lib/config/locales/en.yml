@@ -618,6 +618,10 @@ en:
             can only have values set when the document is a new record."
           resolution: "Don't define '%{name}' as readonly, or do not attempt
             to update its value after the document is persisted."
+        readonly_association:
+          message: "Attempted to modify the read-only association '%{name}' on '%{klass}'."
+          summary: "The :%{name} association is defined with :through and is read-only."
+          resolution: "To modify the association, update :%{through} directly."
         readonly_document:
           message: "Attempted to persist a readonly document of class '%{klass}'."
           summary: "Documents that are marked readonly cannot be persisted."
