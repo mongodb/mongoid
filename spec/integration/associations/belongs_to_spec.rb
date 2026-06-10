@@ -99,6 +99,19 @@ describe 'belongs_to associations' do
         expect(team_manager.reload.unit_type).to eq 'group'
         expect(team_manager.unit).to eq team
       end
+
+      it 'eager-loads the corresponding unit when unit_type is a different alias' do
+        dept_manager.update unit_type: 'sandbox_dept'
+        team_manager.update unit_type: 'group'
+
+        managers = SandboxManager.where(:_id.in => [ dept_manager.id, team_manager.id ])
+                                 .includes(:unit)
+                                 .to_a
+        units_by_id = managers.to_h { |m| [ m.id, m.ivar(:unit) ] }
+
+        expect(units_by_id[dept_manager.id]).to eq department
+        expect(units_by_id[team_manager.id]).to eq team
+      end
     end
 
     context 'when the association uses the default resolver' do
