@@ -65,7 +65,7 @@ module Mongoid
           if _touchable_parent?
             touches = _parent._gather_touch_updates(Time.current)
             if touches.present?
-              operations['$set'] = touches
+              operations['$set'] = (operations['$set'] || {}).merge(touches)
               Threaded.begin_touch_merged(self)
             end
           end

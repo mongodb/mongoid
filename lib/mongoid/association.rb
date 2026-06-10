@@ -46,6 +46,13 @@ module Mongoid
       belongs_to: Association::Referenced::BelongsTo
     }.freeze
 
+    # Internal mapping used when :through option is present. Not exposed as
+    # callable macros.
+    THROUGH_MACRO_MAPPING = {
+      has_one: Association::Referenced::HasOneThrough,
+      has_many: Association::Referenced::HasManyThrough
+    }.freeze
+
     attr_accessor :_association
 
     included do

@@ -218,7 +218,19 @@ module Mongoid
         private
 
         def define_association!(macro_name, name, options = {}, &block)
-          Association::MACRO_MAPPING[macro_name].new(self, name, options, &block).tap do |assoc|
+          klass = if options[:through]
+                    Association::THROUGH_MACRO_MAPPING[macro_name] ||
+                      raise(
+                        Errors::InvalidRelationOption.new(
+                          self, name, :through,
+                          Association::THROUGH_MACRO_MAPPING.keys
+                        )
+                      )
+                  else
+                    Association::MACRO_MAPPING[macro_name]
+                  end
+
+          klass.new(self, name, options, &block).tap do |assoc|
             assoc.setup!
             self.relations = relations.merge(name => assoc)
             if assoc.embedded? && assoc.respond_to?(:store_as) && assoc.store_as != name
