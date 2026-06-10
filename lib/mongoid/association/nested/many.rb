@@ -197,6 +197,12 @@ module Mongoid
 
               # push existing document to association
               doc = association.klass.unscoped.find(converted)
+              # find returns nil instead of raising when
+              # Mongoid.raise_not_found_error is false; a missing document
+              # must still be an error here, consistent with the other
+              # not-found branches.
+              raise Errors::DocumentNotFound.new(association.klass, id) if doc.nil?
+
               update_document(doc, attrs)
               existing.push(doc)
             end
