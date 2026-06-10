@@ -67,12 +67,13 @@ module Mongoid
         valid = document.validating do
           # Now, treating the target as an array, look at each element
           # and see if it is valid, but only if it has already been
-          # persisted, or changed, and hasn't been flagged for destroy.
+          # persisted, or changed, and hasn't been flagged for destroy
+          # or already destroyed.
           #
           # use map.all? instead of just all?, because all? will do short-circuit
           # evaluation and terminate on the first failed validation.
           list.map do |value|
-            if value && !value.flagged_for_destroy? && (!value.persisted? || value.changed?)
+            if needs_validation?(value)
               value.validated? || value.valid?
             else
               true
@@ -119,6 +120,21 @@ module Mongoid
       # @return [ Array<Mongoid::Document> ] the target, as an array.
       def get_target_documents_for_other(target)
         Array.wrap(target)
+      end
+
+      # Returns true if the given value should be validated as part of
+      # an associated validation. Destroyed and flagged-for-destroy
+      # documents are skipped, as are persisted documents that haven't
+      # changed.
+      #
+      # @param [ Mongoid::Document | nil ] value The value to check.
+      #
+      # @return [ true | false ] Whether the value needs validation.
+      def needs_validation?(value)
+        value &&
+          !value.flagged_for_destroy? &&
+          !value.destroyed? &&
+          (!value.persisted? || value.changed?)
       end
     end
   end

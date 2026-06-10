@@ -82,6 +82,25 @@ describe Mongoid::Validatable::AssociatedValidator do
           expect(user).to be_valid
         end
       end
+
+      context 'when a child document has been destroyed' do
+        let(:user) do
+          User.new(name: 'test')
+        end
+
+        let(:description) do
+          Description.new
+        end
+
+        before do
+          user.descriptions << description
+          description.destroyed = true
+        end
+
+        it 'does not run validation on the destroyed child' do
+          expect(user).to be_valid
+        end
+      end
     end
   end
 
