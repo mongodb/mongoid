@@ -25,5 +25,36 @@ describe Mongoid::Errors::MixedClientConfiguration do
         'Provide either only a uri as configuration'
       )
     end
+
+    context 'when the config contains sensitive values' do
+      let(:error) do
+        described_class.new(
+          :testing,
+          {
+            uri: 'mongodb://admin:s3cr3t@cluster.example.com/db',
+            password: 'standalone-secret',
+            options: {
+              auto_encryption_options: {
+                kms_providers: { local: { key: 'A' * 96 } }
+              }
+            }
+          }
+        )
+      end
+
+      it 'redacts the URI userinfo' do
+        expect(error.message).not_to include('admin:s3cr3t')
+        expect(error.message).to include('mongodb://[REDACTED]@cluster.example.com/db')
+      end
+
+      it 'redacts the standalone password value' do
+        expect(error.message).not_to include('standalone-secret')
+      end
+
+      it 'redacts auto_encryption_options entirely' do
+        expect(error.message).not_to include('kms_providers')
+        expect(error.message).not_to include('A' * 96)
+      end
+    end
   end
 end

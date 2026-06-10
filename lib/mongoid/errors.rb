@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'mongoid/errors/mongoid_error'
+require 'mongoid/errors/config_redactor'
 require 'mongoid/errors/ambiguous_relationship'
 require 'mongoid/errors/attribute_not_loaded'
 require 'mongoid/errors/callback'
