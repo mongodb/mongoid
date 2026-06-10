@@ -413,6 +413,20 @@ module Mongoid
           end
         end
 
+        if @options.key?(:fallback)
+          unless @options[:fallback].respond_to?(:call)
+            raise ArgumentError,
+                  "The :fallback option for association '#{name}' on " \
+                  "#{@owner_class} must be a Proc or lambda."
+          end
+
+          if @options.key?(:autobuild)
+            raise ArgumentError,
+                  "The :fallback option for association '#{name}' on " \
+                  "#{@owner_class} cannot be combined with :autobuild."
+          end
+        end
+
         [ name, :"#{name}?", :"#{name}=" ].each do |n|
           raise Errors::InvalidRelation.new(@owner_class, n) if Mongoid.destructive_fields.include?(n)
         end

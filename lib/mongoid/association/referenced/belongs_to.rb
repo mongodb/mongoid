@@ -22,6 +22,7 @@ module Mongoid
           autosave
           counter_cache
           dependent
+          fallback
           foreign_key
           index
           polymorphic

@@ -96,17 +96,17 @@ module Mongoid
       private
 
       def _dependent_delete_all!(association)
-        return unless relation = send(association.name)
+        return unless relation = without_autobuild { send(association.name) }
 
         if relation.respond_to?(:dependents) && relation.dependents.blank?
           relation.clear
         else
-          ::Array.wrap(send(association.name)).each { |rel| rel.delete }
+          ::Array.wrap(relation).each { |rel| rel.delete }
         end
       end
 
       def _dependent_destroy!(association)
-        return unless relation = send(association.name)
+        return unless relation = without_autobuild { send(association.name) }
 
         if relation.is_a?(Enumerable)
           relation.entries
@@ -117,19 +117,19 @@ module Mongoid
       end
 
       def _dependent_nullify!(association)
-        return unless relation = send(association.name)
+        return unless relation = without_autobuild { send(association.name) }
 
         relation.nullify
       end
 
       def _dependent_restrict_with_exception!(association)
-        if (relation = send(association.name)) && !relation.blank?
+        if (relation = without_autobuild { send(association.name) }) && !relation.blank?
           raise Errors::DeleteRestriction.new(relation, association.name)
         end
       end
 
       def _dependent_restrict_with_error!(association)
-        return unless (relation = send(association.name)) && !relation.blank?
+        return unless (relation = without_autobuild { send(association.name) }) && !relation.blank?
 
         errors.add(association.name, :destroy_restrict_with_error_dependencies_exist)
         throw(:abort, false)

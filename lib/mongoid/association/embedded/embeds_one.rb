@@ -21,6 +21,7 @@ module Mongoid
           as
           cascade_callbacks
           cyclic
+          fallback
           store_as
         ]
 

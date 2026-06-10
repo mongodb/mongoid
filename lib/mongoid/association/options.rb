@@ -39,6 +39,23 @@ module Mongoid
         !!@options[:autobuild]
       end
 
+      # Invokes the :fallback Proc and returns the null object that stands in
+      # for the association when its actual value is nil. The Proc is invoked
+      # on every access; identity is the user's responsibility (return a fresh
+      # instance, a shared constant, or whatever the Proc chooses).
+      #
+      # @return [ Object | nil ] The Proc's return value, or nil if not set.
+      def fallback
+        @options[:fallback]&.call
+      end
+
+      # Whether the association has a :fallback (null object) option set.
+      #
+      # @return [ true | false ]
+      def fallback?
+        !@options[:fallback].nil?
+      end
+
       # Is the association cyclic.
       #
       # @return [ true | false ] Whether the association is cyclic.

@@ -22,6 +22,7 @@ module Mongoid
           autobuild
           autosave
           dependent
+          fallback
           foreign_key
           primary_key
           scope

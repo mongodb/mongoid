@@ -26,7 +26,12 @@ module Mongoid
         def build(parent)
           return if reject?(parent, attributes)
 
-          @existing = parent.send(association.name)
+          @existing =
+            if association.fallback?
+              parent.send(:without_autobuild) { parent.send(association.name) }
+            else
+              parent.send(association.name)
+            end
           if update?
             delete_id(attributes)
             existing.assign_attributes(attributes)
