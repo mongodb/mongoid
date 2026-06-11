@@ -4524,6 +4524,39 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         expect(reloaded_band).not_to have_key(:labels)
       end
     end
+
+    context 'when set via raw attribute write in a before_save callback' do
+      after { Band.reset_callbacks(:save) }
+
+      let(:reloaded_band) { Band.collection.find(_id: band._id).first }
+
+      context 'on a new record' do
+        before { Band.before_save { self[:labels] ||= [] } }
+
+        let(:band) { Band.create! }
+
+        it 'persists the empty list' do
+          expect(reloaded_band).to have_key(:labels)
+          expect(reloaded_band[:labels]).to eq []
+        end
+      end
+
+      context 'on an existing record' do
+        # Reload the band from MongoDB so the labels proxy has not been
+        # initialized, which is the scenario that triggers the bug.
+        let(:band) { Band.find(Band.create!._id) }
+
+        before do
+          Band.before_save { self[:labels] ||= [] }
+          band.save!
+        end
+
+        it 'persists the empty list' do
+          expect(reloaded_band).to have_key(:labels)
+          expect(reloaded_band[:labels]).to eq []
+        end
+      end
+    end
   end
 
   context 'when using assign_attributes with an already populated array' do

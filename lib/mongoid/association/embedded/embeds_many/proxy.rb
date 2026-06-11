@@ -601,7 +601,12 @@ module Mongoid
           # @api private
           def update_attributes_hash
             if _target.empty?
-              _base.attributes.delete(_association.store_as)
+              # Only remove the key if it is absent or nil. If it is already
+              # an empty array, the caller explicitly set it to [] (e.g. via
+              # a raw write_attribute call), and that intent must be preserved
+              # so the empty array is persisted to the database.
+              stored = _association.store_as
+              _base.attributes.delete(stored) unless _base.attributes[stored] == []
             else
               _base.attributes.merge!(_association.store_as => _target.map(&:attributes))
             end
