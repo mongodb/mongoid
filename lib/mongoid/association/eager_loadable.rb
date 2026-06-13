@@ -106,20 +106,134 @@ module Mongoid
       def preload_for_lookup(criteria)
         inclusions = criteria.inclusions
         assoc_map = inclusions.group_by(&:inverse_class_name)
+        inclusions_by_name = {}
+        inclusions.each { |a| inclusions_by_name[a.name] = a }
 
         # match first
         pipeline = criteria.selector.to_pipeline
         # then sort, skip, limit
         pipeline.concat(criteria.options.to_pipeline_for_lookup)
 
-        # Emit a $lookup for each top-level inclusion, in declaration order.
-        # Nested inclusions are emitted inside their parent's $lookup
-        # sub-pipeline by create_pipeline.
-        inclusions.select { |assoc| assoc.parent_inclusions.empty? }.each do |assoc|
-          pipeline << create_pipeline(assoc, assoc_map.dup)
+        # Walk every inclusion in declaration order and let each one decide
+        # what to emit: a referenced inclusion emits a $lookup (prefixed with
+        # the embedded ancestor path when it lives inside an embedded doc), an
+        # embedded inclusion is a passthrough, and an inclusion nested under a
+        # referenced parent is emitted inside that parent's sub-pipeline by
+        # create_pipeline.
+        inclusions.each do |assoc|
+          add_inclusion_to_pipeline(pipeline, assoc, inclusions_by_name, assoc_map)
         end
 
         Eager.new(inclusions, [], true, pipeline).run
+      end
+
+      def add_inclusion_to_pipeline(pipeline, assoc, inclusions_by_name, assoc_map)
+        # An embedded inclusion rides inside its document; it needs no $lookup.
+        return if assoc.embedded?
+
+        # A referenced parent already nests this inclusion in its sub-pipeline.
+        parent = inclusions_by_name[assoc.parent_inclusions.first]
+        return if parent && !parent.embedded?
+
+        chains = embedded_ancestor_chains(assoc, inclusions_by_name)
+        return pipeline << create_pipeline(assoc, assoc_map.dup) if chains.empty?
+
+        # The same inclusion can sit under several embedded parents (e.g. two
+        # embeds_one of the same class); graft a fresh $lookup onto each path.
+        chains.each do |chain|
+          graft_embedded_lookup(pipeline, create_pipeline(assoc, assoc_map.dup), chain, assoc)
+        end
+      end
+
+      def graft_embedded_lookup(pipeline, stage, chain, association)
+        lookup = stage['$lookup']
+        path = chain.map(&:store_as).join('.')
+        name = association.name.to_s
+        # The $lookup can't write inside an embedded array, so its matches land in
+        # a temporary top-level field that graft_value distributes and then drops.
+        tmp_field = "__el_#{path.tr('.', '_')}_#{name}"
+        graft = {
+          name: name,
+          tmp: tmp_field,
+          local: lookup['localField'],
+          foreign: lookup['foreignField'],
+          match_operator: association.is_a?(Mongoid::Association::Referenced::HasAndBelongsToMany) ? '$in' : '$eq'
+        }
+        lookup['localField'] = "#{path}.#{lookup['localField']}"
+        lookup['as'] = tmp_field
+        pipeline << stage
+
+        root = chain.first.store_as
+        pipeline << { '$set' => { root => graft_value(chain, "$#{root}", graft) } }
+        pipeline << { '$unset' => tmp_field }
+      end
+
+      # An embeds_many is rebuilt with $map so each element keeps its own matches
+      # instead of collapsing onto the first; an embeds_one is merged in place.
+      def graft_value(chain, node, graft)
+        head, *rest = chain
+        many = head.is_a?(Association::Embedded::EmbedsMany)
+        element = many ? "$$#{head.store_as}" : node
+        child =
+          if rest.empty?
+            { graft[:name] => correlated_matches(graft, element) }
+          else
+            next_segment = rest.first.store_as
+            { next_segment => graft_value(rest, "#{element}.#{next_segment}", graft) }
+          end
+        merged = { '$mergeObjects' => [ element, child ] }
+        many ? { '$map' => { 'input' => node, 'as' => head.store_as, 'in' => merged } } : merged
+      end
+
+      # A has_and_belongs_to_many holds an array of foreign keys, so a match
+      # belongs to the element when its key is contained in that array ($in);
+      # every other association points at a single key ($eq).
+      def correlated_matches(graft, element)
+        { '$filter' => {
+          'input' => "$#{graft[:tmp]}",
+          'as' => 'match',
+          'cond' => { graft[:match_operator] => [ "$$match.#{graft[:foreign]}", "#{element}.#{graft[:local]}" ] }
+        } }
+      end
+
+      # An embedded child rides inside its parent's $lookup, so instead of its own
+      # $lookup its referenced descendants are grafted onto the embedded path.
+      def nest_embedded_inclusion(embedded_assoc, pipeline_stages, mapping, chain = [ embedded_assoc ])
+        child_inclusions_of(embedded_assoc, mapping).each do |child|
+          mapping[child.inverse_class_name] -= [ child ]
+          if child.embedded?
+            nest_embedded_inclusion(child, pipeline_stages, mapping, chain + [ child ])
+          else
+            stage = create_pipeline(child, mapping)
+            graft_embedded_lookup(pipeline_stages, stage, chain, child)
+          end
+        end
+      end
+
+      # Matched by parent_inclusions (the real parent-child link), not by class, so
+      # a sibling branch isn't pulled in when an association points at a superclass
+      # of the queried subclass.
+      def child_inclusions_of(parent, mapping)
+        mapping.values.flatten.select do |child|
+          child.parent_inclusions.include?(parent.name)
+        end
+      end
+
+      def embedded_ancestor_chains(assoc, inclusions_by_name)
+        assoc.parent_inclusions.filter_map do |parent_name|
+          parent = inclusions_by_name[parent_name]
+          embedded_chain_up_to(parent, inclusions_by_name) if parent&.embedded?
+        end
+      end
+
+      def embedded_chain_up_to(embedded_assoc, inclusions_by_name)
+        chain = [ embedded_assoc ]
+        current = embedded_assoc
+        while (ancestor = inclusions_by_name[current.parent_inclusions.first]) && ancestor.embedded?
+          chain.unshift(ancestor)
+          current = ancestor
+        end
+        chain
       end
 
       private
@@ -163,15 +277,12 @@ module Mongoid
           foreign_field = current_assoc.foreign_key
         end
 
-        # Build the 'as' field with embedded path prefix if needed
-        as_field = current_assoc.name.to_s
-
         stage = {
           '$lookup' => {
             'from' => current_assoc.klass.collection.name,
             'localField' => local_field,
             'foreignField' => foreign_field,
-            'as' => as_field
+            'as' => current_assoc.name.to_s
           }
         }
 
@@ -184,14 +295,17 @@ module Mongoid
           pipeline_stages << { '$sort' => { '_id' => 1 } }
         end
 
-        # Add nested lookups for child associations declared on the looked-up
-        # class or any of its subclasses, so subclass-only nested associations
-        # are reached too. Deleting each class from the mapping prevents
-        # infinite loops with circular references.
-        [ current_assoc.klass, *current_assoc.klass.descendants ].each do |child_class|
-          next unless child_assocs = mapping.delete(child_class.to_s)
-
-          child_assocs.each { |child| pipeline_stages << create_pipeline(child, mapping) }
+        # Nest each child inclusion, dropping it from the mapping as it is consumed
+        # to prevent loops with circular references. An embedded child emits no
+        # $lookup of its own (it rides inside this document); its referenced
+        # children are grafted onto the embedded path by nest_embedded_inclusion.
+        child_inclusions_of(current_assoc, mapping).each do |child|
+          mapping[child.inverse_class_name] -= [ child ]
+          if child.embedded?
+            nest_embedded_inclusion(child, pipeline_stages, mapping)
+          else
+            pipeline_stages << create_pipeline(child, mapping)
+          end
         end
 
         # Always add pipeline since we always have at least $sort
