@@ -58,7 +58,13 @@ module Mongoid
           return eager_load(docs_for_lookup_fallback)
         end
 
-        preload_for_lookup(criteria)
+        docs = preload_for_lookup(criteria)
+        # A polymorphic belongs_to cannot be expressed as a $lookup because its
+        # target collection varies per document. Once the root documents are
+        # materialized, a single aggregation fetches every polymorphic target.
+        polymorphic_inclusions = criteria.inclusions.select(&:polymorphic?)
+        preload_polymorphic(polymorphic_inclusions, docs) if polymorphic_inclusions.any?
+        docs
       end
 
       # Load the associations for the given documents. This will be done
@@ -129,6 +135,7 @@ module Mongoid
 
       def add_inclusion_to_pipeline(pipeline, assoc, inclusions_by_name, assoc_map)
         # An embedded inclusion rides inside its document; it needs no $lookup.
+        return if assoc.polymorphic?
         return if assoc.embedded?
 
         # A referenced parent already nests this inclusion in its sub-pipeline.
@@ -236,6 +243,80 @@ module Mongoid
         chain
       end
 
+      # Preload polymorphic belongs_to inclusions onto the already-materialized
+      # root documents. The target collection differs per *_type, so this cannot
+      # be a $lookup; each inclusion is resolved with a single aggregation whose
+      # $facet has one branch per distinct type.
+      def preload_polymorphic(inclusions, docs)
+        inclusions.each do |assoc|
+          keys_by_type = polymorphic_keys_by_type(assoc, docs)
+          targets = fetch_polymorphic_targets(assoc, keys_by_type)
+          assign_polymorphic_targets(assoc, docs, targets)
+        end
+      end
+
+      # Group the foreign keys found on the documents by their polymorphic type,
+      # e.g. { "Printer" => [ id1 ], "Scanner" => [ id2 ] }.
+      def polymorphic_keys_by_type(assoc, docs)
+        docs.each_with_object({}) do |doc, keys_by_type|
+          type, key = polymorphic_reference(assoc, doc)
+          (keys_by_type[type] ||= []) << key if type
+        end
+      end
+
+      # Fetch every target in one aggregation: a $facet with a $lookup branch per
+      # type. Returns the targets as { type => { primary_key => document } }.
+      def fetch_polymorphic_targets(assoc, keys_by_type)
+        return {} if keys_by_type.empty?
+
+        primary_key = assoc.primary_key
+        facets = keys_by_type.to_h do |type, keys|
+          collection = assoc.resolver.model_for(type).collection.name
+          [ type, polymorphic_facet_branch(collection, primary_key, keys) ]
+        end
+
+        aggregated = klass.collection.aggregate([ { '$limit' => 1 }, { '$facet' => facets } ]).first
+        aggregated.to_h do |type, branch|
+          model = assoc.resolver.model_for(type)
+          # $limit => 1 makes each branch yield a single wrapper holding the matches.
+          targets = branch.first['matches'].map { |doc| Factory.from_db(model, doc) }
+          [ type, targets.index_by { |doc| doc.send(primary_key) } ]
+        end
+      end
+
+      # One $facet branch: look up the documents in +collection+ whose primary key
+      # is among +keys+, exposed under "matches".
+      def polymorphic_facet_branch(collection, primary_key, keys)
+        [
+          { '$lookup' => {
+            'from' => collection,
+            'pipeline' => [ { '$match' => { primary_key => { '$in' => keys.uniq } } } ],
+            'as' => 'matches'
+          } },
+          { '$project' => { '_id' => 0, 'matches' => 1 } }
+        ]
+      end
+
+      # Set the eager-loaded target on each document, matched by its type and key.
+      def assign_polymorphic_targets(assoc, docs, targets)
+        docs.each do |doc|
+          type, key = polymorphic_reference(assoc, doc)
+          doc.set_relation(assoc.name, type && targets.dig(type, key))
+        end
+      end
+
+      # The [ type, key ] polymorphic reference stored on the document for this
+      # association, or nil when the document holds no reference.
+      def polymorphic_reference(assoc, doc)
+        type_field = assoc.inverse_type
+        key_field = assoc.foreign_key
+        return unless doc.respond_to?(type_field) && doc.respond_to?(key_field)
+
+        type = doc.send(type_field)
+        key = doc.send(key_field)
+        [ type, key ] if type && key
+      end
+
       private
 
       # Returns the materialized documents to use when falling back from
@@ -253,7 +334,11 @@ module Mongoid
       # @return [ Array<Mongoid::Association::Relatable> ] The offending inclusions.
       def cross_cluster_inclusions
         root_client = klass.client_name
-        criteria.inclusions.reject { |assoc| assoc.klass.client_name == root_client }
+        # Polymorphic associations have no single resolvable klass and are not
+        # loaded via $lookup, so they are never cross-cluster offenders.
+        criteria.inclusions.reject do |assoc|
+          assoc.polymorphic? || assoc.klass.client_name == root_client
+        end
       end
 
       public

@@ -2035,6 +2035,43 @@ describe Mongoid::Criteria::Includable do
         end
       end
     end
+
+    context 'when a polymorphic belongs_to is eager-loaded' do
+      before(:all) do
+        class Printer
+          include Mongoid::Document
+        end
+
+        class Scanner
+          include Mongoid::Document
+        end
+
+        class Cartridge
+          include Mongoid::Document
+
+          belongs_to :device, polymorphic: true
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Cartridge)
+        Object.send(:remove_const, :Scanner)
+        Object.send(:remove_const, :Printer)
+      end
+
+      let!(:printer) { Printer.create! }
+      let!(:scanner) { Scanner.create! }
+      let!(:printer_cartridge) { Cartridge.create!(device: printer) }
+      let!(:scanner_cartridge) { Cartridge.create!(device: scanner) }
+
+      it 'eager-loads polymorphic targets of different types in a single extra query' do
+        expect_query(2) do
+          loaded = Cartridge.eager_load(:device).to_a.index_by(&:id)
+          expect(loaded[printer_cartridge.id].device).to eq(printer)
+          expect(loaded[scanner_cartridge.id].device).to eq(scanner)
+        end
+      end
+    end
   end
 
   describe '#inclusions' do
