@@ -1415,6 +1415,14 @@ describe Mongoid::Criteria::Includable do
     min_server_version '5.0'
     it_behaves_like 'eager loading', :eager_load
 
+    context 'when the inclusion list is empty' do
+      let!(:band) { Band.create! }
+
+      it 'returns the documents without eager loading' do
+        expect(Band.eager_load([]).first).to eq(band)
+      end
+    end
+
     context 'when the association is defined on a subclass of the queried class' do
       before(:all) do
         class Machine

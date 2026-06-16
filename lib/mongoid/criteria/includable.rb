@@ -44,11 +44,13 @@ module Mongoid
         clone
       end
 
-      # Returns whether to use $lookup aggregation for eager loading.
+      # Returns whether to use $lookup aggregation for eager loading. Only when
+      # eager_load was requested and there is something to load: an empty
+      # inclusion list (e.g. eager_load([])) falls back to the normal path.
       #
       # @return [ true | false ] Whether to use $lookup.
       def use_lookup?
-        !!@use_lookup
+        !!@use_lookup && inclusions.any?
       end
 
       # Get a list of criteria that are to be executed for eager loading.
