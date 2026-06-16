@@ -2080,6 +2080,46 @@ describe Mongoid::Criteria::Includable do
         end
       end
     end
+
+    context 'when a has_many targets a class sharing its collection with sibling subclasses' do
+      before(:all) do
+        class Part
+          include Mongoid::Document
+        end
+
+        class Chip < Part
+          belongs_to :board, class_name: 'Board', optional: true
+        end
+
+        class Cable < Part
+          belongs_to :board, class_name: 'Board', optional: true
+        end
+
+        class Board
+          include Mongoid::Document
+
+          has_many :chips, class_name: 'Chip', inverse_of: :board
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Board)
+        Object.send(:remove_const, :Cable)
+        Object.send(:remove_const, :Chip)
+        Object.send(:remove_const, :Part)
+      end
+
+      let!(:board) { Board.create! }
+      let!(:chip) { Chip.create!(board: board) }
+      let!(:cable) { Cable.create!(board: board) }
+
+      it 'eager-loads only the chips, not the sibling subclass' do
+        expect_query(1) do
+          loaded = Board.eager_load(:chips).first
+          expect(loaded.chips.to_a).to eq([ chip ])
+        end
+      end
+    end
   end
 
   describe '#inclusions' do

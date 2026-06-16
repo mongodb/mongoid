@@ -371,6 +371,13 @@ module Mongoid
           }
         }
 
+        # A subclass shares its collection with sibling subclasses, so restrict the
+        # lookup to the target's own discriminators, like a normal query would.
+        if current_assoc.klass.hereditary?
+          target = current_assoc.klass
+          pipeline_stages << { '$match' => { target.discriminator_key => { '$in' => target._types } } }
+        end
+
         # Add ordering if defined on the association, or default to _id for consistent order
         if current_assoc.order
           sort_spec = current_assoc.order.is_a?(Hash) ? current_assoc.order : { current_assoc.order => 1 }
