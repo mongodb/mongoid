@@ -2081,6 +2081,54 @@ describe Mongoid::Criteria::Includable do
       end
     end
 
+    context 'when a polymorphic target is stored in another database' do
+      before(:all) do
+        class LocalDevice
+          include Mongoid::Document
+        end
+
+        class RemoteDevice
+          include Mongoid::Document
+
+          store_in database: 'secondary'
+        end
+
+        class Accessory
+          include Mongoid::Document
+
+          belongs_to :device, polymorphic: true
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Accessory)
+        Object.send(:remove_const, :RemoteDevice)
+        Object.send(:remove_const, :LocalDevice)
+      end
+
+      # RemoteDevice lives in its own database, which the global cleanup hook
+      # (default database only) does not touch, so drop it here.
+      after { RemoteDevice.collection.drop }
+
+      let!(:local_device) { LocalDevice.create! }
+      let!(:remote_device) { RemoteDevice.create! }
+      let!(:local_accessory) { Accessory.create!(device: local_device) }
+      let!(:remote_accessory) { Accessory.create!(device: remote_device) }
+
+      it 'eager-loads the target stored in the other database' do
+        # One query materializes the roots, one $facet fetches the same-database
+        # target, and one direct query fetches the target in the other database.
+        loaded = expect_query(3) do
+          Accessory.eager_load(:device).to_a.index_by(&:id)
+        end
+
+        expect_no_queries do
+          expect(loaded[local_accessory.id].device).to eq(local_device)
+          expect(loaded[remote_accessory.id].device).to eq(remote_device)
+        end
+      end
+    end
+
     context 'when a has_many targets a class sharing its collection with sibling subclasses' do
       before(:all) do
         class Part

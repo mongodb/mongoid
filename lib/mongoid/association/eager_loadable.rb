@@ -344,9 +344,48 @@ module Mongoid
         end
       end
 
-      # Fetch every target in one aggregation: a $facet with a $lookup branch per
-      # type. Returns the targets as { type => { primary_key => document } }.
+      # Resolve the targets of a polymorphic inclusion, as
+      # { type => { primary_key => document } }.
+      #
+      # A $lookup only reaches collections in the root's own database, so the types
+      # are split by where they live: those in the root's database are fetched
+      # together in a single $facet aggregation, while a type kept in another
+      # database (or cluster) is read straight from its own model, which connects
+      # through that model's client.
+      #
+      # @param [ Mongoid::Association::Relatable ] assoc The polymorphic inclusion.
+      # @param [ Hash<String, Array> ] keys_by_type The foreign keys grouped by type.
+      #
+      # @return [ Hash ] The targets, as { type => { primary_key => document } }.
       def fetch_polymorphic_targets(assoc, keys_by_type)
+        local, remote = keys_by_type.partition do |type, _keys|
+          same_database_as_root?(assoc.resolver.model_for(type))
+        end
+
+        targets = fetch_targets_via_facet(assoc, local.to_h)
+        remote.each { |type, keys| targets[type] = fetch_targets_for_type(assoc, type, keys) }
+        targets
+      end
+
+      # Whether +model+ keeps its documents in the same database (and client) as
+      # the root: exactly what a $lookup from the root collection is able to reach.
+      #
+      # @param [ Class ] model The target model.
+      #
+      # @return [ true | false ] Whether it shares the root's database.
+      def same_database_as_root?(model)
+        model.client_name == klass.client_name &&
+          model.database_name == klass.database_name
+      end
+
+      # The single-query path, for the types that live in the root's database: one
+      # $facet aggregation with a $lookup branch per type.
+      #
+      # @param [ Mongoid::Association::Relatable ] assoc The polymorphic inclusion.
+      # @param [ Hash<String, Array> ] keys_by_type The foreign keys grouped by type.
+      #
+      # @return [ Hash ] The targets, as { type => { primary_key => document } }.
+      def fetch_targets_via_facet(assoc, keys_by_type)
         return {} if keys_by_type.empty?
 
         primary_key = assoc.primary_key
@@ -362,6 +401,22 @@ module Mongoid
           targets = branch.first['matches'].map { |doc| Factory.from_db(model, doc) }
           [ type, targets.index_by { |doc| doc.send(primary_key) } ]
         end
+      end
+
+      # The direct-query path, for a type kept outside the root's database that a
+      # $lookup could not reach: its own collection is read through its model.
+      #
+      # @param [ Mongoid::Association::Relatable ] assoc The polymorphic inclusion.
+      # @param [ String ] type The polymorphic type to fetch.
+      # @param [ Array ] keys The foreign keys for this type.
+      #
+      # @return [ Hash ] The targets for this type, as { primary_key => document }.
+      def fetch_targets_for_type(assoc, type, keys)
+        model = assoc.resolver.model_for(type)
+        model.collection
+             .find(assoc.primary_key => { '$in' => keys.uniq })
+             .map { |doc| Factory.from_db(model, doc) }
+             .index_by { |doc| doc.send(assoc.primary_key) }
       end
 
       # One $facet branch: look up the documents in +collection+ whose primary key
