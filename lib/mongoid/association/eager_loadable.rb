@@ -133,6 +133,19 @@ module Mongoid
         Eager.new(inclusions, [], true, pipeline).run
       end
 
+      # Eager loading turns each requested association into aggregation stages, but
+      # not every association is fetched the same way. This is where a single
+      # inclusion's strategy is settled: a plain reference becomes a top-level
+      # $lookup, an embedded one travels inside its own document, a polymorphic one
+      # is resolved after the roots are loaded, and one nested under a referenced
+      # parent is loaded within that parent. Only the top-level cases add stages here.
+      #
+      # @param [ Array<Hash> ] pipeline The aggregation pipeline being built.
+      # @param [ Mongoid::Association::Relatable ] assoc The inclusion to add.
+      # @param [ Hash<Symbol, Mongoid::Association::Relatable> ] inclusions_by_name
+      #   The inclusions indexed by association name.
+      # @param [ Hash<String, Array<Mongoid::Association::Relatable>> ] assoc_map
+      #   The inclusions grouped by inverse class name, used to nest children.
       def add_inclusion_to_pipeline(pipeline, assoc, inclusions_by_name, assoc_map)
         # An embedded inclusion rides inside its document; it needs no $lookup.
         return if assoc.polymorphic?
@@ -152,6 +165,18 @@ module Mongoid
         end
       end
 
+      # Handles eager loading a reference that lives on an embedded document rather
+      # than on a top-level one. MongoDB's $lookup can only attach its results to a
+      # top-level field, never inside an embedded array, so the matches are first
+      # collected at the top level and then moved onto the embedded documents they
+      # belong to, following +chain+ down to where the reference is declared.
+      #
+      # @param [ Array<Hash> ] pipeline The aggregation pipeline being built.
+      # @param [ Hash ] stage The $lookup stage produced for +association+.
+      # @param [ Array<Mongoid::Association::Relatable> ] chain The embedded
+      #   ancestors from the root document down to +association+'s owner.
+      # @param [ Mongoid::Association::Relatable ] association The referenced
+      #   inclusion to graft onto the embedded path.
       def graft_embedded_lookup(pipeline, stage, chain, association)
         lookup = stage['$lookup']
         path = chain.map(&:store_as).join('.')
@@ -175,8 +200,19 @@ module Mongoid
         pipeline << { '$unset' => tmp_field }
       end
 
-      # An embeds_many is rebuilt with $map so each element keeps its own matches
-      # instead of collapsing onto the first; an embeds_one is merged in place.
+      # Once the looked-up documents sit in a temporary top-level field, each
+      # embedded document along the path has to receive the matches that are its
+      # own. This expresses that hand-off. An embedded collection (embeds_many)
+      # keeps a per-element result so matches don't collapse onto the first
+      # element; a single embedded document (embeds_one) receives its match in place.
+      #
+      # @param [ Array<Mongoid::Association::Relatable> ] chain The remaining
+      #   embedded ancestors to descend into.
+      # @param [ String ] node The aggregation expression for the current embedded
+      #   node (e.g. "$ports" or "$$port").
+      # @param [ Hash ] graft The grafting parameters built by graft_embedded_lookup.
+      #
+      # @return [ Hash ] The aggregation expression for the enclosing $set stage.
       def graft_value(chain, node, graft)
         head, *rest = chain
         many = head.is_a?(Association::Embedded::EmbedsMany)
@@ -192,9 +228,15 @@ module Mongoid
         many ? { '$map' => { 'input' => node, 'as' => head.store_as, 'in' => merged } } : merged
       end
 
-      # A has_and_belongs_to_many holds an array of foreign keys, so a match
-      # belongs to the element when its key is contained in that array ($in);
-      # every other association points at a single key ($eq).
+      # From the pool of looked-up documents, keeps only the ones that belong to a
+      # particular embedded document, by matching keys. A has_and_belongs_to_many
+      # holds an array of foreign keys, so a document belongs when its key is one
+      # of them ($in); every other association points at a single key ($eq).
+      #
+      # @param [ Hash ] graft The grafting parameters built by graft_embedded_lookup.
+      # @param [ String ] element The aggregation expression for the embedded element.
+      #
+      # @return [ Hash ] The $filter expression.
       def correlated_matches(graft, element)
         { '$filter' => {
           'input' => "$#{graft[:tmp]}",
@@ -203,8 +245,18 @@ module Mongoid
         } }
       end
 
-      # An embedded child rides inside its parent's $lookup, so instead of its own
-      # $lookup its referenced descendants are grafted onto the embedded path.
+      # Handles references reached through an embedded document, e.g. a Computer
+      # that embeds Ports where each Port references a Device. The embedded
+      # document has no collection of its own to be looked up from (it already
+      # travels inside its parent), so its references are attached onto the
+      # embedded path instead of getting their own top-level $lookup.
+      #
+      # @param [ Mongoid::Association::Relatable ] embedded_assoc The embedded inclusion.
+      # @param [ Array<Hash> ] pipeline_stages The sub-pipeline being built.
+      # @param [ Hash<String, Array<Mongoid::Association::Relatable>> ] mapping The
+      #   inclusions grouped by inverse class name, drained as children are consumed.
+      # @param [ Array<Mongoid::Association::Relatable> ] chain The embedded path
+      #   accumulated so far, from the outermost embedded ancestor inward.
       def nest_embedded_inclusion(embedded_assoc, pipeline_stages, mapping, chain = [ embedded_assoc ])
         child_inclusions_of(embedded_assoc, mapping).each do |child|
           mapping[child.inverse_class_name] -= [ child ]
@@ -217,15 +269,33 @@ module Mongoid
         end
       end
 
-      # Matched by parent_inclusions (the real parent-child link), not by class, so
-      # a sibling branch isn't pulled in when an association points at a superclass
-      # of the queried subclass.
+      # Nested inclusions (e.g. include(a: :b)) form a tree. This gives the ones
+      # that hang directly under +parent+, matched by the actual parent-child link
+      # rather than by class, so a sibling branch isn't pulled in when an
+      # association happens to point at a superclass of the queried subclass.
+      #
+      # @param [ Mongoid::Association::Relatable ] parent The parent inclusion.
+      # @param [ Hash<String, Array<Mongoid::Association::Relatable>> ] mapping
+      #   The inclusions grouped by inverse class name.
+      #
+      # @return [ Array<Mongoid::Association::Relatable> ] The child inclusions.
       def child_inclusions_of(parent, mapping)
         mapping.values.flatten.select do |child|
           child.parent_inclusions.include?(parent.name)
         end
       end
 
+      # A reference can be reached through one or more embedded documents. This
+      # gives the embedded path leading down to it, one per embedded parent, since
+      # the same association can be embedded in more than one place (e.g. two
+      # embeds_one of the same class).
+      #
+      # @param [ Mongoid::Association::Relatable ] assoc The inclusion.
+      # @param [ Hash<Symbol, Mongoid::Association::Relatable> ] inclusions_by_name
+      #   The inclusions indexed by association name.
+      #
+      # @return [ Array<Array<Mongoid::Association::Relatable>> ] One chain of
+      #   embedded ancestors per embedded parent, each ordered from the root inward.
       def embedded_ancestor_chains(assoc, inclusions_by_name)
         assoc.parent_inclusions.filter_map do |parent_name|
           parent = inclusions_by_name[parent_name]
@@ -233,6 +303,16 @@ module Mongoid
         end
       end
 
+      # The path of embedded documents from the root down to a given embedded
+      # association, found by climbing through its embedded ancestors.
+      #
+      # @param [ Mongoid::Association::Relatable ] embedded_assoc The embedded
+      #   inclusion to start from.
+      # @param [ Hash<Symbol, Mongoid::Association::Relatable> ] inclusions_by_name
+      #   The inclusions indexed by association name.
+      #
+      # @return [ Array<Mongoid::Association::Relatable> ] The chain of embedded
+      #   ancestors, outermost first.
       def embedded_chain_up_to(embedded_assoc, inclusions_by_name)
         chain = [ embedded_assoc ]
         current = embedded_assoc
