@@ -16,6 +16,11 @@ if RUBY_PLATFORM =~ /java/
   i18n_versions << '< 1.8.8'
 end
 
+if RUBY_VERSION < '3.2'
+  # 1.15.0 uses Fiber[:foo] syntax, which breaks on Ruby 3.1
+  i18n_versions << '< 1.15.0'
+end
+
 gem 'i18n', *i18n_versions
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
