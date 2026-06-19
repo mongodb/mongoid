@@ -178,6 +178,76 @@ describe Mongoid::Attributes::Nested do
       it "sets the nested attributes" do
         expect(person.posts.first.title).to eq("First")
       end
+
+      context 'when adding an existing document to a relation' do
+        let(:person1) { Person.create! }
+        let(:post) { person1.posts.create!(title: 'Sample Post') }
+
+        let(:person2) { Person.create!(posts_attributes: { '0' => { id: post.id, title: 'Reparented!' } }) }
+
+        context 'when allow_reparenting_via_nested_attributes is false' do
+          config_override :allow_reparenting_via_nested_attributes, false
+
+          it 'raises a document not found error' do
+            expect { person2 }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+
+        context 'when allow_reparenting_via_nested_attributes is true' do
+          config_override :allow_reparenting_via_nested_attributes, true
+
+          it 'sets the nested attributes' do
+            expect(person2.posts.map(&:title)).to eq([ 'Reparented!' ])
+          end
+
+          context 'when the id does not correspond to an existing document' do
+            let(:person2) do
+              Person.create!(posts_attributes: { '0' => { id: BSON::ObjectId.new, title: 'Ghost' } })
+            end
+
+            context 'when raise_not_found_error is true' do
+              config_override :raise_not_found_error, true
+
+              it 'raises a document not found error' do
+                expect { person2 }.to raise_error(Mongoid::Errors::DocumentNotFound,
+                                                  /Document\(s\) not found for class Post/)
+              end
+            end
+
+            context 'when raise_not_found_error is false' do
+              config_override :raise_not_found_error, false
+
+              it 'raises a document not found error' do
+                expect { person2 }.to raise_error(Mongoid::Errors::DocumentNotFound,
+                                                  /Document\(s\) not found for class Post/)
+              end
+            end
+          end
+        end
+
+        context 'when _destroy is true for a document not in the relation' do
+          config_override :allow_reparenting_via_nested_attributes, true
+
+          before do
+            Person.send(:undef_method, :posts_attributes=)
+            Person.accepts_nested_attributes_for :posts, allow_destroy: true
+          end
+
+          let(:person3) do
+            Person.create!(
+              posts_attributes: { '0' => { id: post.id, _destroy: '1' } }
+            )
+          end
+
+          it 'does not raise UnknownAttribute' do
+            expect { person3 }.not_to raise_error
+          end
+
+          it 'does not add the document to the relation' do
+            expect(person3.posts).to be_empty
+          end
+        end
+      end
     end
 
     context "when the relation is a references and referenced in many" do
@@ -212,7 +282,54 @@ describe Mongoid::Attributes::Nested do
           person = Person.new(
             preferences_attributes: { 0 => { id: preference.id, name: preference_name } }
           )
-          expect(person.preferences.map(&:name)).to eq([preference_name])
+          expect(person.preferences.map(&:name)).to eq([ preference_name ])
+        end
+
+        context 'when the id does not correspond to an existing document' do
+          let(:person) do
+            Person.new(
+              preferences_attributes: { 0 => { id: BSON::ObjectId.new, name: 'Ghost' } }
+            )
+          end
+
+          context 'when raise_not_found_error is true' do
+            config_override :raise_not_found_error, true
+
+            it 'raises a document not found error' do
+              expect { person }.to raise_error(Mongoid::Errors::DocumentNotFound,
+                                               /Document\(s\) not found for class Preference/)
+            end
+          end
+
+          context 'when raise_not_found_error is false' do
+            config_override :raise_not_found_error, false
+
+            it 'raises a document not found error' do
+              expect { person }.to raise_error(Mongoid::Errors::DocumentNotFound,
+                                               /Document\(s\) not found for class Preference/)
+            end
+          end
+        end
+
+        context 'when _destroy is true for a document not in the relation' do
+          before do
+            Person.send(:undef_method, :preferences_attributes=)
+            Person.accepts_nested_attributes_for :preferences, allow_destroy: true
+          end
+
+          let(:person) do
+            Person.new(
+              preferences_attributes: { 0 => { id: preference.id, _destroy: '1' } }
+            )
+          end
+
+          it 'does not raise UnknownAttribute' do
+            expect { person }.not_to raise_error
+          end
+
+          it 'does not add the document to the relation' do
+            expect(person.preferences).to be_empty
+          end
         end
       end
     end

@@ -184,11 +184,25 @@ module Mongoid
             else
               update_document(doc, attrs)
             end
+          elsif association.embedded?
+            raise Errors::DocumentNotFound.new(association.klass, id)
+          elsif association.is_a?(Association::Referenced::HasAndBelongsToMany) || Mongoid.allow_reparenting_via_nested_attributes?
+            unless destroyable?(attrs)
+              Mongoid::Warnings.warn_reparenting_via_nested_attributes if Mongoid.allow_reparenting_via_nested_attributes?
+
+              # push existing document to association
+              doc = association.klass.unscoped.find(converted)
+              # find returns nil instead of raising when
+              # Mongoid.raise_not_found_error is false; a missing document
+              # must still be an error here, consistent with the other
+              # not-found branches.
+              raise Errors::DocumentNotFound.new(association.klass, id) if doc.nil?
+
+              update_document(doc, attrs)
+              existing.push(doc)
+            end
           else
-            # push existing document to association
-            doc = association.klass.unscoped.find(converted)
-            update_document(doc, attrs)
-            existing.push(doc) unless destroyable?(attrs)
+            raise Errors::DocumentNotFound.new(association.klass, { _id: id, association.foreign_key => parent.id })
           end
 
           parent.children_may_have_changed!
