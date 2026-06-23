@@ -1641,6 +1641,16 @@ describe Mongoid::Criteria::Includable do
           expect(loaded.port.device).to eq(device)
         end
       end
+
+      it 'leaves the embedded document absent instead of synthesizing it' do
+        without_port = Computer.create!
+        loaded = expect_query(1) do
+          Computer.eager_load(port: :device).to_a.index_by(&:id)
+        end
+        expect_no_queries do
+          expect(loaded[without_port.id].port).to be_nil
+        end
+      end
     end
 
     context 'when two embeds_one associations of the same class are eager-loaded' do

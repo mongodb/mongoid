@@ -108,12 +108,23 @@ module Mongoid
               { segment => distributed_value(rest, "#{element}.#{segment}") }
             end
           merged = { '$mergeObjects' => [ element, child ] }
-          return merged unless many
+          return merge_into_present(node, merged) unless many
 
           { '$map' => {
             'input' => node,
             'as' => head.store_as,
             'in' => merged
+          } }
+        end
+
+        # Merge the matches into a single embedded document only when it exists, so
+        # an absent embeds_one stays absent instead of being synthesized from its
+        # matches alone.
+        def merge_into_present(node, merged)
+          { '$cond' => {
+            'if' => { '$ifNull' => [ node, false ] },
+            'then' => merged,
+            'else' => node
           } }
         end
 
