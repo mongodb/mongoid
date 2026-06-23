@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'mongoid/association/eager_load/discriminated_inclusion'
 require 'mongoid/association/eager_load/inclusion'
 
 module Mongoid
@@ -39,8 +40,15 @@ module Mongoid
 
         private
 
+        # A name that more than one subclass defines (with different targets) can't
+        # share one $lookup field, so its nodes -- each carrying its own children --
+        # are grouped and routed by the discriminator instead of becoming separate,
+        # overwriting roots.
         def roots
-          top_level.map { |association| node(association, @inclusions.dup) }
+          top_level.group_by(&:name).map do |_name, associations|
+            nodes = associations.map { |association| node(association, @inclusions.dup) }
+            nodes.one? ? nodes.first : DiscriminatedInclusion.new(nodes)
+          end
         end
 
         # The inclusions that no other inclusion is the parent of.
@@ -52,17 +60,27 @@ module Mongoid
 
         def node(association, available)
           children = take_children(association, available).map { |child| node(child, available) }
-          Inclusion.for(association, @pipeline, children)
+          AssociationInclusion.for(association, @pipeline, children)
         end
 
         # The still-available inclusions parented to +association+, removed as they
-        # are taken so each lands once on this branch. Matched by the real
-        # parent-child link, not by class, so a sibling branch isn't pulled in when
-        # an association points at a superclass of the queried subclass.
+        # are taken so each lands once on this branch. A child belongs here when it
+        # names this association as its parent and its owner shares the target's
+        # class hierarchy, which tells apart children of two unrelated subclasses
+        # that share an association name.
         def take_children(association, available)
-          children = available.select { |candidate| candidate.parent_inclusions.include?(association.name) }
+          children = available.select do |candidate|
+            candidate.parent_inclusions.include?(association.name) &&
+              same_hierarchy?(association.klass, candidate.inverse_class)
+          end
           available.reject! { |candidate| children.include?(candidate) }
           children
+        end
+
+        # Whether two classes belong to the same inheritance chain (one is the
+        # other, an ancestor of it, or a descendant of it).
+        def same_hierarchy?(one, other)
+          one <= other || other <= one
         end
       end
     end

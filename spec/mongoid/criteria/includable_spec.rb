@@ -2180,6 +2180,76 @@ describe Mongoid::Criteria::Includable do
       end
     end
 
+    context 'when a has_many of the same name is defined on more than one subclass' do
+      before(:all) do
+        class Supplier
+          include Mongoid::Document
+        end
+
+        class Cog
+          include Mongoid::Document
+
+          belongs_to :machine, optional: true
+          belongs_to :supplier, optional: true
+        end
+
+        class Belt
+          include Mongoid::Document
+
+          belongs_to :machine, optional: true
+          belongs_to :supplier, optional: true
+        end
+
+        class Machine
+          include Mongoid::Document
+        end
+
+        class Lathe < Machine
+          has_many :widgets, class_name: 'Cog', inverse_of: :machine
+        end
+
+        class Press < Machine
+          has_many :widgets, class_name: 'Belt', inverse_of: :machine
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Press)
+        Object.send(:remove_const, :Lathe)
+        Object.send(:remove_const, :Machine)
+        Object.send(:remove_const, :Belt)
+        Object.send(:remove_const, :Cog)
+        Object.send(:remove_const, :Supplier)
+      end
+
+      let!(:cog_supplier) { Supplier.create! }
+      let!(:belt_supplier) { Supplier.create! }
+      let!(:lathe) { Lathe.create! }
+      let!(:press) { Press.create! }
+      let!(:cog) { Cog.create!(machine: lathe, supplier: cog_supplier) }
+      let!(:belt) { Belt.create!(machine: press, supplier: belt_supplier) }
+
+      it 'loads each subclass association without one overwriting the other' do
+        loaded = expect_query(1) do
+          Machine.eager_load(:widgets).to_a.index_by(&:id)
+        end
+        expect_no_queries do
+          expect(loaded[lathe.id].widgets).to eq([ cog ])
+          expect(loaded[press.id].widgets).to eq([ belt ])
+        end
+      end
+
+      it 'eager-loads inclusions nested under each subclass association' do
+        loaded = expect_query(1) do
+          Machine.eager_load(widgets: :supplier).to_a.index_by(&:id)
+        end
+        expect_no_queries do
+          expect(loaded[lathe.id].widgets.first.supplier).to eq(cog_supplier)
+          expect(loaded[press.id].widgets.first.supplier).to eq(belt_supplier)
+        end
+      end
+    end
+
     context 'when a has_many targets a class sharing its collection with sibling subclasses' do
       before(:all) do
         class Part
