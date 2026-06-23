@@ -679,9 +679,9 @@ describe Mongoid::Association::EagerLoadable do
         expect(docs.first.posts).to eq([ post ])
       end
 
-      it 'mentions the offending association and client in the warning' do
+      it 'mentions the offending association, client, and database in the warning' do
         expect(Mongoid.logger).to receive(:warn).with(
-          /posts \(other_cluster\)/
+          /posts \(client: other_cluster, database: /
         )
         context.eager_load_with_lookup
       end

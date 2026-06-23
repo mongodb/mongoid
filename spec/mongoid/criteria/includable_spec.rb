@@ -2129,6 +2129,47 @@ describe Mongoid::Criteria::Includable do
       end
     end
 
+    context 'when a non-polymorphic target is stored in another database' do
+      before(:all) do
+        class RemoteServer
+          include Mongoid::Document
+
+          store_in database: 'secondary'
+        end
+
+        class Workstation
+          include Mongoid::Document
+
+          belongs_to :server, class_name: 'RemoteServer', optional: true
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Workstation)
+        Object.send(:remove_const, :RemoteServer)
+      end
+
+      # RemoteServer lives in its own database, which the global cleanup hook
+      # (default database only) does not touch, so drop it here.
+      after { RemoteServer.collection.drop }
+
+      let!(:server) { RemoteServer.create! }
+      let!(:workstation) { Workstation.create!(server: server) }
+
+      it 'eager-loads the target stored in the other database' do
+        # A $lookup cannot reach another database, so this falls back to
+        # separate-query loading: one query materializes the roots and one fetches
+        # the targets, instead of silently returning nothing.
+        loaded = expect_query(2) do
+          Workstation.eager_load(:server).to_a
+        end
+
+        expect_no_queries do
+          expect(loaded.first.server).to eq(server)
+        end
+      end
+    end
+
     context 'when a has_many targets a class sharing its collection with sibling subclasses' do
       before(:all) do
         class Part

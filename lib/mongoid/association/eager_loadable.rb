@@ -30,19 +30,21 @@ module Mongoid
 
       # Load the associations for the given documents using $lookup.
       #
-      # If any of the associated collections reside in a different cluster than
-      # the root class, falls back to the #includes behavior and logs a warning.
+      # If any of the associated collections reside in a different cluster or
+      # database than the root class, falls back to the #includes behavior and
+      # logs a warning.
       #
       # @return [ Array<Mongoid::Document> ] The given documents.
       def eager_load_with_lookup
-        offenders = cross_cluster_inclusions
+        offenders = inclusions_unreachable_by_lookup
         if offenders.any?
           offender_descriptions = offenders.map do |offender|
-            "#{offender.name} (#{offender.klass.client_name})"
+            "#{offender.name} (client: #{offender.klass.client_name}, database: #{offender.klass.database_name})"
           end
           Mongoid.logger.warn(
             'eager_load cannot use $lookup aggregation because the following associations ' \
-            "reside in a different cluster than #{klass} (client: #{klass.client_name}): " \
+            "reside in a different cluster or database than #{klass} " \
+            "(client: #{klass.client_name}, database: #{klass.database_name}): " \
             "#{offender_descriptions.join(', ')}. Falling back to #includes behavior."
           )
           return eager_load(docs_for_lookup_fallback)
@@ -132,17 +134,23 @@ module Mongoid
         raise NotImplementedError, "#{self.class} must implement #docs_for_lookup_fallback"
       end
 
-      # Returns the inclusions whose target class resides in a different cluster
-      # than the root class.
+      # Returns the inclusions whose target class can't be reached by a $lookup
+      # from the root class, which joins only within the same client and database.
       #
       # @return [ Array<Mongoid::Association::Relatable> ] The offending inclusions.
-      def cross_cluster_inclusions
-        root_client_name = klass.client_name
+      def inclusions_unreachable_by_lookup
         # Polymorphic associations have no single resolvable klass and are not
-        # loaded via $lookup, so they are never cross-cluster offenders.
+        # loaded via $lookup, so they are never offenders.
         criteria.inclusions.reject do |association|
-          association.polymorphic? || association.klass.client_name == root_client_name
+          association.polymorphic? || reachable_by_lookup?(association.klass)
         end
+      end
+
+      # Whether a $lookup from a query on the root class can reach the model: it
+      # must live in the same client and database.
+      def reachable_by_lookup?(model)
+        model.client_name == klass.client_name &&
+          model.database_name == klass.database_name
       end
     end
   end
