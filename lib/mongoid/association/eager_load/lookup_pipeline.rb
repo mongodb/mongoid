@@ -36,6 +36,8 @@ module Mongoid
       #         } }
       #       ]
       #     } } ]
+      #
+      # @api private
       class LookupPipeline
         def initialize(criteria)
           @criteria = criteria

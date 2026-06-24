@@ -4,6 +4,15 @@ module Mongoid
   module Association
     # Base class for eager load preload functions.
     class Eager
+      # Build a preloader for the given arguments and run it.
+      #
+      # @param (see #initialize)
+      #
+      # @return [ Array ] The list of documents given.
+      def self.run(associations, docs, use_lookup = false, pipeline = [])
+        new(associations, docs, use_lookup, pipeline).run
+      end
+
       # Instantiate the eager load class.
       #
       # @example Create the new belongs to eager load preloader.
@@ -12,12 +21,18 @@ module Mongoid
       # @param [ Array<Mongoid::Association::Relatable> ] associations
       #   Associations to eager load
       # @param [ Array<Document> ] docs Documents to preload the associations
+      # @param [ Boolean ] use_lookup Whether to use $lookup aggregation
+      #   for eager loading. This is used in Criteria#eager_load.
+      # @param [ Array<Hash> ] pipeline The aggregation pipeline to use
+      #   when using $lookup for eager loading.
       #
       # @return [ Base ] The eager load preloader
-      def initialize(associations, docs)
+      def initialize(associations, docs, use_lookup = false, pipeline = [])
         @associations = associations
         @docs = docs
         @grouped_docs = {}
+        @use_lookup = use_lookup
+        @pipeline = pipeline
       end
 
       # Run the preloader.
@@ -28,6 +43,12 @@ module Mongoid
       # @return [ Array ] The list of documents given.
       def run
         @loaded = []
+
+        if @use_lookup
+          preload_with_lookup
+          @loaded = @docs
+          return @loaded.flatten
+        end
 
         while shift_association
           preload
@@ -46,6 +67,21 @@ module Mongoid
       #   loader.preload
       def preload
         raise NotImplementedError
+      end
+
+      # Preload the current association using $lookup aggregation.
+      # This method executes the aggregation pipeline
+      # and instantiates the documents.
+      # @example Preload the current association using $lookup.
+      #   loader.preload_with_lookup
+      def preload_with_lookup
+        # For $lookup aggregation, execute pipeline and instantiate documents
+        owner_class = @associations.first.owner_class
+        aggregated_docs = owner_class.collection.aggregate(@pipeline)
+        aggregated_docs.each do |doc|
+          parsed_doc = Factory.from_db(owner_class, doc)
+          @docs << parsed_doc
+        end
       end
 
       # Retrieves the documents referenced by the association, and

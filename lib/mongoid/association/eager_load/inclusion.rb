@@ -8,6 +8,8 @@ module Mongoid
       # tree follows by recursion. AssociationInclusion stands for a single
       # association; DiscriminatedInclusion stands for a name several subclasses
       # share.
+      #
+      # @api private
       class Inclusion
         # Add this inclusion's stages to the destination.
         #
@@ -23,6 +25,8 @@ module Mongoid
       # An inclusion that stands for a single association. The LookupPipeline holds
       # the stage-building helpers the kinds lean on, and a node carries its own
       # children, so the pipeline is built by recursion from the roots downward.
+      #
+      # @api private
       class AssociationInclusion < Inclusion
         class << self
           # Builds the right kind of inclusion for the association. Each subclass
@@ -38,6 +42,8 @@ module Mongoid
           end
 
           # Whether this kind handles the given association.
+          #
+          # @param [ Mongoid::Association::Relatable ] association The inclusion.
           #
           # @return [ true | false ] Whether it handles it.
           def for?(association)
@@ -75,15 +81,28 @@ module Mongoid
       #       <children>
       #     ]
       #   } }
+      #
+      # @api private
       class JoinedInclusion < AssociationInclusion
         class << self
           # The default kind: a referenced, non-polymorphic association, i.e. the
           # one no sibling kind claims.
+          #
+          # @param [ Mongoid::Association::Relatable ] association The inclusion.
+          #
+          # @return [ true | false ] Whether it handles it.
           def for?(association)
             (superclass.subclasses - [ self ]).none? { |kind| kind.for?(association) }
           end
         end
 
+        # Append the $lookup, with the children in its sub-pipeline, to the
+        # destination; or distribute it onto the embedded path when nested in one.
+        #
+        # @param [ Array<Hash> ] destination The pipeline (or sub-pipeline) the
+        #   stages are appended to.
+        # @param [ Array<Mongoid::Association::Relatable> ] chain The embedded path
+        #   accumulated from the ancestors above this inclusion (empty at the top).
         def contribute(destination, chain)
           stage = @pipeline.lookup_stage_for(@association)
           @children.each { |child| child.contribute(stage['$lookup']['pipeline'], []) }
@@ -103,13 +122,25 @@ module Mongoid
       # For Computer.eager_load(port: :device) the :port inclusion emits nothing;
       # it hands the path [ :port ] to :device, which EmbeddedDistributor then
       # turns into stages.
+      #
+      # @api private
       class EmbeddedInclusion < AssociationInclusion
         class << self
+          # @param [ Mongoid::Association::Relatable ] association The inclusion.
+          #
+          # @return [ true | false ] Whether the association is embedded.
           def for?(association)
             association.embedded?
           end
         end
 
+        # Add no stage of its own; hand this document down the embedded path so the
+        # children distribute onto it.
+        #
+        # @param [ Array<Hash> ] destination The pipeline (or sub-pipeline) the
+        #   stages are appended to.
+        # @param [ Array<Mongoid::Association::Relatable> ] chain The embedded path
+        #   accumulated from the ancestors above this inclusion (empty at the top).
         def contribute(destination, chain)
           @children.each { |child| child.contribute(destination, chain + [ @association ]) }
         end
@@ -118,13 +149,23 @@ module Mongoid
       # A polymorphic inclusion: its target collection varies per document, so it
       # can't be a $lookup. It adds nothing here; PolymorphicPreloader resolves it
       # after the roots are materialized.
+      #
+      # @api private
       class DeferredInclusion < AssociationInclusion
         class << self
+          # @param [ Mongoid::Association::Relatable ] association The inclusion.
+          #
+          # @return [ true | false ] Whether the association is polymorphic.
           def for?(association)
             association.polymorphic?
           end
         end
 
+        # Add nothing; PolymorphicPreloader resolves the association after the
+        # roots are materialized.
+        #
+        # @param [ Array<Hash> ] destination The pipeline (unused).
+        # @param [ Array<Mongoid::Association::Relatable> ] chain The embedded path (unused).
         def contribute(destination, chain); end
       end
     end

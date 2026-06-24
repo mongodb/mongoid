@@ -119,8 +119,7 @@ module Mongoid
       # @return [ Array<Mongoid::Document> ] The materialized root documents.
       def preload_for_lookup(criteria)
         pipeline = EagerLoad::LookupPipeline.new(criteria).stages
-        owner = criteria.inclusions.first.owner_class
-        owner.collection.aggregate(pipeline).map { |document| Factory.from_db(owner, document) }
+        Eager.run(criteria.inclusions, [], true, pipeline)
       end
 
       private

@@ -31,6 +31,8 @@ module Mongoid
       #     ] }
       #   } },
       #   { '$unset' => '__eager_load_port_device' }  # drop the temp field
+      #
+      # @api private
       class EmbeddedDistributor
         # @param [ Mongoid::Association::Relatable ] association The referenced
         #   inclusion being eager-loaded from within an embedded document.

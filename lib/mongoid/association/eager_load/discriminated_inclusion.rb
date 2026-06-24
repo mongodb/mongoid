@@ -24,6 +24,8 @@ module Mongoid
       #     ], 'default' => [] } }
       #   } },
       #   { '$unset' => [ '__eager_load_widgets_Lathe', '__eager_load_widgets_Press' ] }
+      #
+      # @api private
       class DiscriminatedInclusion < Inclusion
         def initialize(nodes)
           super()

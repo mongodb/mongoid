@@ -7,12 +7,19 @@ module Mongoid
       # { type => { primary_key => document } }. Each subclass reaches the types that
       # live in one place (the root's database or elsewhere); .for resolves the whole
       # set, routing each type to the subclass that can reach it.
+      #
+      # @api private
       class PolymorphicTargets
         class << self
           # Resolve every polymorphic target for the foreign keys grouped by type.
           # The types whose documents share the root's database are fetched together
           # in one $facet; those living elsewhere are read through their own models.
-          # Returns them indexed as { type => { primary_key => document } }.
+          #
+          # @param [ Mongoid::Association::Relatable ] association The polymorphic inclusion.
+          # @param [ Hash ] keys_by_type The foreign keys grouped by type.
+          # @param [ Class ] root_class The class being queried.
+          #
+          # @return [ Hash ] The targets, as { type => { primary_key => document } }.
           def for(association, keys_by_type, root_class)
             here, elsewhere = keys_by_type.partition do |type, _keys|
               in_root_database?(association, type, root_class)
@@ -73,12 +80,15 @@ module Mongoid
       #       'Scanner' => [ { '$lookup' => { 'from' => 'scanners', ... } }, ... ]
       #     } }
       #   ]
+      #
+      # @api private
       class SameDatabaseTargets < PolymorphicTargets
         def initialize(association, keys_by_type, root_class)
           super(association, keys_by_type)
           @root_class = root_class
         end
 
+        # @return [ Hash ] The targets, as { type => { primary_key => document } }.
         def fetch
           return {} if @keys_by_type.empty?
 
@@ -124,7 +134,10 @@ module Mongoid
       #
       # For { 'Scanner' => [ id2 ] } it runs, on the Scanner model's own client:
       #   scanners.find('_id' => { '$in' => [ id2 ] })
+      #
+      # @api private
       class OtherDatabaseTargets < PolymorphicTargets
+        # @return [ Hash ] The targets, as { type => { primary_key => document } }.
         def fetch
           @keys_by_type.to_h do |type, keys|
             model = model_for(type)

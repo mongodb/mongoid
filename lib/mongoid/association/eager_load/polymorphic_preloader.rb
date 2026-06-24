@@ -11,6 +11,8 @@ module Mongoid
       # collection varies per document. So once the roots are materialized, the
       # foreign keys are grouped by type, PolymorphicTargets resolves the documents
       # for those keys, and the result is set on each document.
+      #
+      # @api private
       class PolymorphicPreloader
         def initialize(association, root_class)
           @association = association

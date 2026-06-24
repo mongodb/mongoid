@@ -14,8 +14,16 @@ module Mongoid
       # inclusion is removed as it is placed, so it lands once per branch even if
       # more than one parent in that branch points at it, and a circular chain of
       # inclusions can't loop forever.
+      #
+      # @api private
       class InclusionTree
         class << self
+          # Builds the tree for the criteria's inclusions.
+          #
+          # @param [ Array<Mongoid::Association::Relatable> ] inclusions The inclusions.
+          # @param [ LookupPipeline ] pipeline The pipeline being built.
+          #
+          # @return [ InclusionTree ] The tree.
           def from(inclusions, pipeline)
             new(inclusions, pipeline, inclusions.to_h { |association| [ association.name, association ] })
           end
