@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 require 'mongoid/association/eager'
+require 'mongoid/association/eager_load/embedded_distributor'
+require 'mongoid/association/eager_load/polymorphic_preloader'
+require 'mongoid/association/eager_load/lookup_pipeline'
 
 module Mongoid
   module Association
@@ -27,38 +30,49 @@ module Mongoid
 
       # Load the associations for the given documents using $lookup.
       #
-      # If any of the associated collections reside in a different cluster than
-      # the root class, falls back to the #includes behavior and logs a warning.
+      # If any of the associated collections reside in a different cluster or
+      # database than the root class, falls back to the #includes behavior and
+      # logs a warning.
       #
       # @return [ Array<Mongoid::Document> ] The given documents.
       def eager_load_with_lookup
-        offenders = cross_cluster_inclusions
+        offenders = inclusions_unreachable_by_lookup
         if offenders.any?
-          root_client = klass.client_name
-          offender_list = offenders.map { |a| "#{a.name} (#{a.klass.client_name})" }.join(', ')
+          offender_descriptions = offenders.map do |offender|
+            "#{offender.name} (client: #{offender.klass.client_name}, database: #{offender.klass.database_name})"
+          end
           Mongoid.logger.warn(
             'eager_load cannot use $lookup aggregation because the following associations ' \
-            "reside in a different cluster than #{klass} (client: #{root_client}): " \
-            "#{offender_list}. Falling back to #includes behavior."
+            "reside in a different cluster or database than #{klass} " \
+            "(client: #{klass.client_name}, database: #{klass.database_name}): " \
+            "#{offender_descriptions.join(', ')}. Falling back to #includes behavior."
           )
           return eager_load(docs_for_lookup_fallback)
         end
 
-        through_inclusions = criteria.inclusions.select do |assoc|
-          assoc.is_a?(Association::Referenced::HasOneThrough) ||
-            assoc.is_a?(Association::Referenced::HasManyThrough)
+        through_inclusions = criteria.inclusions.select do |association|
+          association.is_a?(Association::Referenced::HasOneThrough) ||
+            association.is_a?(Association::Referenced::HasManyThrough)
         end
 
         if through_inclusions.any?
-          names = through_inclusions.map { |a| ":#{a.name}" }.join(', ')
+          through_names = through_inclusions.map { |association| ":#{association.name}" }
           Mongoid.logger.warn(
-            "#{names} are :through associations and do not support $lookup-based eager " \
-            'loading. All inclusions for this query will be preloaded using separate queries.'
+            "#{through_names.join(', ')} are :through associations and do not support " \
+            '$lookup-based eager loading. All inclusions for this query will be preloaded ' \
+            'using separate queries.'
           )
           return eager_load(docs_for_lookup_fallback)
         end
 
-        preload_for_lookup(criteria)
+        documents = preload_for_lookup(criteria)
+        # A polymorphic belongs_to cannot be expressed as a $lookup: its target
+        # collection varies per document. It is resolved after the roots are
+        # materialized, each inclusion by its own preloader.
+        criteria.inclusions.select(&:polymorphic?).each do |association|
+          EagerLoad::PolymorphicPreloader.new(association, klass).preload_into(documents)
+        end
+        documents
       end
 
       # Load the associations for the given documents. This will be done
@@ -96,39 +110,16 @@ module Mongoid
         end
       end
 
-      # Load the associations for the given documents. This will be done
-      # recursively to load the associations of the given documents'
-      # associated documents.
+      # Materialize the root documents with their inclusions eager-loaded by a
+      # single $lookup aggregation. The pipeline is built by LookupPipeline; the
+      # polymorphic inclusions it leaves out are resolved by the caller.
       #
-      # @param [ Array<Mongoid::Association::Relatable> ] associations
-      #   The associations to load.
-      # @param [ Array<Mongoid::Document> ] docs The documents.
+      # @param [ Mongoid::Criteria ] criteria The criteria to load.
+      #
+      # @return [ Array<Mongoid::Document> ] The materialized root documents.
       def preload_for_lookup(criteria)
-        assoc_map = criteria.inclusions.group_by(&:inverse_class_name)
-
-        # match first
-        pipeline = criteria.selector.to_pipeline
-        # then sort, skip, limit
-        pipeline.concat(criteria.options.to_pipeline_for_lookup)
-
-        # account for single-collection inheritance
-        root_class = klass.root_class
-
-        if assoc_map[klass.to_s]
-          assoc_map[klass.to_s].each do |assoc|
-            # Create a copy of the mapping for each top-level association to avoid mutation issues
-            pipeline << create_pipeline(assoc, assoc_map.dup)
-          end
-        end
-
-        if klass != root_class && assoc_map[root_class.to_s]
-          assoc_map[root_class.to_s].each do |assoc|
-            # Create a copy of the mapping for each top-level association to avoid mutation issues
-            pipeline << create_pipeline(assoc, assoc_map.dup)
-          end
-        end
-
-        Eager.new(criteria.inclusions, [], true, pipeline).run
+        pipeline = EagerLoad::LookupPipeline.new(criteria).stages
+        Eager.run(criteria.inclusions, [], true, pipeline)
       end
 
       private
@@ -142,71 +133,23 @@ module Mongoid
         raise NotImplementedError, "#{self.class} must implement #docs_for_lookup_fallback"
       end
 
-      # Returns the inclusions whose target class resides in a different cluster
-      # than the root class.
+      # Returns the inclusions whose target class can't be reached by a $lookup
+      # from the root class, which joins only within the same client and database.
       #
       # @return [ Array<Mongoid::Association::Relatable> ] The offending inclusions.
-      def cross_cluster_inclusions
-        root_client = klass.client_name
-        criteria.inclusions.reject { |assoc| assoc.klass.client_name == root_client }
+      def inclusions_unreachable_by_lookup
+        # Polymorphic associations have no single resolvable klass and are not
+        # loaded via $lookup, so they are never offenders.
+        criteria.inclusions.reject do |association|
+          association.polymorphic? || reachable_by_lookup?(association.klass)
+        end
       end
 
-      public
-
-      def switch_local_and_foreign_fields?(association)
-        association.is_a?(Mongoid::Association::Referenced::BelongsTo) ||
-          association.is_a?(Mongoid::Association::Referenced::HasAndBelongsToMany)
-      end
-
-      def create_pipeline(current_assoc, mapping)
-        # Build nested pipeline for children and ordering
-        pipeline_stages = []
-
-        # For belongs_to and has_and_belongs_to_many, the foreign key is on the current document
-        # For has_many/has_one, the foreign key is on the related document
-        if switch_local_and_foreign_fields?(current_assoc)
-          local_field = current_assoc.foreign_key
-          foreign_field = current_assoc.primary_key
-        else
-          local_field = current_assoc.primary_key
-          foreign_field = current_assoc.foreign_key
-        end
-
-        # Build the 'as' field with embedded path prefix if needed
-        as_field = current_assoc.name.to_s
-
-        stage = {
-          '$lookup' => {
-            'from' => current_assoc.klass.collection.name,
-            'localField' => local_field,
-            'foreignField' => foreign_field,
-            'as' => as_field
-          }
-        }
-
-        # Add ordering if defined on the association, or default to _id for consistent order
-        if current_assoc.order
-          sort_spec = current_assoc.order.is_a?(Hash) ? current_assoc.order : { current_assoc.order => 1 }
-          pipeline_stages << { '$sort' => sort_spec }
-        else
-          # Default to sorting by _id to maintain insertion order consistency
-          pipeline_stages << { '$sort' => { '_id' => 1 } }
-        end
-
-        # Add nested lookups for child associations
-        # Child associations don't need the embedded_path prefix since they're referenced from the looked-up document
-        # Remove this class from the mapping to prevent infinite loops with circular references
-        class_name = current_assoc.klass.to_s
-        if child_assocs = mapping.delete(class_name)
-          child_assocs.each do |child|
-            pipeline_stages << create_pipeline(child, mapping)
-          end
-        end
-
-        # Always add pipeline since we always have at least $sort
-        stage['$lookup']['pipeline'] = pipeline_stages
-
-        stage
+      # Whether a $lookup from a query on the root class can reach the model: it
+      # must live in the same client and database.
+      def reachable_by_lookup?(model)
+        model.client_name == klass.client_name &&
+          model.database_name == klass.database_name
       end
     end
   end

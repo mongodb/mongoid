@@ -1414,6 +1414,881 @@ describe Mongoid::Criteria::Includable do
     # 4.4 lookup does not support the lookup pipeline as it is currently written
     min_server_version '5.0'
     it_behaves_like 'eager loading', :eager_load
+
+    context 'when the inclusion list is empty' do
+      let!(:band) { Band.create! }
+
+      it 'returns the documents without eager loading' do
+        expect(Band.eager_load([]).first).to eq(band)
+      end
+    end
+
+    context 'when the association is defined on a subclass of the queried class' do
+      before(:all) do
+        class Machine
+          include Mongoid::Document
+        end
+
+        class Peripheral
+          include Mongoid::Document
+        end
+
+        class Webcam < Peripheral
+        end
+
+        class Mouse < Peripheral
+          belongs_to :machine
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Mouse)
+        Object.send(:remove_const, :Webcam)
+        Object.send(:remove_const, :Peripheral)
+        Object.send(:remove_const, :Machine)
+      end
+
+      let!(:machine) { Machine.create! }
+      let!(:webcam) { Webcam.create! }
+      let!(:mouse) { Mouse.create!(machine: machine) }
+
+      it 'eager-loads it through the queried superclass' do
+        expect_query(1) do
+          loaded = Peripheral.eager_load(:machine).detect { |doc| doc.is_a?(Mouse) }
+          expect(loaded.machine).to eq(machine)
+        end
+      end
+    end
+
+    context 'when the association is defined on a subclass of an associated class' do
+      before(:all) do
+        class Brand
+          include Mongoid::Document
+        end
+
+        class Machine
+          include Mongoid::Document
+        end
+
+        class Laptop < Machine
+          belongs_to :brand
+        end
+
+        class Peripheral
+          include Mongoid::Document
+        end
+
+        class Mouse < Peripheral
+          belongs_to :machine
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Mouse)
+        Object.send(:remove_const, :Peripheral)
+        Object.send(:remove_const, :Laptop)
+        Object.send(:remove_const, :Machine)
+        Object.send(:remove_const, :Brand)
+      end
+
+      let!(:brand) { Brand.create! }
+      let!(:laptop) { Laptop.create!(brand: brand) }
+      let!(:mouse) { Mouse.create!(machine: laptop) }
+
+      it 'eager-loads it through the parent association' do
+        expect_query(1) do
+          loaded = Peripheral.eager_load(machine: :brand).first
+          expect(loaded.machine).to eq(laptop)
+          expect(loaded.machine.brand).to eq(brand)
+        end
+      end
+    end
+
+    context 'when a has_many is defined only on a subclass' do
+      before(:all) do
+        class Gadget
+          include Mongoid::Document
+        end
+
+        class Speaker < Gadget
+          has_many :cables
+        end
+
+        class Cable
+          include Mongoid::Document
+
+          belongs_to :speaker
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Cable)
+        Object.send(:remove_const, :Speaker)
+        Object.send(:remove_const, :Gadget)
+      end
+
+      let!(:speaker) { Speaker.create! }
+      let!(:cable) { Cable.create!(speaker: speaker) }
+
+      it 'eager-loads it through the queried superclass' do
+        expect_query(1) do
+          loaded = Gadget.eager_load(:cables).first
+          expect(loaded.cables).to eq([ cable ])
+        end
+      end
+    end
+
+    context 'when a has_one is defined only on a subclass' do
+      before(:all) do
+        class Gadget
+          include Mongoid::Document
+        end
+
+        class Speaker < Gadget
+          has_one :cable
+        end
+
+        class Cable
+          include Mongoid::Document
+
+          belongs_to :speaker
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Cable)
+        Object.send(:remove_const, :Speaker)
+        Object.send(:remove_const, :Gadget)
+      end
+
+      let!(:speaker) { Speaker.create! }
+      let!(:cable) { Cable.create!(speaker: speaker) }
+
+      it 'eager-loads it through the queried superclass' do
+        expect_query(1) do
+          loaded = Gadget.eager_load(:cable).first
+          expect(loaded.cable).to eq(cable)
+        end
+      end
+    end
+
+    context 'when a has_and_belongs_to_many is defined only on a subclass' do
+      before(:all) do
+        class Cable
+          include Mongoid::Document
+
+          has_and_belongs_to_many :speakers
+        end
+
+        class Gadget
+          include Mongoid::Document
+        end
+
+        class Speaker < Gadget
+          has_and_belongs_to_many :cables
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Speaker)
+        Object.send(:remove_const, :Gadget)
+        Object.send(:remove_const, :Cable)
+      end
+
+      let!(:cable) { Cable.create! }
+      let!(:speaker) { Speaker.create!(cables: [ cable ]) }
+
+      it 'eager-loads it through the queried superclass' do
+        expect_query(1) do
+          loaded = Gadget.eager_load(:cables).first
+          expect(loaded.cables).to eq([ cable ])
+        end
+      end
+    end
+
+    context 'when a belongs_to lives inside an embedded document' do
+      before(:all) do
+        class Device
+          include Mongoid::Document
+        end
+
+        class Port
+          include Mongoid::Document
+
+          embedded_in :computer
+          belongs_to :device
+        end
+
+        class Computer
+          include Mongoid::Document
+
+          embeds_one :port
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Computer)
+        Object.send(:remove_const, :Port)
+        Object.send(:remove_const, :Device)
+      end
+
+      let!(:device) { Device.create! }
+      let!(:computer) { Computer.create!(port: Port.new(device: device)) }
+
+      it 'eager-loads it through the embedded document' do
+        expect_query(1) do
+          loaded = Computer.eager_load(port: :device).first
+          expect(loaded.port.device).to eq(device)
+        end
+      end
+
+      it 'leaves the embedded document absent instead of synthesizing it' do
+        without_port = Computer.create!
+        loaded = expect_query(1) do
+          Computer.eager_load(port: :device).to_a.index_by(&:id)
+        end
+        expect_no_queries do
+          expect(loaded[without_port.id].port).to be_nil
+        end
+      end
+    end
+
+    context 'when two embeds_one associations of the same class are eager-loaded' do
+      before(:all) do
+        class Device
+          include Mongoid::Document
+        end
+
+        class Port
+          include Mongoid::Document
+
+          embedded_in :computer
+          belongs_to :device
+        end
+
+        class Computer
+          include Mongoid::Document
+
+          embeds_one :left_port, class_name: 'Port'
+          embeds_one :right_port, class_name: 'Port'
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Computer)
+        Object.send(:remove_const, :Port)
+        Object.send(:remove_const, :Device)
+      end
+
+      let!(:device1) { Device.create! }
+      let!(:device2) { Device.create! }
+      let!(:computer) do
+        Computer.create!(
+          left_port: Port.new(device: device1),
+          right_port: Port.new(device: device2)
+        )
+      end
+
+      it 'eager-loads the belongs_to in both embedded documents' do
+        expect_query(1) do
+          loaded = Computer.eager_load(left_port: :device, right_port: :device).first
+          expect(loaded.left_port.device).to eq(device1)
+          expect(loaded.right_port.device).to eq(device2)
+        end
+      end
+    end
+
+    context 'when a belongs_to lives inside a doubly embedded document' do
+      before(:all) do
+        class Device
+          include Mongoid::Document
+        end
+
+        class Port
+          include Mongoid::Document
+
+          embedded_in :panel
+          belongs_to :device
+        end
+
+        class Panel
+          include Mongoid::Document
+
+          embedded_in :computer
+          embeds_one :port
+        end
+
+        class Computer
+          include Mongoid::Document
+
+          embeds_one :panel
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Computer)
+        Object.send(:remove_const, :Panel)
+        Object.send(:remove_const, :Port)
+        Object.send(:remove_const, :Device)
+      end
+
+      let!(:device) { Device.create! }
+      let!(:computer) { Computer.create!(panel: Panel.new(port: Port.new(device: device))) }
+
+      it 'eager-loads it through both embedded documents' do
+        expect_query(1) do
+          loaded = Computer.eager_load(panel: { port: :device }).first
+          expect(loaded.panel.port.device).to eq(device)
+        end
+      end
+    end
+
+    context 'when a belongs_to is defined only on a subclass of an embedded document' do
+      before(:all) do
+        class Device
+          include Mongoid::Document
+        end
+
+        class Port
+          include Mongoid::Document
+
+          embedded_in :computer
+        end
+
+        class UsbPort < Port
+          belongs_to :device
+        end
+
+        class Computer
+          include Mongoid::Document
+
+          embeds_one :port
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Computer)
+        Object.send(:remove_const, :UsbPort)
+        Object.send(:remove_const, :Port)
+        Object.send(:remove_const, :Device)
+      end
+
+      let!(:device) { Device.create! }
+      let!(:computer) { Computer.create!(port: UsbPort.new(device: device)) }
+
+      it 'eager-loads it through the embedded subclass' do
+        expect_query(1) do
+          loaded = Computer.eager_load(port: :device).first
+          expect(loaded.port.device).to eq(device)
+        end
+      end
+    end
+
+    context 'when a belongs_to lives inside an embeds_many' do
+      before(:all) do
+        class Device
+          include Mongoid::Document
+        end
+
+        class Port
+          include Mongoid::Document
+
+          embedded_in :computer
+          belongs_to :device
+        end
+
+        class Computer
+          include Mongoid::Document
+
+          embeds_many :ports
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Computer)
+        Object.send(:remove_const, :Port)
+        Object.send(:remove_const, :Device)
+      end
+
+      let!(:device1) { Device.create! }
+      let!(:device2) { Device.create! }
+      let!(:computer) { Computer.create!(ports: [ Port.new(device: device1), Port.new(device: device2) ]) }
+
+      it 'eager-loads each embedded belongs_to without extra queries' do
+        expect_query(1) do
+          loaded = Computer.eager_load(ports: :device).first
+          expect(loaded.ports.map(&:device)).to eq([ device1, device2 ])
+        end
+      end
+    end
+
+    context 'when a has_and_belongs_to_many lives inside an embedded document' do
+      before(:all) do
+        class Device
+          include Mongoid::Document
+        end
+
+        class Port
+          include Mongoid::Document
+
+          embedded_in :computer
+          has_and_belongs_to_many :devices
+        end
+
+        class Computer
+          include Mongoid::Document
+
+          embeds_one :port
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Computer)
+        Object.send(:remove_const, :Port)
+        Object.send(:remove_const, :Device)
+      end
+
+      let!(:device1) { Device.create! }
+      let!(:device2) { Device.create! }
+      let!(:computer) { Computer.create!(port: Port.new(devices: [ device1, device2 ])) }
+
+      it 'eager-loads the devices referenced by the embedded port' do
+        expect_query(1) do
+          loaded = Computer.eager_load(port: :devices).first
+          expect(loaded.port.devices).to eq([ device1, device2 ])
+        end
+      end
+    end
+
+    context 'when an embedded belongs_to targets a superclass of the queried subclass' do
+      before(:all) do
+        class Device
+          include Mongoid::Document
+        end
+
+        class Computer < Device
+          embeds_one :port
+        end
+
+        class Port
+          include Mongoid::Document
+
+          embedded_in :computer
+          belongs_to :device
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Port)
+        Object.send(:remove_const, :Computer)
+        Object.send(:remove_const, :Device)
+      end
+
+      let!(:device) { Device.create! }
+      let!(:computer) { Computer.create!(port: Port.new(device: device)) }
+
+      it 'eager-loads the embedded belongs_to through the queried subclass' do
+        expect_query(1) do
+          loaded = Computer.eager_load(port: :device).first
+          expect(loaded.port.device).to eq(device)
+        end
+      end
+    end
+
+    context 'when an embedded association is nested under a referenced one' do
+      before(:all) do
+        class Device
+          include Mongoid::Document
+        end
+
+        class Port
+          include Mongoid::Document
+
+          embedded_in :computer
+          belongs_to :device
+        end
+
+        class Computer
+          include Mongoid::Document
+
+          embeds_one :port
+        end
+
+        class Desk
+          include Mongoid::Document
+
+          belongs_to :computer
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Desk)
+        Object.send(:remove_const, :Computer)
+        Object.send(:remove_const, :Port)
+        Object.send(:remove_const, :Device)
+      end
+
+      let!(:device) { Device.create! }
+      let!(:computer) { Computer.create!(port: Port.new(device: device)) }
+      let!(:desk) { Desk.create!(computer: computer) }
+
+      it 'eager-loads the embedded association together with its referenced child' do
+        expect_query(1) do
+          loaded = Desk.eager_load(computer: { port: :device }).first
+          expect(loaded.computer.port.device).to eq(device)
+        end
+      end
+    end
+
+    context 'when an embedded association is nested two levels under a referenced one' do
+      before(:all) do
+        class Device
+          include Mongoid::Document
+        end
+
+        class Pin
+          include Mongoid::Document
+
+          embedded_in :port
+          belongs_to :device
+        end
+
+        class Port
+          include Mongoid::Document
+
+          embedded_in :computer
+          embeds_one :pin
+        end
+
+        class Computer
+          include Mongoid::Document
+
+          embeds_one :port
+        end
+
+        class Desk
+          include Mongoid::Document
+
+          belongs_to :computer
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Desk)
+        Object.send(:remove_const, :Computer)
+        Object.send(:remove_const, :Port)
+        Object.send(:remove_const, :Pin)
+        Object.send(:remove_const, :Device)
+      end
+
+      let!(:device) { Device.create! }
+      let!(:computer) { Computer.create!(port: Port.new(pin: Pin.new(device: device))) }
+      let!(:desk) { Desk.create!(computer: computer) }
+
+      it 'eager-loads the doubly embedded association together with its referenced child' do
+        expect_query(1) do
+          loaded = Desk.eager_load(computer: { port: { pin: :device } }).first
+          expect(loaded.computer.port.pin.device).to eq(device)
+        end
+      end
+    end
+
+    context 'when an embeds_many is nested inside another embeds_many under a referenced one' do
+      before(:all) do
+        class Device
+          include Mongoid::Document
+        end
+
+        class Port
+          include Mongoid::Document
+
+          embedded_in :card
+          belongs_to :device
+        end
+
+        class Card
+          include Mongoid::Document
+
+          embedded_in :computer
+          embeds_many :ports
+        end
+
+        class Computer
+          include Mongoid::Document
+
+          embeds_many :cards
+        end
+
+        class Desk
+          include Mongoid::Document
+
+          belongs_to :computer
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Desk)
+        Object.send(:remove_const, :Computer)
+        Object.send(:remove_const, :Card)
+        Object.send(:remove_const, :Port)
+        Object.send(:remove_const, :Device)
+      end
+
+      let!(:devices) { Array.new(4) { Device.create! } }
+      let!(:computer) do
+        Computer.create!(
+          cards: [
+            Card.new(ports: [ Port.new(device: devices[0]), Port.new(device: devices[1]) ]),
+            Card.new(ports: [ Port.new(device: devices[2]), Port.new(device: devices[3]) ])
+          ]
+        )
+      end
+      let!(:desk) { Desk.create!(computer: computer) }
+
+      it 'eager-loads each deeply embedded belongs_to correlated to its own element' do
+        expect_query(1) do
+          loaded = Desk.eager_load(computer: { cards: { ports: :device } }).first
+          got = loaded.computer.cards.flat_map { |card| card.ports.map(&:device) }
+          expect(got).to eq(devices)
+        end
+      end
+    end
+
+    context 'when a polymorphic belongs_to is eager-loaded' do
+      before(:all) do
+        class Printer
+          include Mongoid::Document
+        end
+
+        class Scanner
+          include Mongoid::Document
+        end
+
+        class Cartridge
+          include Mongoid::Document
+
+          belongs_to :device, polymorphic: true
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Cartridge)
+        Object.send(:remove_const, :Scanner)
+        Object.send(:remove_const, :Printer)
+      end
+
+      let!(:printer) { Printer.create! }
+      let!(:scanner) { Scanner.create! }
+      let!(:printer_cartridge) { Cartridge.create!(device: printer) }
+      let!(:scanner_cartridge) { Cartridge.create!(device: scanner) }
+
+      it 'eager-loads polymorphic targets of different types in a single extra query' do
+        expect_query(2) do
+          loaded = Cartridge.eager_load(:device).to_a.index_by(&:id)
+          expect(loaded[printer_cartridge.id].device).to eq(printer)
+          expect(loaded[scanner_cartridge.id].device).to eq(scanner)
+        end
+      end
+    end
+
+    context 'when a polymorphic target is stored in another database' do
+      before(:all) do
+        class LocalDevice
+          include Mongoid::Document
+        end
+
+        class RemoteDevice
+          include Mongoid::Document
+
+          store_in database: 'secondary'
+        end
+
+        class Accessory
+          include Mongoid::Document
+
+          belongs_to :device, polymorphic: true
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Accessory)
+        Object.send(:remove_const, :RemoteDevice)
+        Object.send(:remove_const, :LocalDevice)
+      end
+
+      # RemoteDevice lives in its own database, which the global cleanup hook
+      # (default database only) does not touch, so drop it here.
+      after { RemoteDevice.collection.drop }
+
+      let!(:local_device) { LocalDevice.create! }
+      let!(:remote_device) { RemoteDevice.create! }
+      let!(:local_accessory) { Accessory.create!(device: local_device) }
+      let!(:remote_accessory) { Accessory.create!(device: remote_device) }
+
+      it 'eager-loads the target stored in the other database' do
+        # One query materializes the roots, one $facet fetches the same-database
+        # target, and one direct query fetches the target in the other database.
+        loaded = expect_query(3) do
+          Accessory.eager_load(:device).to_a.index_by(&:id)
+        end
+
+        expect_no_queries do
+          expect(loaded[local_accessory.id].device).to eq(local_device)
+          expect(loaded[remote_accessory.id].device).to eq(remote_device)
+        end
+      end
+    end
+
+    context 'when a non-polymorphic target is stored in another database' do
+      before(:all) do
+        class RemoteServer
+          include Mongoid::Document
+
+          store_in database: 'secondary'
+        end
+
+        class Workstation
+          include Mongoid::Document
+
+          belongs_to :server, class_name: 'RemoteServer', optional: true
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Workstation)
+        Object.send(:remove_const, :RemoteServer)
+      end
+
+      # RemoteServer lives in its own database, which the global cleanup hook
+      # (default database only) does not touch, so drop it here.
+      after { RemoteServer.collection.drop }
+
+      let!(:server) { RemoteServer.create! }
+      let!(:workstation) { Workstation.create!(server: server) }
+
+      it 'eager-loads the target stored in the other database' do
+        # A $lookup cannot reach another database, so this falls back to
+        # separate-query loading: one query materializes the roots and one fetches
+        # the targets, instead of silently returning nothing.
+        loaded = expect_query(2) do
+          Workstation.eager_load(:server).to_a
+        end
+
+        expect_no_queries do
+          expect(loaded.first.server).to eq(server)
+        end
+      end
+    end
+
+    context 'when a has_many of the same name is defined on more than one subclass' do
+      before(:all) do
+        class Supplier
+          include Mongoid::Document
+        end
+
+        class Cog
+          include Mongoid::Document
+
+          belongs_to :machine, optional: true
+          belongs_to :supplier, optional: true
+        end
+
+        class Belt
+          include Mongoid::Document
+
+          belongs_to :machine, optional: true
+          belongs_to :supplier, optional: true
+        end
+
+        class Machine
+          include Mongoid::Document
+        end
+
+        class Lathe < Machine
+          has_many :widgets, class_name: 'Cog', inverse_of: :machine
+        end
+
+        class Press < Machine
+          has_many :widgets, class_name: 'Belt', inverse_of: :machine
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Press)
+        Object.send(:remove_const, :Lathe)
+        Object.send(:remove_const, :Machine)
+        Object.send(:remove_const, :Belt)
+        Object.send(:remove_const, :Cog)
+        Object.send(:remove_const, :Supplier)
+      end
+
+      let!(:cog_supplier) { Supplier.create! }
+      let!(:belt_supplier) { Supplier.create! }
+      let!(:lathe) { Lathe.create! }
+      let!(:press) { Press.create! }
+      let!(:cog) { Cog.create!(machine: lathe, supplier: cog_supplier) }
+      let!(:belt) { Belt.create!(machine: press, supplier: belt_supplier) }
+
+      it 'loads each subclass association without one overwriting the other' do
+        loaded = expect_query(1) do
+          Machine.eager_load(:widgets).to_a.index_by(&:id)
+        end
+        expect_no_queries do
+          expect(loaded[lathe.id].widgets).to eq([ cog ])
+          expect(loaded[press.id].widgets).to eq([ belt ])
+        end
+      end
+
+      it 'eager-loads inclusions nested under each subclass association' do
+        loaded = expect_query(1) do
+          Machine.eager_load(widgets: :supplier).to_a.index_by(&:id)
+        end
+        expect_no_queries do
+          expect(loaded[lathe.id].widgets.first.supplier).to eq(cog_supplier)
+          expect(loaded[press.id].widgets.first.supplier).to eq(belt_supplier)
+        end
+      end
+    end
+
+    context 'when a has_many targets a class sharing its collection with sibling subclasses' do
+      before(:all) do
+        class Part
+          include Mongoid::Document
+        end
+
+        class Chip < Part
+          belongs_to :board, class_name: 'Board', optional: true
+        end
+
+        class Cable < Part
+          belongs_to :board, class_name: 'Board', optional: true
+        end
+
+        class Board
+          include Mongoid::Document
+
+          has_many :chips, class_name: 'Chip', inverse_of: :board
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Board)
+        Object.send(:remove_const, :Cable)
+        Object.send(:remove_const, :Chip)
+        Object.send(:remove_const, :Part)
+      end
+
+      let!(:board) { Board.create! }
+      let!(:chip) { Chip.create!(board: board) }
+      let!(:cable) { Cable.create!(board: board) }
+
+      it 'eager-loads only the chips, not the sibling subclass' do
+        expect_query(1) do
+          loaded = Board.eager_load(:chips).first
+          expect(loaded.chips.to_a).to eq([ chip ])
+        end
+      end
+    end
   end
 
   describe '#inclusions' do

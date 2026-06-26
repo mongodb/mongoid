@@ -44,11 +44,13 @@ module Mongoid
         clone
       end
 
-      # Returns whether to use $lookup aggregation for eager loading.
+      # Returns whether to use $lookup aggregation for eager loading. Only when
+      # eager_load was requested and there is something to load: an empty
+      # inclusion list (e.g. eager_load([])) falls back to the normal path.
       #
       # @return [ true | false ] Whether to use $lookup.
       def use_lookup?
-        !!@use_lookup
+        !!@use_lookup && inclusions.any?
       end
 
       # Get a list of criteria that are to be executed for eager loading.
@@ -96,19 +98,41 @@ module Mongoid
       #   The names of the association(s) to eager load.
       def extract_includes_list(_parent_class, parent, is_eager_load = false, *relations_list)
         relations_list.flatten.each do |relation_object|
-          if relation_object.is_a?(Hash)
-            relation_object.each do |relation, _includes|
-              association = _parent_class.reflect_on_association(relation)
-              raise_eager_error(is_eager_load, _klass, relation) unless association
+          # Normalize a bare association name to a hash with no nested
+          # inclusions, so both forms share one resolution path below.
+          relations = relation_object.is_a?(Hash) ? relation_object : { relation_object => nil }
+
+          relations.each do |relation, nested|
+            associations = resolve_inclusion_associations(_parent_class, relation, is_eager_load)
+            raise_eager_error(is_eager_load, _parent_class, relation) if associations.empty?
+
+            associations.each do |association|
               add_inclusion(association, parent)
-              extract_includes_list(association.klass, association.name, is_eager_load, _includes)
+              extract_includes_list(association.klass, association.name, is_eager_load, nested) if nested
             end
-          else
-            association = _parent_class.reflect_on_association(relation_object)
-            raise_eager_error(is_eager_load, _parent_class, relation_object) unless association
-            add_inclusion(association, parent)
           end
         end
+      end
+
+      # Resolve the association(s) matching the given relation name. For the
+      # regular #includes path, only the parent class is consulted. For the
+      # #eager_load ($lookup) path, its subclasses are consulted as well, so
+      # associations defined only on a subclass can also be eager-loaded when
+      # querying through the superclass.
+      #
+      # @param [ Class ] parent_class The class to start the lookup from.
+      # @param [ Symbol | String ] relation The association name.
+      # @param [ Boolean ] is_eager_load Whether to consider subclasses.
+      #
+      # @return [ Array<Mongoid::Association::Relatable> ] Matching associations.
+      def resolve_inclusion_associations(parent_class, relation, is_eager_load)
+        if association = parent_class.reflect_on_association(relation)
+          return [ association ]
+        end
+
+        return [] unless is_eager_load
+
+        parent_class.descendants.filter_map { |sub| sub.reflect_on_association(relation) }
       end
     end
 
