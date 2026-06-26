@@ -2163,4 +2163,5 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
   end
+
 end
