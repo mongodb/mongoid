@@ -4,6 +4,15 @@ module Mongoid
   module Association
     # Base class for eager load preload functions.
     class Eager
+      # Build a preloader for the given arguments and run it.
+      #
+      # @param (see #initialize)
+      #
+      # @return [ Array ] The list of documents given.
+      def self.run(associations, docs, use_lookup = false, pipeline = [])
+        new(associations, docs, use_lookup, pipeline).run
+      end
+
       # Instantiate the eager load class.
       #
       # @example Create the new belongs to eager load preloader.

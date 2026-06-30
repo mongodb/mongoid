@@ -342,6 +342,15 @@ module Mongoid
         [ Referenced::BelongsTo, Embedded::EmbeddedIn ].any? { |a| is_a?(a) }
       end
 
+      # Is this association a many-to-many association? Such an association stores
+      # its foreign keys as an array on the document itself.
+      #
+      # @return [ true | false ] true if it is a has_and_belongs_to_many
+      #   association, false if not.
+      def many_to_many?
+        is_a?(Referenced::HasAndBelongsToMany)
+      end
+
       private
 
       # Gets the model classes with inverse associations of this model. This is used to determine
