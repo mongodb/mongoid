@@ -812,8 +812,8 @@ module Mongoid
               if field_s.start_with?('$')
                 unless Mongoid.allow_unsafe_query_operators? || ALLOWED_QUERY_OPERATORS.include?(field_s)
                   raise Errors::InvalidQuery,
-                    "Operator '#{field_s}' is not allowed in a query expression. " \
-                    "Set Mongoid.allow_unsafe_query_operators = true to permit all operators."
+                        "Operator '#{field_s}' is not allowed in a query expression. " \
+                        'Set Mongoid.allow_unsafe_query_operators = true to permit all operators.'
                 end
                 query.add_operator_expression(field_s, value)
               else

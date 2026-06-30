@@ -551,62 +551,62 @@ describe Mongoid::Criteria::Queryable::Selectable do
     end
   end
 
-  describe "top-level operator injection guard" do
-    context "when allow_unsafe_query_operators is true (default)" do
-      context "when passing $where" do
-        it "does not raise" do
-          expect {
+  describe 'top-level operator injection guard' do
+    context 'when allow_unsafe_query_operators is true (default)' do
+      context 'when passing $where' do
+        it 'does not raise' do
+          expect do
             query.where('$where' => 'this.name == "admin"')
-          }.not_to raise_error
+          end.not_to raise_error
         end
       end
 
-      context "when passing $function" do
-        it "does not raise" do
-          expect {
+      context 'when passing $function' do
+        it 'does not raise' do
+          expect do
             query.where('$function' => { body: 'function() { return true; }', args: [], lang: 'js' })
-          }.not_to raise_error
+          end.not_to raise_error
         end
       end
     end
 
-    context "when allow_unsafe_query_operators is false" do
+    context 'when allow_unsafe_query_operators is false' do
       config_override :allow_unsafe_query_operators, false
 
-      context "when passing $where" do
-        it "raises InvalidQuery" do
-          expect {
+      context 'when passing $where' do
+        it 'raises InvalidQuery' do
+          expect do
             query.where('$where' => 'this.name == "admin"')
-          }.to raise_error(Mongoid::Errors::InvalidQuery, /\$where/)
+          end.to raise_error(Mongoid::Errors::InvalidQuery, /\$where/)
         end
       end
 
-      context "when passing $function" do
-        it "raises InvalidQuery" do
-          expect {
+      context 'when passing $function' do
+        it 'raises InvalidQuery' do
+          expect do
             query.where('$function' => { body: 'function() { return true; }', args: [], lang: 'js' })
-          }.to raise_error(Mongoid::Errors::InvalidQuery, /\$function/)
+          end.to raise_error(Mongoid::Errors::InvalidQuery, /\$function/)
         end
       end
 
-      context "when the error mentions allow_unsafe_query_operators" do
-        it "includes the config opt-in in the message" do
-          expect {
+      context 'when the error mentions allow_unsafe_query_operators' do
+        it 'includes the config opt-in in the message' do
+          expect do
             query.where('$where' => 'true')
-          }.to raise_error(Mongoid::Errors::InvalidQuery, /allow_unsafe_query_operators/)
+          end.to raise_error(Mongoid::Errors::InvalidQuery, /allow_unsafe_query_operators/)
         end
       end
 
       %w[$and $or $nor $not $text $comment $expr $jsonSchema $alwaysFalse $alwaysTrue].each do |op|
         context "when passing #{op} (allowlisted)" do
-          it "does not raise" do
+          it 'does not raise' do
             value = case op
-            when '$and', '$or', '$nor', '$not' then [{ 'x' => 1 }]
-            when '$text' then { '$search' => 'hi' }
-            when '$expr' then { '$gt' => ['$a', 1] }
-            when '$jsonSchema' then { 'required' => ['x'] }
-            else true
-            end
+                    when '$and', '$or', '$nor', '$not' then [ { 'x' => 1 } ]
+                    when '$text' then { '$search' => 'hi' }
+                    when '$expr' then { '$gt' => [ '$a', 1 ] }
+                    when '$jsonSchema' then { 'required' => [ 'x' ] }
+                    else true
+                    end
             expect { query.where(op => value) }.not_to raise_error
           end
         end
