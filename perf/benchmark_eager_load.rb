@@ -96,6 +96,13 @@ else
   500.times { |n| Cartridge.create!(hardware: Printer.create!(model: "Printer #{n}")) }
   500.times { |n| Cartridge.create!(hardware: Scanner.create!(model: "Scanner #{n}")) }
 
+  # Add some nested data
+  Person.limit(1000).each do |person|
+    person.posts.limit(2).each do |post|
+      2.times { |i| post.alerts.create!(message: "Alert #{i}") }
+    end
+  end
+
   puts "PR #6158 scenario data created. Starting benchmarks...\n"
 end
 
@@ -207,13 +214,6 @@ Benchmark.bm(30) do |bm|
   end
 
   puts "\n[ Nested Associations Benchmarks ]"
-
-  # Add some nested data
-  Person.limit(1000).each do |person|
-    person.posts.limit(2).each do |post|
-      2.times { |i| post.alerts.create!(message: "Alert #{i}") }
-    end
-  end
 
   bm.report('nested: normal') do
     Person.limit(1000).each do |person|
