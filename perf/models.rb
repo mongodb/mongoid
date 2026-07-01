@@ -92,3 +92,87 @@ class Alert
 
   index post_id: 1
 end
+
+# PR #6158 scenarios -------------------------------------------------------
+
+# Subclass association: Speaker inherits from Gadget and owns the :cables
+# association; Gadget itself does not define it.
+class Gadget
+  include Mongoid::Document
+
+  field :name, type: String
+end
+
+class Speaker < Gadget
+  has_many :cables
+end
+
+class Cable
+  include Mongoid::Document
+
+  field :label, type: String
+  belongs_to :speaker
+  index speaker_id: 1
+end
+
+# Peripheral is the referenced target for both embedded scenarios below.
+class Peripheral
+  include Mongoid::Document
+
+  field :name, type: String
+end
+
+# Embedded reference (embeds_one): Computer embeds one Port which
+# holds a belongs_to reference to a Peripheral.
+class Computer
+  include Mongoid::Document
+
+  field :name, type: String
+  embeds_one :port
+end
+
+class Port
+  include Mongoid::Document
+
+  field :label, type: String
+  embedded_in :computer
+  belongs_to :peripheral
+end
+
+# Embedded reference (embeds_many): Rack embeds multiple Slots, each
+# holding a belongs_to reference to a Peripheral.
+class Rack
+  include Mongoid::Document
+
+  field :name, type: String
+  embeds_many :slots
+end
+
+class Slot
+  include Mongoid::Document
+
+  field :label, type: String
+  embedded_in :rack
+  belongs_to :peripheral
+end
+
+# Polymorphic belongs_to: Cartridge can belong to either a Printer or a
+# Scanner via a single polymorphic association.
+class Printer
+  include Mongoid::Document
+
+  field :model, type: String
+end
+
+class Scanner
+  include Mongoid::Document
+
+  field :model, type: String
+end
+
+class Cartridge
+  include Mongoid::Document
+
+  belongs_to :hardware, polymorphic: true
+  index({ hardware_type: 1, hardware_id: 1 })
+end
