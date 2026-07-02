@@ -294,6 +294,15 @@ module Mongoid
     # See https://jira.mongodb.org/browse/MONGOID-5892 for more details.
     option :serializable_hash_with_legacy_only, default: true
 
+    # When true (default), all top-level query operators are passed through
+    # to MongoDB without restriction when using +where+/+find_by+. Set to
+    # false to enable a strict allowlist that rejects operators like +$where+
+    # and +$function+, which can execute arbitrary JavaScript when user-supplied
+    # input reaches the query builder.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5939 for details.
+    option :allow_unsafe_query_operators, default: true
+
     # Returns the Config singleton, for use in the configure DSL.
     #
     # @return [ self ] The Config singleton.
