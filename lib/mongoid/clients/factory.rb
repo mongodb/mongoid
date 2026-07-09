@@ -111,10 +111,6 @@ module Mongoid
         version: VERSION
       }.freeze
 
-      def driver_version
-        Mongo::VERSION.split('.')[0...2].map(&:to_i)
-      end
-
       # Prepare options for Mongo::Client based on Mongoid client configuration.
       #
       # @param [ Hash ] opts Parameters from options section of Mongoid client configuration.
@@ -125,16 +121,14 @@ module Mongoid
         options = opts.dup
         options[:platform] = PLATFORM_DETAILS
         options[:app_name] = Mongoid::Config.app_name if Mongoid::Config.app_name
-        if (driver_version <=> [ 2, 13 ]) >= 0
-          wrap_lib = if options[:wrapping_libraries]
-                       [ MONGOID_WRAPPING_LIBRARY ] + options[:wrapping_libraries]
-                     else
-                       [ MONGOID_WRAPPING_LIBRARY ]
-                     end.tap do |wrap|
-            wrap << { name: 'Rails', version: ::Rails.version } if defined?(::Rails) && ::Rails.respond_to?(:version)
-          end
-          options[:wrapping_libraries] = wrap_lib
+        wrap_lib = if options[:wrapping_libraries]
+                     [ MONGOID_WRAPPING_LIBRARY ] + options[:wrapping_libraries]
+                   else
+                     [ MONGOID_WRAPPING_LIBRARY ]
+                   end.tap do |wrap|
+          wrap << { name: 'Rails', version: ::Rails.version } if defined?(::Rails) && ::Rails.respond_to?(:version)
         end
+        options[:wrapping_libraries] = wrap_lib
         options.reject { |k, _v| k == :hosts }.to_hash.symbolize_keys!
       end
     end

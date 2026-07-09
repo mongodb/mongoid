@@ -548,6 +548,10 @@ module Mongoid
       end
     end
 
+    # Wraps configuration options that have been deprecated so that assigning
+    # them emits a deprecation warning. OPTIONS is intentionally empty when no
+    # options are currently deprecated; it is populated as options are retired,
+    # at which point this module rewrites their setters to warn.
     module DeprecatedOptions
       OPTIONS = %i[]
 
