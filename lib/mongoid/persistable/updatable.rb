@@ -103,7 +103,7 @@ module Mongoid
 
         process_flagged_destroys
         update_children = cascadable_children(:update)
-        process_touch_option(options, update_children) do
+        process_touch_option(options) do
           run_all_callbacks_for_update(update_children) do
             result = yield(self)
             self.previously_new_record = false
@@ -160,24 +160,22 @@ module Mongoid
         end
       end
 
-      # If there is a touch option and it is false, this method will call the
-      # timeless method so that the updated_at attribute is not updated. It
-      # will call the timeless method on all of the cascadable children as
-      # well. Note that timeless is cleared in the before_update callback.
+      # If there is a touch option and it is false, this method suppresses
+      # timestamping for the duration of the update using a block-based
+      # timeless scope, which covers this document and every cascaded child
+      # (at any nesting depth), and also suppresses touch callbacks.
       #
       # @param [ Hash ] options The options.
-      # @param [ Array<Document> ] children The children that the :update
-      #   callbacks will be executed on.
       #
       # @option options [ true | false ] :touch Whether or not the updated_at
       #   attribute will be updated with the current time.
-      def process_touch_option(options, children, &block)
+      def process_touch_option(options, &block)
         if options.fetch(:touch, true)
           yield
         else
-          timeless
-          children.each(&:timeless)
-          suppress_touch_callbacks(&block)
+          Mongoid::Timestamps::Timeless.with_timeless do
+            suppress_touch_callbacks(&block)
+          end
         end
       end
 
