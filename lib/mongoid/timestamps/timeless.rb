@@ -58,8 +58,8 @@ module Mongoid
         # The key to use to store the timeless table
         TIMELESS_TABLE_KEY = '[mongoid]:timeless'
 
-        # The key to use to store the block-based timeless nesting depth.
-        TIMELESS_DEPTH_KEY = '[mongoid]:timeless-depth'
+        # The key to use to store the block-based timeless flag.
+        TIMELESS_FLAG_KEY = '[mongoid]:timeless-flag'
 
         # Returns the in-memory thread cache of classes
         # for which to skip timestamping.
@@ -85,46 +85,15 @@ module Mongoid
         #
         # @return [ Object ] The return value of the block.
         def with_timeless
-          begin_timeless
+          # Only the outermost block owns the flag: if we are already inside a
+          # timeless scope, we leave the suppression in place when this block
+          # ends. This avoids tracking a nesting depth that could drift out of
+          # sync.
+          already_timeless = suppressing_timestamps?
+          set_suppressing_timestamps(true) unless already_timeless
           yield
         ensure
-          exit_timeless
-        end
-
-        # Increment the block-based timeless nesting depth.
-        #
-        # @return [ Integer ] The new depth.
-        #
-        # @api private
-        def begin_timeless
-          set_timeless_depth(timeless_depth + 1)
-        end
-
-        # Decrement the block-based timeless nesting depth.
-        #
-        # @return [ Integer ] The new depth.
-        #
-        # @api private
-        def exit_timeless
-          set_timeless_depth(timeless_depth - 1)
-        end
-
-        # The current block-based timeless nesting depth on this thread/fiber.
-        #
-        # @return [ Integer ] The nesting depth.
-        #
-        # @api private
-        def timeless_depth
-          Threaded.get(TIMELESS_DEPTH_KEY) { 0 }
-        end
-
-        # Set the block-based timeless nesting depth on this thread/fiber.
-        #
-        # @param [ Integer ] value The new depth.
-        #
-        # @api private
-        def set_timeless_depth(value)
-          Threaded.set(TIMELESS_DEPTH_KEY, value)
+          set_suppressing_timestamps(false) unless already_timeless
         end
 
         # Whether a block-based timeless scope is currently active on this
@@ -134,7 +103,17 @@ module Mongoid
         #
         # @api private
         def suppressing_timestamps?
-          timeless_depth.positive?
+          !!Threaded.get(TIMELESS_FLAG_KEY) { false }
+        end
+
+        # Set whether a block-based timeless scope is active on this
+        # thread/fiber.
+        #
+        # @param [ true | false ] value Whether to suppress timestamps.
+        #
+        # @api private
+        def set_suppressing_timestamps(value)
+          Threaded.set(TIMELESS_FLAG_KEY, value)
         end
       end
 
