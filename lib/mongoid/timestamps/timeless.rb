@@ -7,6 +7,10 @@ module Mongoid
     module Timeless
       extend ActiveSupport::Concern
 
+      # Deprecator for the block-less form of the timeless API. Its removal
+      # horizon is computed automatically as (current major + 1).0.
+      DEPRECATION = Mongoid::Deprecation.new
+
       # Clears out the timeless option.
       #
       # @example Clear the timeless option.
@@ -22,13 +26,20 @@ module Mongoid
         true
       end
 
-      # Begin an execution that should skip timestamping.
+      # Skip timestamping for the duration of the given block, or (in the
+      # deprecated, block-less form) for the next persistence operation.
       #
-      # @example Save a document but don't timestamp.
+      # @example Save a document but don't timestamp (block form).
+      #   person.timeless { person.save }
+      #
+      # @example Save a document but don't timestamp (deprecated chained form).
       #   person.timeless.save
       #
-      # @return [ Document ] The document this was called on.
-      def timeless
+      # @return [ Object | Document ] The return value of the block, or (in the
+      #   block-less form) the document this was called on.
+      def timeless(&block)
+        return Timeless.with_timeless(&block) if block
+
         self.class.timeless
         self
       end
@@ -47,6 +58,9 @@ module Mongoid
         # The key to use to store the timeless table
         TIMELESS_TABLE_KEY = '[mongoid]:timeless'
 
+        # The key to use to store the block-based timeless flag.
+        TIMELESS_FLAG_KEY = '[mongoid]:timeless-flag'
+
         # Returns the in-memory thread cache of classes
         # for which to skip timestamping.
         #
@@ -58,16 +72,70 @@ module Mongoid
         end
 
         def_delegators :timeless_table, :[]=, :[]
+
+        # Skip timestamping for the duration of the given block, on the
+        # current thread or fiber. This applies to every document persisted
+        # while the block is executing, regardless of class, including
+        # cascaded embedded children at any nesting depth.
+        #
+        # @example Skip timestamping for a block.
+        #   Mongoid::Timestamps::Timeless.with_timeless do
+        #     person.save
+        #   end
+        #
+        # @return [ Object ] The return value of the block.
+        def with_timeless
+          # Only the outermost block owns the flag: if we are already inside a
+          # timeless scope, we leave the suppression in place when this block
+          # ends. This avoids tracking a nesting depth that could drift out of
+          # sync.
+          already_timeless = suppressing_timestamps?
+          set_suppressing_timestamps(true) unless already_timeless
+          yield
+        ensure
+          set_suppressing_timestamps(false) unless already_timeless
+        end
+
+        # Whether a block-based timeless scope is currently active on this
+        # thread/fiber.
+        #
+        # @return [ true | false ] Whether timestamps are being suppressed.
+        #
+        # @api private
+        def suppressing_timestamps?
+          !!Threaded.get(TIMELESS_FLAG_KEY) { false }
+        end
+
+        # Set whether a block-based timeless scope is active on this
+        # thread/fiber.
+        #
+        # @param [ true | false ] value Whether to suppress timestamps.
+        #
+        # @api private
+        def set_suppressing_timestamps(value)
+          Threaded.set(TIMELESS_FLAG_KEY, value)
+        end
       end
 
       module ClassMethods
-        # Begin an execution that should skip timestamping.
+        # Skip timestamping for the duration of the given block, or (in the
+        # deprecated, block-less form) for the next persistence operation.
         #
-        # @example Create a document but don't timestamp.
+        # @example Create a document but don't timestamp (block form).
+        #   Person.timeless { Person.create(title: "Sir") }
+        #
+        # @example Create a document but don't timestamp (deprecated form).
         #   Person.timeless.create(:title => "Sir")
         #
-        # @return [ Class ] The class this was called on.
-        def timeless
+        # @return [ Object | Class ] The return value of the block, or (in the
+        #   block-less form) the class this was called on.
+        def timeless(&block)
+          return Timeless.with_timeless(&block) if block
+
+          DEPRECATION.warn(
+            'Calling #timeless without a block is deprecated; pass a block ' \
+            'instead, e.g. `record.timeless { record.save }`.'
+          )
           counter = 0
           counter += 1 if self < Mongoid::Timestamps::Created
           counter += 1 if self < Mongoid::Timestamps::Updated
@@ -109,12 +177,14 @@ module Mongoid
           Timeless[name] = (counter == 0) ? nil : counter
         end
 
-        # Returns whether the current class should skip timestamping.
+        # Returns whether the current class should skip timestamping. This is
+        # true when either a block-based timeless scope is active on the
+        # current thread/fiber, or the deprecated per-class counter is set.
         #
         # @return [ true | false ] Whether the current class should
         #   skip timestamping.
         def timeless?
-          !!Timeless[name]
+          Timeless.suppressing_timestamps? || !!Timeless[name]
         end
       end
     end
