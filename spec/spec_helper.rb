@@ -129,6 +129,9 @@ end
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
   config.load_configuration(CONFIG)
+  # Attribute caching defaults to disabled. CI sets MONGOID_CACHING_ENABLED=1
+  # in a separate matrix leg to exercise the opt-in cache path explicitly.
+  config.cache_attribute_values = ENV['MONGOID_CACHING_ENABLED'] == '1'
 end
 
 # Autoload every model for the test suite that sits in spec/support/models.

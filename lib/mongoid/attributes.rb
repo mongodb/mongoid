@@ -143,9 +143,91 @@ module Mongoid
           attribute_will_change!(access)
           delayed_atomic_unsets[atomic_attribute_name(access)] = [] unless new_record?
           attributes.delete(access)
+          # Clear cache since the attribute is being removed
+          clear_demongoized_cache(access)
         end
       end
     end
+
+    # Clear the demongoized cache for a specific field.
+    #
+    # This method centralizes cache invalidation to ensure all attribute
+    # mutation paths (write, remove, unset, rename) remain consistent.
+    #
+    # @param [ String ] name The field name to clear from cache.
+    #
+    # @return [ void ]
+    #
+    # @since 9.1.0
+    #
+    # @api private
+    def clear_demongoized_cache(name)
+      @__demongoized_cache&.delete(name) if Mongoid::Config.cache_attribute_values?
+    end
+    private :clear_demongoized_cache
+
+    # Lazily allocate demongoized cache to avoid document initialization overhead.
+    #
+    # @return [ Hash | nil ] The cache map when caching is enabled.
+    #
+    # @api private
+    def demongoized_cache
+      return unless Mongoid::Config.cache_attribute_values?
+
+      @__demongoized_cache ||= {}
+    end
+    private :demongoized_cache
+
+    # Demongoize and cache a raw field value together with any metadata needed
+    # to determine whether the cached value remains valid.
+    #
+    # Set and Range demongoize into objects that are distinct from their raw
+    # Array or Hash values, so retain a deep copy to detect in-place raw-value
+    # mutations. Time and DateTime demongoization depends on the configured
+    # UTC behavior and the current thread's time zone, so retain that context.
+    #
+    # @param [ Hash ] cache The document's demongoized value cache.
+    # @param [ String ] name The field name.
+    # @param [ Object ] raw The raw field value.
+    # @param [ Field ] field The field definition.
+    # @param [ true | false ] track_raw_content Whether to snapshot raw content.
+    # @param [ true | false ] track_time_zone Whether to retain time zone context.
+    #
+    # @return [ Object ] The demongoized field value.
+    #
+    # @api private
+    def cache_demongoized_value(cache, name, raw, field, track_raw_content, track_time_zone)
+      if track_time_zone
+        use_utc = Mongoid::Config.use_utc?
+        time_zone = use_utc ? nil : ::Time.zone
+      end
+
+      demongoized = process_raw_attribute(name, raw, field)
+
+      cache[name] =
+        if track_raw_content
+          [ raw, demongoized, raw.__deep_copy__ ]
+        elsif track_time_zone
+          [ raw, demongoized, use_utc, time_zone ]
+        else
+          [ raw, demongoized ]
+        end
+
+      demongoized
+    end
+    private :cache_demongoized_value
+
+    # Lazily allocate projector cache to avoid document initialization overhead.
+    #
+    # @return [ Concurrent::Map | nil ] The cache map when caching is enabled.
+    #
+    # @api private
+    def projector_cache
+      return unless Mongoid::Config.cache_attribute_values?
+
+      @__projector_cache ||= Concurrent::Map.new
+    end
+    private :projector_cache
 
     # Write a single attribute to the document attribute hash. This will
     # also fire the before and after update callbacks, and perform any
@@ -168,14 +250,15 @@ module Mongoid
 
       if attribute_writable?(field_name)
         _assigning do
-          localized = fields[field_name].try(:localized?)
+          field = fields[field_name]
+          localized = field&.localized?
           attributes_before_type_cast[name.to_s] = value
           typed_value = typed_value_for(field_name, value)
           unless attribute_will_not_change?(field_name, typed_value) || attribute_changed?(field_name)
             attribute_will_change!(field_name)
           end
           if localized
-            present = fields[field_name].try(:localize_present?)
+            present = field&.localize_present?
             loc_key, loc_val = typed_value.first
             if present && loc_val.blank?
               attributes[field_name]&.delete(loc_key)
@@ -185,6 +268,7 @@ module Mongoid
             end
           else
             attributes[field_name] = typed_value
+            clear_demongoized_cache(field_name)
           end
 
           # when writing an attribute, also remove it from the unsets,
@@ -236,6 +320,9 @@ module Mongoid
     # Determine if the attribute is missing from the document, due to loading
     # it from the database with missing fields.
     #
+    # Cache the projector keyed by __selected_fields to automatically handle
+    # invalidation when selected fields change (only if caching is enabled).
+    #
     # @example Is the attribute missing?
     #   document.attribute_missing?("test")
     #
@@ -243,7 +330,16 @@ module Mongoid
     #
     # @return [ true | false ] If the attribute is missing.
     def attribute_missing?(name)
-      !Projector.new(__selected_fields).attribute_or_path_allowed?(name)
+      return false unless __selected_fields
+
+      if Mongoid::Config.cache_attribute_values?
+        projector = projector_cache.compute_if_absent(__selected_fields) do
+          Projector.new(__selected_fields)
+        end
+        !projector.attribute_or_path_allowed?(name)
+      else
+        !Projector.new(__selected_fields).attribute_or_path_allowed?(name)
+      end
     end
 
     # Return type-casted attributes.
