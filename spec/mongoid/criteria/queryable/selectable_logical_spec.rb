@@ -1862,9 +1862,13 @@ describe Mongoid::Criteria::Queryable::Selectable do
         it_behaves_like 'returns a cloned query'
       end
 
+      # This context tests a deprecated syntax and behavior, and must be
+      # removed when the deprecated parameterless-not syntax is removed.
       context 'when the criterion are a double negative' do
         let(:selection) do
-          query.not.where(:first.not => /1/)
+          Mongoid.deprecator.silence do
+            query.not.where(:first.not => /1/)
+          end
         end
 
         it 'does not double the $not selector' do

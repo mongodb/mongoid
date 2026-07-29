@@ -496,6 +496,9 @@ module Mongoid
         # @example Add the $not criterion.
         #   Person.not(name: /Bob/)
         #
+        # @example Execute a $not in a where query.
+        #   Person.where(:name.not => /Bob/)
+        #
         # @example Negate a Criteria instance
         #   Person.not(Person.where(...))
         #
