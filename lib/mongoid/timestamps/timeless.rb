@@ -7,10 +7,6 @@ module Mongoid
     module Timeless
       extend ActiveSupport::Concern
 
-      # Deprecator for the block-less form of the timeless API. Its removal
-      # horizon is computed automatically as (current major + 1).0.
-      DEPRECATION = Mongoid::Deprecation.new
-
       # Clears out the timeless option.
       #
       # @example Clear the timeless option.
@@ -132,9 +128,17 @@ module Mongoid
         def timeless(&block)
           return Timeless.with_timeless(&block) if block
 
-          DEPRECATION.warn(
+          locations = caller_locations
+
+          # if this is called from the #timeless instance method, look up one
+          # level higher for the call site
+          locations.shift if locations[0].path == __FILE__
+
+          Mongoid.deprecation_warning(
+            :timeless_sans_block,
             'Calling #timeless without a block is deprecated; pass a block ' \
-            'instead, e.g. `record.timeless { record.save }`.'
+            'instead, e.g. `record.timeless { record.save }`.',
+            locations
           )
           counter = 0
           counter += 1 if self < Mongoid::Timestamps::Created

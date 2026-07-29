@@ -491,16 +491,13 @@ module Mongoid
           !!negating
         end
 
-        # Negate the arguments, or the next selection if no arguments are given.
-        #
-        # @example Negate the next selection.
-        #   selectable.not.in(field: [ 1, 2 ])
+        # Negate the arguments.
         #
         # @example Add the $not criterion.
-        #   selectable.not(name: /Bob/)
+        #   Person.not(name: /Bob/)
         #
-        # @example Execute a $not in a where query.
-        #   selectable.where(:field.not => /Bob/)
+        # @example Negate a Criteria instance
+        #   Person.not(Person.where(...))
         #
         # @param [ [ Hash | Criteria ]... ] *criteria The key/value pair
         #   matches or Criteria objects to negate.
@@ -508,6 +505,14 @@ module Mongoid
         # @return [ Selectable ] The new selectable.
         def not(*criteria)
           if criteria.empty?
+            # @deprecated
+            Mongoid.deprecation_warning(
+              :not_sans_arguments,
+              'Calling `#not` without arguments is deprecated, and will be ' \
+              'removed in the next major version. Instead, pass the Hash or ' \
+              'Criteria instance to negate.',
+              caller_locations
+            )
             dup.tap { |query| query.negating = !query.negating }
           else
             criteria.compact.inject(clone) do |c, new_s|

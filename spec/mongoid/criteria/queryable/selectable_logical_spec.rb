@@ -1589,7 +1589,14 @@ describe Mongoid::Criteria::Queryable::Selectable do
   end
 
   describe '#not' do
+    # deprecated functionality
     context 'when provided no criterion' do
+      around do |example|
+        Mongoid.deprecator.silence do
+          example.run
+        end
+      end
+
       let(:selection) do
         query.not
       end

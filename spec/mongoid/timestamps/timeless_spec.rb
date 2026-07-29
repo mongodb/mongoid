@@ -12,7 +12,7 @@ describe Mongoid::Timestamps::Timeless do
         before_save :lay_timeless_egg
 
         def lay_timeless_egg
-          Egg.timeless.create!
+          Egg.timeless { Egg.create! }
         end
       end
 
@@ -30,7 +30,7 @@ describe Mongoid::Timestamps::Timeless do
     context 'when timeless is used on one instance and then not used on another instance' do
       let!(:first_instance) do
         egg = Egg.create!
-        egg.timeless.save!
+        egg.timeless { egg.save! }
         egg
       end
 
@@ -60,7 +60,7 @@ describe Mongoid::Timestamps::Timeless do
 
       context 'when the root executes timeless' do
         let!(:chicken) do
-          Chicken.timeless.create!
+          Chicken.timeless { Chicken.create! }
         end
 
         it 'creates the parent with a timestamp' do
@@ -80,7 +80,7 @@ describe Mongoid::Timestamps::Timeless do
         end
 
         before do
-          document.timeless.save!
+          document.timeless { document.save! }
         end
 
         it 'does not set the created timestamp' do
@@ -108,7 +108,7 @@ describe Mongoid::Timestamps::Timeless do
 
       context 'when used on the class' do
         let!(:document) do
-          Dokument.timeless.create!
+          Dokument.timeless { Dokument.create! }
         end
 
         it 'does not set the created timestamp' do
@@ -301,15 +301,17 @@ describe Mongoid::Timestamps::Timeless do
   end
 
   describe 'deprecation of the block-less form' do
+    before { Mongoid.reset_deprecation_warnings! }
+
     let(:document) { Dokument.new }
 
     it 'warns when called on an instance without a block' do
-      expect(Mongoid.logger).to receive(:warn).with(/timeless/).and_call_original
+      expect(Mongoid.logger).to receive(:warn).with(/timeless/)
       document.timeless.save!
     end
 
     it 'warns when called on the class without a block' do
-      expect(Mongoid.logger).to receive(:warn).with(/timeless/).and_call_original
+      expect(Mongoid.logger).to receive(:warn).with(/timeless/)
       Dokument.timeless.create!
     end
 
