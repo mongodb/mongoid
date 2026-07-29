@@ -743,6 +743,9 @@ buildvariants:
   tasks:
     - name: "test"
 
+# MONGOID-5908: test master against the upcoming Ruby (ruby-dev). Runs off-PR
+# (no "pr" tag) on a ~2-week cadence. Failures are reported as MONGOID Jira
+# issues via an Evergreen project notification; see .evergreen/README.md.
 - matrix_name: "ruby-dev"
   matrix_spec:
     ruby: ["ruby-dev"]
@@ -753,6 +756,7 @@ buildvariants:
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
     - name: "test"
+      batchtime: 20160 # run at most once every 14 days
 
 - matrix_name: "driver-upcoming"
   matrix_spec:
@@ -811,6 +815,9 @@ buildvariants:
   tasks:
     - name: "test"
 
+# MONGOID-5908: test master against the upcoming Rails (rails master). Runs
+# off-PR (no "pr" tag) on a ~2-week cadence. Failures are reported as MONGOID
+# Jira issues via an Evergreen project notification; see .evergreen/README.md.
 - matrix_name: "rails-master"
   matrix_spec:
     ruby: ["ruby-4.0"]
@@ -823,6 +830,7 @@ buildvariants:
   display_name: "${rails}, ${driver}, ${mongodb-version} (FLE ${fle})"
   tasks:
     - name: "test"
+      batchtime: 20160 # run at most once every 14 days
 
 - matrix_name: "rails-8"
   matrix_spec:
