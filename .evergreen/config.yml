@@ -406,6 +406,12 @@ axes:
         display_name: "MongoDB Latest"
         variables:
            MONGODB_VERSION: "latest"
+      # 9.0 is not yet GA. drivers-evergreen-tools resolves this to the latest
+      # nightly build of the server's v9.0 branch (DRIVERS-3610).
+      - id: "9.0"
+        display_name: "MongoDB 9.0"
+        variables:
+           MONGODB_VERSION: "9.0"
       - id: "8.2"
         display_name: "MongoDB 8.2"
         variables:
@@ -676,7 +682,7 @@ buildvariants:
     ruby: ["ruby-4.0", "ruby-3.4", "ruby-3.3"]
     driver: ["current"]
     topology: '*'
-    mongodb-version: ["8.2", "8.0", "7.0"]
+    mongodb-version: ["9.0", "8.2", "8.0", "7.0"]
     os: ubuntu-22.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tags: ["pr"]
