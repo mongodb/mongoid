@@ -122,14 +122,14 @@ module Mongoid
                    target_pk = source_association.primary_key # '_id' on Patient
                    source_fk = source_association.foreign_key # 'patient_id' on Appointment
                    source_association.klass.where(
-                     target_pk => { '$in' => through_crit.pluck(source_fk) }
+                     target_pk => { '$in' => key_values(through_crit, source_fk) }
                    )
                  else
                    # FK is on the source (e.g. reader.book_id -> has_many :readers on Book)
                    source_pk = source_association.primary_key # '_id' on intermediate (Book)
                    source_fk = source_association.foreign_key # 'book_id' on Reader
                    source_association.klass.where(
-                     source_fk => { '$in' => through_crit.pluck(source_pk) }
+                     source_fk => { '$in' => key_values(through_crit, source_pk) }
                    )
                  end
           order ? crit.order_by(order) : crit
@@ -143,6 +143,20 @@ module Mongoid
         end
 
         private
+
+        # Pluck the given key from the criteria, dropping intermediates that
+        # have no value for it. A nil in an $in array matches every document
+        # whose queried field is null or absent, which would return documents
+        # outside the association. An empty result correctly matches nothing.
+        # Mirrors what the eager loader does.
+        #
+        # @param [ Mongoid::Criteria ] criteria The intermediate criteria.
+        # @param [ String ] key The key to pluck.
+        #
+        # @return [ Array<Object> ] The usable key values.
+        def key_values(criteria, key)
+          criteria.pluck(key).compact.uniq
+        end
 
         def setup_instance_methods!
           define_through_getter!

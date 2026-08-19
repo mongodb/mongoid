@@ -984,4 +984,54 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
       expect(school.updated_at).to eq(update_time)
     end
   end
+
+  context 'when the stored foreign key array contains nil', :integration do
+    # Associating a target whose custom primary key is unset stores a literal
+    # nil in the foreign key array. A nil in an $in matches every document
+    # whose primary key field is null or absent, returning documents that were
+    # never associated.
+
+    before(:all) do
+      Object.const_set(:NkPost, Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'nk_posts'
+        has_and_belongs_to_many :nk_tags, class_name: 'NkTag',
+                                          primary_key: :slug, inverse_of: nil
+      end)
+      Object.const_set(:NkTag, Class.new do
+        include Mongoid::Document
+
+        store_in collection: 'nk_tags'
+        field :slug, type: String
+        field :name, type: String
+      end)
+    end
+
+    after(:all) do
+      %w[NkPost NkTag].each { |c| Object.send(:remove_const, c) }
+    end
+
+    before { [ NkPost, NkTag ].each(&:delete_all) }
+
+    let!(:tag)         { NkTag.create!(slug: 'ruby', name: 'tagged') }
+    let!(:keyless_tag) { NkTag.create!(name: 'never associated') }
+    let!(:post)        { NkPost.create!(nk_tags: [ tag, NkTag.create!(name: 'no slug') ]) }
+
+    it 'does not return tags that were never associated' do
+      expect(post.reload.nk_tags.to_a).to eq([ tag ])
+    end
+
+    it 'does not put nil in the membership query' do
+      expect(post.reload.nk_tags.criteria.selector['slug']['$in']).not_to include(nil)
+    end
+
+    context 'when every stored key is nil' do
+      let!(:post) { NkPost.create!(nk_tags: [ NkTag.create!(name: 'no slug') ]) }
+
+      it 'returns nothing rather than everything' do
+        expect(post.reload.nk_tags.to_a).to eq([])
+      end
+    end
+  end
 end

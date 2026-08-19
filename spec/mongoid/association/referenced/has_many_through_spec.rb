@@ -259,4 +259,141 @@ describe Mongoid::Association::Referenced::HasManyThrough do
       expect(physician.ord_patients.to_a).to eq([ alice, bob, charlie ])
     end
   end
+
+  context 'integration - intermediates missing the plucked key', :integration do
+    # An intermediate document with no value for the plucked key contributes a
+    # nil to the $in array, and a nil in an $in matches every document whose
+    # queried field is null or absent. With a custom primary key those are real
+    # documents, potentially belonging to another owner.
+
+    context 'when the foreign key is on the intermediate' do
+      before(:all) do
+        Object.const_set(:NkClinic, Class.new do
+          include Mongoid::Document
+
+          store_in collection: 'nk_clinics'
+          has_many :nk_visits, class_name: 'NkVisit', inverse_of: :nk_clinic
+          has_many :nk_patients, through: :nk_visits,
+                                 class_name: 'NkPatient', source: :nk_patient
+        end)
+        Object.const_set(:NkVisit, Class.new do
+          include Mongoid::Document
+
+          store_in collection: 'nk_visits'
+          belongs_to :nk_clinic, class_name: 'NkClinic'
+          belongs_to :nk_patient, class_name: 'NkPatient',
+                                  primary_key: :ssn, optional: true
+        end)
+        Object.const_set(:NkPatient, Class.new do
+          include Mongoid::Document
+
+          store_in collection: 'nk_patients'
+          field :ssn, type: String
+          field :name, type: String
+        end)
+      end
+
+      after(:all) do
+        %w[NkClinic NkVisit NkPatient].each { |c| Object.send(:remove_const, c) }
+      end
+
+      before { [ NkClinic, NkVisit, NkPatient ].each(&:delete_all) }
+
+      let!(:clinic)  { NkClinic.create! }
+      let!(:patient) { NkPatient.create!(ssn: 'SSN-1', name: 'own patient') }
+      # Not reachable from any clinic: it has no ssn at all.
+      let!(:keyless_patient) { NkPatient.create!(name: 'unrelated patient') }
+      let!(:_visit)          { NkVisit.create!(nk_clinic: clinic, nk_patient: patient) }
+      # An intermediate that never got a patient assigned.
+      let!(:_keyless_visit)  { NkVisit.create!(nk_clinic: clinic) }
+
+      it 'does not return documents whose primary key is absent' do
+        expect(clinic.nk_patients.to_a).to eq([ patient ])
+      end
+
+      it 'does not put nil in the membership query' do
+        expect(clinic.nk_patients.criteria.selector['ssn']['$in']).not_to include(nil)
+      end
+
+      it 'agrees with the eager-loaded result' do
+        eager = NkClinic.includes(:nk_patients).find(clinic.id).nk_patients.to_a
+        expect(clinic.nk_patients.to_a).to eq(eager)
+      end
+
+      context 'when no intermediate carries a usable key' do
+        before do
+          NkVisit.delete_all
+          NkVisit.create!(nk_clinic: clinic)
+        end
+
+        it 'returns nothing rather than everything' do
+          expect(clinic.nk_patients.to_a).to eq([])
+        end
+      end
+    end
+
+    context 'when the foreign key is on the source' do
+      before(:all) do
+        Object.const_set(:NkLibrary, Class.new do
+          include Mongoid::Document
+
+          store_in collection: 'nk_libraries'
+          has_many :nk_books, class_name: 'NkBook', inverse_of: :nk_library
+          has_many :nk_readers, through: :nk_books,
+                                class_name: 'NkReader', source: :nk_readers
+        end)
+        Object.const_set(:NkBook, Class.new do
+          include Mongoid::Document
+
+          store_in collection: 'nk_books'
+          field :isbn, type: String
+          belongs_to :nk_library, class_name: 'NkLibrary'
+          has_many :nk_readers, class_name: 'NkReader', inverse_of: :nk_book,
+                                primary_key: :isbn
+        end)
+        Object.const_set(:NkReader, Class.new do
+          include Mongoid::Document
+
+          store_in collection: 'nk_readers'
+          field :name, type: String
+          belongs_to :nk_book, class_name: 'NkBook',
+                               primary_key: :isbn, optional: true
+        end)
+      end
+
+      after(:all) do
+        %w[NkLibrary NkBook NkReader].each { |c| Object.send(:remove_const, c) }
+      end
+
+      before { [ NkLibrary, NkBook, NkReader ].each(&:delete_all) }
+
+      let!(:library) { NkLibrary.create! }
+      let!(:book)    { NkBook.create!(nk_library: library, isbn: 'ISBN-1') }
+      let!(:reader)  { NkReader.create!(nk_book: book, name: 'own reader') }
+      # Orphaned, as dependent: :nullify would leave them.
+      let!(:orphan)  { NkReader.create!(name: 'orphaned reader') }
+      # A book that never got an isbn assigned.
+      let!(:_keyless_book) { NkBook.create!(nk_library: library) }
+
+      it 'does not return documents whose foreign key is absent' do
+        expect(library.nk_readers.to_a).to eq([ reader ])
+      end
+
+      it 'does not put nil in the membership query' do
+        expect(library.nk_readers.criteria.selector['nk_book_id']['$in']).not_to include(nil)
+      end
+
+      it 'agrees with the eager-loaded result' do
+        eager = NkLibrary.includes(:nk_readers).find(library.id).nk_readers.to_a
+        expect(library.nk_readers.to_a).to eq(eager)
+      end
+
+      it 'does not leak documents belonging to another owner' do
+        attacker = NkLibrary.create!
+        NkBook.create!(nk_library: attacker)
+        expect(attacker.nk_readers.to_a).to eq([])
+        expect(attacker.nk_readers.to_a).not_to include(orphan)
+      end
+    end
+  end
 end

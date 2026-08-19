@@ -271,6 +271,11 @@ module Mongoid
           crit = relation_class.criteria
           crit = if id_list
                    crit = crit.apply_scope(scope)
+                   # A nil in the stored key array would match every document
+                   # whose primary key is null or absent, returning documents
+                   # that were never associated. Associating a target whose
+                   # custom primary key is unset stores such a nil.
+                   id_list = id_list.compact if id_list.is_a?(Array)
                    crit.all_of(primary_key => { '$in' => id_list })
                  else
                    crit.none
