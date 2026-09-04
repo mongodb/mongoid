@@ -570,4 +570,95 @@ describe Mongoid::Contextual::Aggregable::Memory do
       end
     end
   end
+
+  context 'when the field name is a method name' do
+    let!(:depeche) do
+      Band.create!(name: 'Depeche Mode', likes: 1000)
+    end
+
+    let(:criteria) do
+      Band.all.tap do |crit|
+        crit.documents = [ depeche ]
+      end
+    end
+
+    it 'does not call the method for sum' do
+      expect(depeche).not_to receive(:delete)
+      expect(context.sum(:delete)).to eq(0)
+    end
+
+    it 'does not call the method for min' do
+      expect(depeche).not_to receive(:delete)
+      expect(context.min(:delete)).to be_nil
+    end
+
+    it 'does not call the method for max' do
+      expect(depeche).not_to receive(:delete)
+      expect(context.max(:delete)).to be_nil
+    end
+
+    it 'does not call the method for avg' do
+      expect(depeche).not_to receive(:delete)
+      expect(context.avg(:delete)).to be_nil
+    end
+
+    it 'does not call the method for aggregates' do
+      expect(depeche).not_to receive(:delete)
+      expect(context.aggregates(:delete))
+        .to eq('count' => 0, 'avg' => nil, 'max' => nil, 'min' => nil, 'sum' => 0)
+    end
+
+    it 'does not call a private method for avg' do
+      expect(depeche).not_to receive(:exit)
+      expect(context.avg(:exit)).to be_nil
+    end
+  end
+
+  context 'when the field is not defined' do
+    let!(:depeche) do
+      Band.create!(name: 'Depeche Mode', likes: 1000)
+    end
+
+    let(:criteria) do
+      Band.all.tap do |crit|
+        crit.documents = [ depeche ]
+      end
+    end
+
+    it 'returns zero for sum' do
+      expect(context.sum(:not_a_field)).to eq(0)
+    end
+
+    it 'returns nil for min' do
+      expect(context.min(:not_a_field)).to be_nil
+    end
+
+    it 'returns nil for max' do
+      expect(context.max(:not_a_field)).to be_nil
+    end
+
+    it 'returns nil for avg' do
+      expect(context.avg(:not_a_field)).to be_nil
+    end
+  end
+
+  context 'when the field is the foreign key of a many to many association' do
+    let!(:preference) do
+      Preference.create!(name: 'nature')
+    end
+
+    let!(:person) do
+      Person.new(preferences: [ preference ])
+    end
+
+    let(:criteria) do
+      Person.all.tap do |crit|
+        crit.documents = [ person ]
+      end
+    end
+
+    it 'aggregates the stored ids' do
+      expect(context.max(:preference_ids)).to eq([ preference.id ])
+    end
+  end
 end
