@@ -2,6 +2,7 @@
 
 require "mongoid/contextual/aggregable/memory"
 require "mongoid/association/eager_loadable"
+require "mongoid/field_readable"
 
 module Mongoid
   module Contextual
@@ -11,6 +12,7 @@ module Mongoid
       include Association::EagerLoadable
       include Queryable
       include Positional
+      include FieldReadable
 
       # @attribute [r] root The root document.
       # @attribute [r] path The atomic path.
@@ -79,7 +81,7 @@ module Mongoid
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
         if Mongoid.legacy_pluck_distinct
-          documents.map{ |doc| doc.send(field) }.uniq
+          documents.map { |doc| read_field_value(doc, field) }.uniq
         else
           pluck(field).uniq
         end
@@ -523,11 +525,10 @@ module Mongoid
             # _translations hash so that we can get the specified translation in
             # the remaining
             if field&.localized?
-              document.send("#{segment}_translations")
+              document.public_send("#{segment}_translations")
             end
           end
-          meth = klass.aliased_associations[segment] || segment
-          res.nil? ? document.try(meth) : res
+          res.nil? ? read_field_value(document, segment) : res
         elsif document.is_a?(Hash)
           # TODO: Remove the indifferent access when implementing MONGOID-5410.
           document.key?(segment.to_s) ?

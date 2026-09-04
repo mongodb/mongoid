@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
+require 'mongoid/field_readable'
+
 module Mongoid
   module Contextual
     module Aggregable
       # Contains behavior for aggregating values in memory.
       module Memory
+        include FieldReadable
 
         # Get all the aggregate values for the provided field.
         # Provided for interface consistency with Aggregable::Mongo.
@@ -88,7 +91,7 @@ module Mongoid
           if block_given?
             super()
           else
-            count > 0 ? super(0) { |doc| doc.public_send(field) } : 0
+            count > 0 ? map { |doc| read_field_value(doc, field) }.compact.sum : 0
           end
         end
 
@@ -106,7 +109,10 @@ module Mongoid
         #
         # @return [ Integer ] The aggregate.
         def aggregate_by(field, method)
-          count > 0 ? send(method) { |doc| doc.public_send(field) }.public_send(field) : nil
+          return nil if count == 0
+
+          doc = send(method) { |doc| read_field_value(doc, field) }
+          read_field_value(doc, field)
         end
       end
     end
