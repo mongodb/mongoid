@@ -129,6 +129,32 @@ en:
             A collation option is only supported if the query is executed on a MongoDB server
             with version >= 3.4."
           resolution: "Remove the collation option from the query."
+        in_memory_regexp_timeout:
+          message: "Evaluating this query in memory exceeded the %{limit} second
+            limit that applies to conditions containing a regular expression."
+          summary: "Mongoid evaluates some conditions in the calling thread
+            rather than sending them to the server: queries against an embedded
+            association, removing documents from an association by condition,
+            and Document#_matches?. A regular expression in such a condition
+            runs locally. Mongoid limits the total time one in-memory
+            evaluation may spend matching, because both the cost of a single
+            match and the number of matches performed grow with the condition,
+            and a pattern built from end-user input can be made to consume an
+            unbounded amount of CPU. The limit is cumulative over the whole
+            evaluation rather than per match. Where the Ruby in use offers no
+            per-Regexp timeout the limit is enforced as wall clock over the
+            whole in-memory evaluation, so there it can be exceeded by a large
+            scan even when the pattern itself is cheap."
+          resolution: "Check whether the pattern in this query comes from user
+            input; if it does, validate it before querying. If the query is
+            legitimate and simply large, raise
+            Mongoid::Config.in_memory_regexp_time_limit, or set it to nil to
+            remove the limit entirely. The limit in force is the smaller of
+            that setting and any global Regexp.timeout the application has set,
+            so check both. On JRuby, and on MRI before 3.2, there is no
+            per-Regexp timeout, so what the limit bounds there is the elapsed
+            time of the whole in-memory evaluation rather than the time spent
+            matching."
         invalid_async_query_executor:
           message: "Invalid async_query_executor option: %{executor}."
           summary: "A invalid async query executor was specified.

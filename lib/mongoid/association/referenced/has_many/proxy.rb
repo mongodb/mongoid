@@ -486,12 +486,111 @@ module Mongoid
           # @return [ Integer ] The number of documents deleted.
           def remove_all(conditions = nil, method = :delete_all)
             selector = conditions || {}
-            removed = klass.send(method, selector.merge!(criteria.selector))
+            selector.merge!(criteria.selector)
+
+            # Scanning before the delete means scanning only what is already in
+            # memory, so it is only done where there is a pattern whose cost has
+            # to be bounded. Everywhere else the delete comes first and the scan
+            # sees the survivors, which is what this association has always
+            # done.
+            #
+            # The limit is read once and carried into whichever branch is taken.
+            # Letting the branch below ask again would read it a second time,
+            # across a server round trip, and a limit that had become positive
+            # in the meantime would put a deadline on the delete_if -- a query,
+            # and an unbind of every match -- which is the arrangement this
+            # branch exists to avoid.
+            limit = Matcher::RegexpBudget.limit_for(selector)
+            return remove_all_bounded(selector, method, limit) if limit
+
+            removed = klass.send(method, selector)
+
+            # No scope around this. The scan runs after the delete, so the
+            # association this loads comes back holding only what the delete did
+            # not match, and there is no pattern here to bound in any case.
+            # Opening a scope would save _matches? from deciding once per
+            # document -- 0.48us against 1.74us for the match itself -- but a
+            # scope with nothing to bound suppresses that decision for
+            # everything nested inside it, and loading the association runs
+            # find callbacks. A pattern in a selector one of those evaluates
+            # would go unguarded, which costs more than the saving is worth on a
+            # path that has just made two round trips.
             _target.delete_if do |doc|
               doc._matches?(selector).tap do |b|
                 unbind_one(doc) if b
               end
             end
+
+            removed
+          end
+
+          # Deletes all related documents matching a selector that carries a
+          # regular expression, with the whole scan under one regexp budget.
+          #
+          # The scan runs before anything is deleted, so a budget that runs out
+          # leaves both the database and the association untouched rather than
+          # reporting a failure for a delete that has already happened. It also
+          # means the budget is closed by the time the association is mutated,
+          # so where the budget is enforced with Timeout there is no window for
+          # the exception to land in the middle of an unbind.
+          #
+          # @param [ Hash ] selector The selector to delete with.
+          # @param [ Symbol ] method The deletion method to call.
+          # @param [ Float ] limit The seconds the scan may spend, as read by
+          #   the caller when it chose this path.
+          #
+          # @return [ Integer ] The number of documents deleted.
+          def remove_all_bounded(selector, method, limit)
+            # Only what the association already holds. Iterating it instead
+            # would load the whole association before the delete, and for a
+            # broad pattern that is every document the association has: /.*/ is
+            # both the cheapest pattern an attacker can supply and the one that
+            # matches everything, so bounding the cost of the matching would
+            # have been paid for with an unbounded amount of memory. Nothing is
+            # missed by not loading, because the server evaluates the same
+            # selector for the delete itself.
+            #
+            # It also means the scan runs no query, so no deadline of ours can
+            # land on one. Where the budget is enforced with Timeout, covering
+            # a query would report a slow network as a regexp timeout and could
+            # deliver the asynchronous exception inside the driver's socket
+            # read.
+            documents = _target.in_memory
+
+            matching = Matcher::RegexpBudget.open_with(limit) do
+              documents.select { |doc| doc._matches?(selector) }
+            end
+
+            removed = klass.send(method, selector)
+
+            # The ids are already known to be in memory, so the loaded and added
+            # documents can be dropped directly. Enumerable#delete would look
+            # each one up by id and stop at the first hash that has it, which
+            # removes the wrong instance when both hashes hold one for the same
+            # id. Enumerable#delete_if drops it from both, as this does, but
+            # only after load_all!, which is the load this scan exists to avoid.
+            #
+            # Which documents get unbound has always depended on which ones
+            # happened to be in memory, and scanning only what is in memory
+            # keeps that. It matters for has_and_belongs_to_many, whose
+            # unbind_one pulls the id out of the foreign key array on _base and
+            # marks it dirty; the scan used to run after the delete, against an
+            # association that a cold proxy had just reloaded as holding only
+            # the survivors, so nothing matched and nothing was unbound.
+            #
+            # TODO: unbinding should not depend on what was in memory. Every
+            # matched document leaves the association, so every one of them
+            # should be unbound, which would also stop _base's foreign key
+            # array from keeping ids that no longer resolve. That is a
+            # behaviour change for has_and_belongs_to_many and belongs in a
+            # ticket of its own, with a release note; it should not ride along
+            # on this one.
+            matching.each do |doc|
+              unbind_one(doc)
+              _target._loaded.delete(doc._id)
+              _target._added.delete(doc._id)
+            end
+
             removed
           end
 

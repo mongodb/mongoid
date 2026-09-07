@@ -198,6 +198,22 @@ module Mongoid
     # See https://jira.mongodb.org/browse/MONGOID-5658 for more details.
     option :around_callbacks_for_embeds, default: true
 
+    # The maximum number of seconds that evaluating a single query in memory
+    # may spend executing regular expressions. Queries against an embedded
+    # association are evaluated in the calling thread, so a pattern built from
+    # user input runs locally and can otherwise consume unbounded CPU. The
+    # limit is cumulative over the whole query, since cost grows with the
+    # number of documents and conditions as well as with the pattern.
+    #
+    # Set to nil to remove the limit. On Ruby 3.2 and later the remaining
+    # budget is compiled into the pattern, so the limit counts only the time
+    # spent matching. Earlier Rubies have no per-Regexp timeout, so the query
+    # is bounded with Timeout instead and the limit is wall clock over the
+    # whole in-memory evaluation.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5981 for details.
+    option :in_memory_regexp_time_limit, default: 5.0
+
     # Returns the Config singleton, for use in the configure DSL.
     #
     # @return [ self ] The Config singleton.
