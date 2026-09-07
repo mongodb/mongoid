@@ -30,6 +30,9 @@ module Mongoid
     # executed on documents.
     EXECUTE_CALLBACKS = '[mongoid]:execute-callbacks'
 
+    # The key for the time left in the current in-memory regexp budget.
+    REGEXP_BUDGET_KEY = 'regexp-budget'
+
     extend self
 
     # Begin entry into a named thread local stack.
