@@ -144,10 +144,20 @@ module Mongoid
       # @param [ Criteria ] criteria The criteria.
       def initialize(criteria)
         @criteria, @klass = criteria, criteria.klass
-        @documents = criteria.documents.select do |doc|
-          @root ||= doc._root
-          @collection ||= root.collection
-          doc._matches?(criteria.selector)
+
+        # Resolving the collection can build a Mongo::Client the first time it
+        # runs, so it happens before the budget opens. Where the budget is
+        # enforced with Timeout the exception is asynchronous, and landing in
+        # the middle of that would leave a half-built client behind.
+        if (first = criteria.documents.first)
+          @root = first._root
+          @collection = @root.collection
+        end
+
+        # One regexp budget covers the whole scan, so that the limit bounds the
+        # query rather than each document individually.
+        @documents = Matcher::RegexpBudget.open(criteria.selector) do
+          criteria.documents.select { |doc| doc._matches?(criteria.selector) }
         end
         apply_sorting
         apply_options

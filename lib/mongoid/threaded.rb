@@ -26,6 +26,9 @@ module Mongoid
       hash[key] = "[mongoid]:#{key}-stack"
     end
 
+    # The key for the time left in the current in-memory regexp budget.
+    REGEXP_BUDGET_KEY = 'regexp-budget'
+
     extend self
 
     # Begin entry into a named thread local stack.
