@@ -459,6 +459,13 @@ describe 'Mongoid application tests' do
     end
     gemfile_lines << "gem 'mongoid', path: '#{File.expand_path(BASE)}'\n"
 
+    # json 3.0 removed the quirks_mode and max_nesting keywords that
+    # ActiveSupport::JSON (every 7.x) still passes to JSON.generate and
+    # JSON.parse, so a freshly resolved bundle picks a 3.x json and the app
+    # fails to encode any response with ArgumentError: unknown keyword:
+    # quirks_mode. Cap json at 2.x, which still accepts those keywords.
+    gemfile_lines << "gem 'json', '< 3'\n"
+
     # Rails 6.0 and 6.1 need logger gem on Ruby 2.7+ due to stdlib changes
     if rails_version && rails_version.to_f < 7.0 && RUBY_VERSION >= '2.7'
       gemfile_lines << "gem 'logger'\n"

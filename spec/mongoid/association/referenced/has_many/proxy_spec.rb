@@ -1832,6 +1832,151 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(person.posts).to eq([])
           end
         end
+
+        context 'when a document is appended with an id that is already loaded' do
+          # Iterating the association moves an appended document out of _added
+          # without adding it to _loaded, so the scan for matches and the
+          # removal that follows see different instances for the same id.
+          let(:person) { Person.create! }
+          let!(:post) { person.posts.create!(title: 'Testing') }
+          let(:reloaded) { Person.find(person._id) }
+
+          before do
+            reloaded.posts.to_a
+            reloaded.posts._target.push(
+              Post.new(_id: post._id, title: 'Testing', person_id: reloaded._id)
+            )
+          end
+
+          shared_examples 'removes the document once' do
+            it 'sets the association locally' do
+              reloaded.posts.send(method, conditions)
+              expect(reloaded.posts).to eq([])
+            end
+
+            it 'deletes the documents from the database' do
+              reloaded.posts.send(method, conditions)
+              expect(Post.count).to eq(0)
+            end
+          end
+
+          context 'when the conditions carry no regular expression' do
+            let(:conditions) { { title: 'Testing' } }
+
+            it_behaves_like 'removes the document once'
+          end
+
+          context 'when the conditions carry a regular expression' do
+            let(:conditions) { { title: /Testing/ } }
+
+            it_behaves_like 'removes the document once'
+          end
+        end
+
+        context 'when an appended document disagrees with the loaded one' do
+          # Only the appended instance matches, so the removal has to drop that
+          # id from both _loaded and _added. Removing by id and stopping at the
+          # first hash that has it would take the loaded instance instead and
+          # leave the unbound one behind.
+          let(:person) { Person.create! }
+          let!(:post) { person.posts.create!(title: 'Other') }
+          let(:reloaded) { Person.find(person._id) }
+
+          before do
+            reloaded.posts.to_a
+            reloaded.posts._target.push(
+              Post.new(_id: post._id, title: 'Testing', person_id: reloaded._id)
+            )
+          end
+
+          it 'deletes nothing from the database' do
+            expect(reloaded.posts.send(method, { title: /Testing/ })).to eq(0)
+            expect(Post.where(title: 'Other').count).to eq(1)
+          end
+
+          it 'leaves no unbound document in the association' do
+            reloaded.posts.send(method, { title: /Testing/ })
+            expect(reloaded.posts._target.in_memory.map(&:person_id)).not_to include(nil)
+          end
+        end
+
+        context 'when a nested selector is evaluated while the association loads' do
+          # Loading the association runs find callbacks, and application code in
+          # one of those can evaluate a selector of its own. A scope opened
+          # around the load would mark it as having nothing to bound, and that
+          # suppresses the decision for the nested selector too, leaving any
+          # pattern in it unguarded.
+          config_override :in_memory_regexp_time_limit, 5.0
+
+          let(:person) { Person.create! }
+          let(:reloaded) { Person.find(person._id) }
+
+          before do
+            person.posts.create!(title: 'Testing')
+            person.posts.create!(title: 'Keep')
+            reloaded
+          end
+
+          it 'leaves the nested scope free to establish its own budget' do
+            seen = []
+            allow(Mongoid::Factory).to receive(:from_db).and_wrap_original do |original, *args|
+              Mongoid::Matcher::RegexpBudget.open('title' => /Testing/) do
+                seen << Mongoid::Matcher::RegexpBudget.remaining
+              end
+              original.call(*args)
+            end
+
+            reloaded.posts.send(method, { title: 'Testing' })
+
+            expect(seen).not_to be_empty
+            expect(seen).not_to include(nil)
+          end
+        end
+
+        if method == :delete_all
+          context 'when the association has not been loaded' do
+            let(:person) { Person.create! }
+            let(:reloaded) { Person.find(person._id) }
+            let(:subscriber) { Mrss::EventSubscriber.new }
+
+            before do
+              person.posts.create!(title: 'Testing')
+              person.posts.create!(title: 'Test')
+              reloaded
+            end
+
+            def commands_for(conditions)
+              Person.collection.client.subscribe(Mongo::Monitoring::COMMAND, subscriber)
+              reloaded.posts.delete_all(conditions)
+              subscriber.started_events.map(&:command_name)
+            ensure
+              Person.collection.client.unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
+            end
+
+            context 'when the conditions carry no regular expression' do
+              # Nothing to bound, so the scan for matches stays where it was,
+              # after the delete, where the association it loads comes back
+              # empty. Moving it ahead of the delete would transfer the whole
+              # association for an operation that need send nothing over the
+              # wire.
+              it 'deletes before loading the association' do
+                expect(commands_for(nil)).to eq(%w[ delete find ])
+              end
+            end
+
+            context 'when the conditions carry a regular expression' do
+              # The scan has to run under a budget, and before anything is
+              # deleted, so that a budget which runs out leaves the database
+              # untouched. What it scans is what is already in memory: loading
+              # would trade the matching cost the budget exists to bound for an
+              # unbounded amount of memory, since /.*/ is both cheap to supply
+              # and matches every document in the association.
+              it 'deletes without loading the association' do
+                expect(commands_for({ title: /Test/ })).to eq(%w[ delete ])
+              end
+            end
+          end
+        end
       end
 
       context 'when the association is polymorphic' do
