@@ -813,6 +813,12 @@ module Mongoid
             # only ever specify one criterion to #where.
             @criterion = criterion
             if criterion.is_a?(String)
+              unless Mongoid.allow_unsafe_query_operators?
+                raise Errors::InvalidQuery,
+                      "String criteria are not allowed because they compile to the '$where' operator, " \
+                      'which is not allowed in a query expression. Set Mongoid.allow_unsafe_query_operators = true ' \
+                      'to permit all operators.'
+              end
               js_query(criterion)
             else
               expr_query(criterion)
@@ -839,6 +845,13 @@ module Mongoid
         #
         # @return [ Selectable ] The cloned selectable.
         # @api private
+        # Operators permitted in a query expression without opt-in.
+        # Excludes $where (JS execution) and other operators not needed for
+        # ordinary application queries.
+        ALLOWED_QUERY_OPERATORS = %w[
+          $and $or $nor $not $text $comment $expr $jsonSchema $alwaysFalse $alwaysTrue
+        ].freeze
+
         def expr_query(criterion)
           if criterion.nil?
             raise ArgumentError, 'Criterion cannot be nil here'
@@ -852,6 +865,11 @@ module Mongoid
             normalized.each do |field, value|
               field_s = field.to_s
               if field_s.start_with?('$')
+                unless Mongoid.allow_unsafe_query_operators? || ALLOWED_QUERY_OPERATORS.include?(field_s)
+                  raise Errors::InvalidQuery,
+                        "Operator '#{field_s}' is not allowed in a query expression. " \
+                        'Set Mongoid.allow_unsafe_query_operators = true to permit all operators.'
+                end
                 # Query expression-level operator, like $and or $where
                 query.add_operator_expression(field_s, value)
               else
