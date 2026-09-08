@@ -110,20 +110,22 @@ module Mongoid
     # to `:global_thread_pool`.
     option :global_executor_concurrency, default: nil
 
-    # When this flag is true, it will be possible to change the parent of a
-    # record in a "has_many" association by passing the child record's id in the
-    # nested attributes for another parent record.
+    # When this flag is true, it will be possible to add a record to a
+    # "has_many" or "has_and_belongs_to_many" association by passing that
+    # record's id in the nested attributes for another parent record, even
+    # when the record does not already belong to that association. For a
+    # "has_many" association this moves the record to the new parent.
     #
-    # When this flag is false, attempting to change the parent of a record in a
-    # "has-many" association via nested attributes will raise an error.
+    # When this flag is false, an id in nested attributes is only resolved
+    # within the association itself, and anything else raises an error.
     #
-    # The default is `true`. Note that allowing reparenting via nested attributes
+    # The default is `false`. Note that allowing reparenting via nested attributes
     # is a potential security risk, since it could allow a malicious user to move
     # records that they do not own to a parent record that they do own.
     #
-    # This option will default to `false` in Mongoid 9.1, and will be removed
-    # in Mongoid 10.
-    option :allow_reparenting_via_nested_attributes, default: true
+    # This option will be removed in Mongoid 10, and the only behavior will be
+    # as if this option were set to false.
+    option :allow_reparenting_via_nested_attributes, default: false
 
     # When this flag is true, any documents in associations with `autosave: true`
     # will be saved even if they have not been changed. When this flag is false,

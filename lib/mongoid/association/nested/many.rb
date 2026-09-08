@@ -174,7 +174,7 @@ module Mongoid
         # @param [ Hash ] attrs The single document attributes to process.
         def update_nested_relation(parent, id, attrs)
           first = existing.first
-          converted = first ? convert_id(first.class, id) : id
+          converted = convert_id(first ? first.class : association.klass, id)
 
           if existing.where(_id: converted).exists?
             # document exists in association
@@ -186,18 +186,47 @@ module Mongoid
             end
           elsif association.embedded?
             raise Errors::DocumentNotFound.new(association.klass, id)
-          elsif association.is_a?(Association::Referenced::HasAndBelongsToMany) || Mongoid.allow_reparenting_via_nested_attributes?
-            Mongoid::Warnings.warn_reparenting_via_nested_attributes if Mongoid.allow_reparenting_via_nested_attributes?
+          elsif destroyable?(attrs)
+            # A destroy of a document that is not in the association is
+            # ignored, rather than reaching for it outside the association.
+            nil
+          elsif Mongoid.allow_reparenting_via_nested_attributes?
+            Mongoid::Warnings.warn_reparenting_via_nested_attributes
 
             # push existing document to association
             doc = association.klass.unscoped.find(converted)
+            # find returns nil instead of raising when
+            # Mongoid.raise_not_found_error is false; a missing document
+            # must still be an error here, consistent with the other
+            # not-found branches.
+            raise Errors::DocumentNotFound.new(association.klass, id) if doc.nil?
+
             update_document(doc, attrs)
-            existing.push(doc) unless destroyable?(attrs)
+            existing.push(doc)
           else
-            raise Errors::DocumentNotFound.new(association.klass, { _id: id, association.foreign_key => parent.id })
+            raise Errors::DocumentNotFound.new(association.klass, not_found_params(parent, id))
           end
 
           parent.children_may_have_changed!
+        end
+
+        # The params to report when an id in the nested attributes could not
+        # be resolved within the association.
+        #
+        # @api private
+        #
+        # @param [ Document ] parent The parent document.
+        # @param [ String | BSON::ObjectId ] id of the related document.
+        #
+        # @return [ Hash | Object ] The params for the not found error.
+        def not_found_params(parent, id)
+          if association.is_a?(Association::Referenced::HasAndBelongsToMany)
+            # A many-to-many association has no foreign key on the child, so
+            # the id is only ever resolved within the association itself.
+            id
+          else
+            { _id: id, association.foreign_key => parent.id }
+          end
         end
       end
     end
