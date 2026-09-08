@@ -24,5 +24,6 @@ module Mongoid
     warning :geo_haystack_deprecated, 'The geoHaystack type is deprecated.'
     warning :as_json_compact_deprecated, '#as_json :compact option is deprecated. Please call #compact on the returned Hash object instead.'
     warning :symbol_type_deprecated, 'The BSON Symbol type is deprecated by MongoDB. Please use String or StringifiedSymbol field types instead of the Symbol field type'
+    warning :reparenting_via_nested_attributes, 'Reparenting documents via nested attributes is insecure and is deprecated. Set Mongoid.allow_reparenting_via_nested_attributes to false and update your code to avoid reparenting documents via nested attributes.'
   end
 end
