@@ -181,6 +181,18 @@ module Mongoid
     # See https://jira.mongodb.org/browse/MONGOID-5981 for details.
     option :in_memory_regexp_time_limit, default: 5.0
 
+    # When true (default), all top-level query operators are passed through
+    # to MongoDB without restriction when using +where+/+find_by+. Set to
+    # false to enable a strict allowlist that rejects operators like +$where+
+    # and +$function+, which can execute arbitrary JavaScript when user-supplied
+    # input reaches the query builder. This also governs the string form of
+    # +where+ (e.g. +where("this.name == 'admin'")+), which compiles to
+    # +$where+ and is rejected the same way when this flag is false.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5939 and
+    # https://jira.mongodb.org/browse/MONGOID-5993 for details.
+    option :allow_unsafe_query_operators, default: true
+
     # When this flag is true, it will be possible to add a record to a
     # "has_many" or "has_and_belongs_to_many" association by passing that
     # record's id in the nested attributes for another parent record, even
