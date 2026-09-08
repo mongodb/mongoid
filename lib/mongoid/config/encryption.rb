@@ -21,17 +21,25 @@ module Mongoid
       #
       # @return [ Hash ] The encryption schema map.
       def encryption_schema_map(default_database, models = ::Mongoid.models)
-        visited = Set.new
         models.each_with_object({}) do |model, map|
-          next if visited.include?(model)
-          visited << model
           next if model.embedded?
-          next unless model.encrypted?
+          next unless model.requires_encryption_schema?
 
           database = model.storage_options.fetch(:database) { default_database }
+          # A callable database name cannot be resolved here: the documented
+          # multi-tenant idiom has no correct value while the client is being
+          # built. Interpolating the callable would produce a key that never
+          # matches any namespace, so leave the model out of the map. Writes
+          # are refused later, by PersistenceContext, rather than silently
+          # going out unencrypted.
+          next if database.respond_to?(:call)
+
           key = "#{database}.#{model.collection_name}"
-          props = metadata_for(model).merge(properties_for(model, visited))
-          map[key] = props unless props.empty?
+          props = metadata_for(model).merge(properties_for(model, [ model ]))
+          # The root of a collection schema describes the document, so it is
+          # always an object. Saying so matters when a nested schema carries
+          # encryptMetadata: mongocryptd rejects the schema otherwise.
+          map[key] = { 'bsonType' => 'object' }.merge(props) unless props.empty?
         end
       end
 
@@ -100,11 +108,12 @@ module Mongoid
       # are marked as encrypted.
       #
       # @param [ Mongoid::Document ] model The model to generate the properties for.
-      # @param [ Set<Mongoid::Document> ] visited The set of models that have already been visited.
+      # @param [ Array<Mongoid::Document> ] path The models the walk is already
+      #   inside of, outermost first.
       #
       # @return [ Hash ] The encryption properties.
-      def properties_for(model, visited)
-        result = properties_for_fields(model).merge(properties_for_relations(model, visited))
+      def properties_for(model, path)
+        result = properties_for_fields(model).merge(properties_for_relations(model, path))
         if result.empty?
           {}
         else
@@ -141,20 +150,29 @@ module Mongoid
       # are configured to be encrypted.
       #
       # @param [ Mongoid::Document ] model The model to generate the properties for.
-      # @param [ Set<Mongoid::Document> ] visited The set of models that have already been visited.
+      # @param [ Array<Mongoid::Document> ] path The models the walk is already
+      #   inside of, outermost first.
       #
       # @return [ Hash ] The encryption properties.
-      def properties_for_relations(model, visited)
+      def properties_for_relations(model, path)
         model.relations.each_with_object({}) do |(name, relation), props|
-          next if visited.include?(relation.relation_class)
+          # relation_class constantizes, and a polymorphic embedded_in has no
+          # class to resolve, so the relation type has to be checked first.
           next unless relation.is_a?(Association::Embedded::EmbedsOne)
-          next unless relation.relation_class.encrypted?
 
-          visited << relation.relation_class
-          metadata_for(
-            relation.relation_class
-          ).merge(
-            properties_for(relation.relation_class, visited)
+          klass = relation.try_relation_class
+          # An association target does not have to be a Mongoid document, and
+          # the class it names does not have to exist.
+          next unless klass.respond_to?(:requires_encryption_schema?)
+          # Stop at a model the walk is already inside of, or a self-embedding
+          # model never terminates. The path covers the current branch only:
+          # a model embedded by two parents, or twice by one parent, has to be
+          # emitted at every place it appears.
+          next if path.include?(klass)
+          next unless klass.requires_encryption_schema?
+
+          metadata_for(klass).merge(
+            properties_for(klass, path + [ klass ])
           ).tap do |properties|
             props[name] = { 'bsonType' => 'object' }.merge(properties) unless properties.empty?
           end

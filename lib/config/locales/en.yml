@@ -541,6 +541,25 @@ en:
             environment, Mongoid cannot load its configuration."
           resolution: "Please ensure an environment is set in one of the
             listed locations. The environment must be explicitly set."
+        no_encryption_schema:
+          message: "The encryption schema of client %{client} does not cover
+            %{namespace}."
+          summary: "%{klass} declares encrypted fields, but the namespace it
+            resolved to, %{namespace}, is not part of the automatic encryption
+            schema of client %{client}. The encryption schema is built once,
+            when the client is created, and is keyed by namespace, so a
+            database name that is only known later - a callable :database
+            option, Model.with(database:), Mongoid.override_database - is not
+            in it. Routing the model to a client that has no
+            auto_encryption_options has the same effect. Mongoid refuses the
+            operation because the driver would store the declared fields in
+            plaintext without reporting an error."
+          resolution: "Give the model a namespace that is known when the
+            client is created, and a client configured with
+            auto_encryption_options. If the model has to live in a database
+            chosen at runtime, configure one client per database, each with
+            its own auto_encryption_options, and select between them with
+            Model.with(client:) instead of switching the database."
         no_map_reduce_output:
           message: "No output location was specified for the map/reduce
             operation."

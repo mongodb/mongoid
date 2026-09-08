@@ -172,6 +172,23 @@ module Mongoid
       end
       alias :klass :relation_class
 
+      # The class of the association target, or nil when the named class is
+      # not defined.
+      #
+      # An association may name a class that never gets defined. The
+      # association is then unusable, but its owner still has to be. Callers
+      # that walk every association of every model, rather than following the
+      # one the application asked for, use this instead of relation_class.
+      #
+      # @return [ Class | nil ] The association objects' class.
+      #
+      # @api private
+      def try_relation_class
+        relation_class
+      rescue NameError
+        nil
+      end
+
       # The class name of the object owning this association.
       #
       # @return [ String ] The owning objects' class name.

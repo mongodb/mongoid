@@ -22,6 +22,14 @@ module Mongoid
       # @raise [ Errors::CreateCollectionFailure ] If collection creation failed.
       # @raise [ Errors::DropCollectionFailure ] If an attempt to drop collection failed.
       def create_collection(force: false)
+        Threaded.with_collection_management do
+          perform_create_collection(force: force)
+        end
+      end
+
+      private
+
+      def perform_create_collection(force:)
         if collection_name.empty?
           # This is most probably an anonymous class, we ignore them.
           return
