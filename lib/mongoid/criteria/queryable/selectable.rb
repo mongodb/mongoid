@@ -806,6 +806,19 @@ module Mongoid
 
         private
 
+        # Operators permitted at the top level of a query expression without
+        # opt-in. Excludes $where (JS execution) and other operators not needed
+        # for ordinary application queries.
+        ALLOWED_QUERY_OPERATORS = %w[
+          $and $or $nor $not $text $comment $expr $jsonSchema $alwaysFalse $alwaysTrue
+        ].freeze
+
+        # Operators that execute server-side JavaScript. These are rejected at
+        # any depth, not just at the top level: the allowlist above permits
+        # $expr and the logical operators, and their values are arbitrary
+        # nested expressions that can carry $function or $where.
+        JAVASCRIPT_QUERY_OPERATORS = %w[$where $function $accumulator].freeze
+
         # Adds the specified expression to the query.
         #
         # Criterion must be a hash in one of the following forms:
@@ -823,13 +836,6 @@ module Mongoid
         #
         # @return [ Selectable ] The cloned selectable.
         # @api private
-        # Operators permitted in a query expression without opt-in.
-        # Excludes $where (JS execution) and other operators not needed for
-        # ordinary application queries.
-        ALLOWED_QUERY_OPERATORS = %w[
-          $and $or $nor $not $text $comment $expr $jsonSchema $alwaysFalse $alwaysTrue
-        ].freeze
-
         def expr_query(criterion)
           if criterion.nil?
             raise ArgumentError, 'Criterion cannot be nil here'
@@ -838,16 +844,13 @@ module Mongoid
             raise Errors::InvalidQuery, "Expression must be a Hash: #{Errors::InvalidQuery.truncate_expr(criterion)}"
           end
 
+          # The operator guard is applied by _mongoid_expand_keys, which every
+          # query method that accepts a user-supplied expression passes through.
           normalized = _mongoid_expand_keys(criterion)
           clone.tap do |query|
             normalized.each do |field, value|
               field_s = field.to_s
               if field_s.start_with?('$')
-                unless Mongoid.allow_unsafe_query_operators? || ALLOWED_QUERY_OPERATORS.include?(field_s)
-                  raise Errors::InvalidQuery,
-                        "Operator '#{field_s}' is not allowed in a query expression. " \
-                        'Set Mongoid.allow_unsafe_query_operators = true to permit all operators.'
-                end
                 # Query expression-level operator, like $and or $where
                 query.add_operator_expression(field_s, value)
               else
@@ -855,6 +858,94 @@ module Mongoid
               end
             end
             query.reset_strategies!
+          end
+        end
+
+        # Enforces the operator rules governed by the
+        # +allow_unsafe_query_operators+ configuration option against a
+        # normalized query expression.
+        #
+        # Two rules apply, and both are skipped when the option is true:
+        #
+        # - An operator at the top level of the expression must appear in
+        #   ALLOWED_QUERY_OPERATORS.
+        # - An operator in JAVASCRIPT_QUERY_OPERATORS is rejected at any depth.
+        #
+        # This is called from #_mongoid_expand_keys rather than from the
+        # individual query methods, because that is the one point every query
+        # method taking a user-supplied expression passes through on its way to
+        # the selector.
+        #
+        # It deliberately does not cover the APIs that ask for JavaScript
+        # outright, such as #js_query and Criteria#for_js: there the developer
+        # has chosen server-side JavaScript, so there is nothing to guard
+        # against. The same goes for the low-level Storable methods
+        # (#add_field_expression, #add_operator_expression), which write to the
+        # selector directly.
+        #
+        # @param [ Hash ] expr A normalized query expression.
+        #
+        # @raise [ Errors::InvalidQuery ] If a disallowed operator is present.
+        #
+        # @api private
+        def _mongoid_validate_operators!(expr)
+          return if Mongoid.allow_unsafe_query_operators?
+
+          expr.each_key do |field|
+            field_s = field.to_s
+            next unless field_s.start_with?('$')
+            next if ALLOWED_QUERY_OPERATORS.include?(field_s)
+
+            raise Errors::InvalidQuery,
+                  "Operator '#{field_s}' is not allowed in a query expression. " \
+                  'Set Mongoid.allow_unsafe_query_operators = true to permit all operators.'
+          end
+
+          _mongoid_validate_no_javascript!(expr)
+        end
+
+        # Walks a query expression looking for operators that execute
+        # server-side JavaScript, descending through both hashes and arrays so
+        # that nested forms such as {'$expr' => {'$function' => ...}} and
+        # {'$or' => [ {'$where' => ...} ]} are caught.
+        #
+        # The walk does not distinguish operator position from value position,
+        # so it also rejects queries where a JavaScript operator name appears as
+        # data rather than as an operator. Server 5.0+ permits $-prefixed field
+        # names in stored documents, which makes this reachable:
+        #
+        #   Doc.where(payload: { '$eq' => { '$function' => 'abc' } })
+        #
+        # Here the $eq marks its argument as a literal value to compare, so the
+        # server never evaluates it, but the guard raises anyway. The only
+        # workaround today is the global allow_unsafe_query_operators flag.
+        #
+        # TODO: discuss whether to track operator position (skipping the subtree
+        # under $eq, $ne, $in, $nin, and $elemMatch values) in a future
+        # iteration. It removes the false positive but adds exactly the kind of
+        # state that a real bypass could hide in, so it was left out for now.
+        #
+        # @param [ Object ] object A fragment of a query expression.
+        #
+        # @raise [ Errors::InvalidQuery ] If a JavaScript operator is present.
+        #
+        # @api private
+        def _mongoid_validate_no_javascript!(object)
+          case object
+          when Hash
+            object.each do |key, value|
+              key_s = key.to_s
+              if JAVASCRIPT_QUERY_OPERATORS.include?(key_s)
+                raise Errors::InvalidQuery,
+                      "Operator '#{key_s}' executes server-side JavaScript and is not allowed " \
+                      'anywhere in a query expression. Set Mongoid.allow_unsafe_query_operators = true ' \
+                      'to permit all operators.'
+              end
+
+              _mongoid_validate_no_javascript!(value)
+            end
+          when Array
+            object.each { |value| _mongoid_validate_no_javascript!(value) }
           end
         end
 
