@@ -1536,5 +1536,33 @@ describe Mongoid::Touchable do
         expect(building.updated_at).to be > original_updated_at
       end
     end
+
+    context 'when an existing child of the same array has a pending touch' do
+      let(:building) do
+        TouchableSpec::Embedded::Building.create!(title: 'Tower')
+      end
+
+      before do
+        floor = building.floors.create!(level: 1)
+        # Leave a pending touch on the existing sibling so merging it into
+        # the insert would target a path inside the pushed array.
+        floor.updated_at = Time.now + 60
+      end
+
+      it 'does not raise a conflict error when creating a sibling' do
+        expect { building.floors.create!(level: 2) }.not_to raise_error
+      end
+
+      it 'persists the new sibling' do
+        building.floors.create!(level: 2)
+        expect(building.reload.floors.length).to eq(2)
+      end
+
+      it 'touches the parent' do
+        building.floors.create!(level: 2)
+        building.reload
+        expect(building.updated_at).to be_within(5).of(Time.now)
+      end
+    end
   end
 end

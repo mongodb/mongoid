@@ -39,13 +39,45 @@ module Mongoid
         { atomic_insert_modifier => { atomic_position => as_attributes } }
       end
 
+      # Determine whether merging the touch updates into the insert
+      # operations would produce an update whose operators target both a
+      # path and one of its ancestors or descendants. MongoDB rejects such
+      # an update with error 40. This can happen for embeds_many inserts,
+      # where the operations target the array (via $push) but the touches
+      # include a path inside that array (e.g. items.0.updated_at) when a
+      # sibling has a pending touch.
+      #
+      # @api private
+      #
+      # @param [ Hash ] operations The atomic insert operations.
+      # @param [ Hash ] touches The touch updates to merge.
+      #
+      # @return [ true | false ] Whether any touch path conflicts with a
+      #   path the insert operations target.
+      def conflicting_touch_paths?(operations, touches)
+        targeted = operations.each_value.flat_map do |doc|
+          doc.respond_to?(:keys) ? doc.keys.map(&:to_s) : []
+        end
+
+        touches.each_key.any? do |touch_path|
+          path = touch_path.to_s
+          targeted.any? do |target|
+            path == target || path.start_with?("#{target}.") ||
+              target.start_with?("#{path}.")
+          end
+        end
+      end
+
       # Insert the embedded document.
       #
       # When the parent association is touchable (which is the default for
       # +embedded_in+), the touch timestamp updates are merged into the
       # same +update_one+ call that performs the insert. This avoids a
       # second round-trip that the +after_save+ touch callback would
-      # otherwise issue.
+      # otherwise issue. The merge is skipped when a touch path would
+      # conflict with a path the insert targets (see
+      # +conflicting_touch_paths?+); such touches are deferred to the
+      # callback's separate round-trip.
       #
       # @api private
       #
@@ -64,7 +96,7 @@ module Mongoid
 
           if _touchable_parent?
             touches = _parent._gather_touch_updates(Time.current)
-            if touches.present?
+            if touches.present? && !conflicting_touch_paths?(operations, touches)
               operations['$set'] = (operations['$set'] || {}).merge(touches)
               Threaded.begin_touch_merged(self)
             end
