@@ -786,4 +786,39 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
   end
+
+  describe 'operator guard on chained override methods' do
+    # On this branch overwrite_chained_operators defaults to false, which
+    # routes elem_match through the guarded and_with_operator funnel. Force
+    # the override path so the guard in Mergeable#__override__ is exercised.
+    config_override :overwrite_chained_operators, true
+
+    let(:js) { 'this.name == "admin"' }
+
+    context 'when allow_unsafe_query_operators is false' do
+      config_override :allow_unsafe_query_operators, false
+
+      it 'rejects a $where nested in elem_match' do
+        expect do
+          query.elem_match(a: { '$where' => js })
+        end.to raise_error(Mongoid::Errors::InvalidQuery, /executes server-side JavaScript/)
+      end
+
+      it 'permits an ordinary elem_match value' do
+        expect do
+          query.elem_match(a: { name: 'x' })
+        end.not_to raise_error
+      end
+    end
+
+    context 'when allow_unsafe_query_operators is true' do
+      config_override :allow_unsafe_query_operators, true
+
+      it 'permits a $where nested in elem_match' do
+        expect do
+          query.elem_match(a: { '$where' => js })
+        end.not_to raise_error
+      end
+    end
+  end
 end
