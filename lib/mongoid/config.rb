@@ -138,17 +138,34 @@ module Mongoid
     # See https://jira.mongodb.org/browse/MONGOID-5981 for details.
     option :in_memory_regexp_time_limit, default: 5.0
 
-    # When true (default), all top-level query operators are passed through
-    # to MongoDB without restriction when using +where+/+find_by+. Set to
-    # false to enable a strict allowlist that rejects operators like +$where+
-    # and +$function+, which can execute arbitrary JavaScript when user-supplied
-    # input reaches the query builder. This also governs the string form of
-    # +where+ (e.g. +where("this.name == 'admin'")+), which compiles to
-    # +$where+ and is rejected the same way when this flag is false.
+    # When false (default), query operators are restricted when building a
+    # selector, so that user-supplied input reaching the query builder cannot
+    # make MongoDB execute arbitrary JavaScript. Two rules are enforced:
     #
-    # See https://jira.mongodb.org/browse/MONGOID-5939 and
-    # https://jira.mongodb.org/browse/MONGOID-5993 for details.
-    option :allow_unsafe_query_operators, default: true
+    # - An operator at the top level of an expression must appear in
+    #   +Criteria::Queryable::Selectable::ALLOWED_QUERY_OPERATORS+.
+    # - +$where+, +$function+, and +$accumulator+ are rejected at any depth,
+    #   including inside +$expr+ and the logical operators.
+    #
+    # This applies to every query method that accepts an expression, including
+    # +where+, +find_by+, +and+, +or+, +nor+, +not+, +any_of+, and +none_of+.
+    # It also governs the string form of +where+, e.g.
+    # +where("this.name == 'admin'")+, which the server evaluates as +$where+.
+    # Applications relying on that form must set this option to true.
+    #
+    # The APIs that request JavaScript explicitly, +Criteria#for_js+ and
+    # +js_query+, are unaffected: there the developer has asked for it.
+    #
+    # Set to true to restore the unrestricted pass-through behavior.
+    #
+    # Note that this option is deliberately not tied to +load_defaults+: an
+    # application that has opted into older defaults still gets the guard, and
+    # must set this option explicitly to turn it off.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5939,
+    # https://jira.mongodb.org/browse/MONGOID-5993,
+    # https://jira.mongodb.org/browse/MONGOID-5994 for details.
+    option :allow_unsafe_query_operators, default: false
 
     # When this flag is true, it will be possible to add a record to a
     # "has_many" or "has_and_belongs_to_many" association by passing that
