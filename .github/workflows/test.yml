@@ -7,6 +7,10 @@ name: Run Mongoid Tests
 - pull_request
 jobs:
   build:
+    # skip github workflows on this branch; we'll rely solely on
+    # evergreen for CI runs
+    if: false
+
     name: "${{matrix.ruby}} db:${{matrix.mongodb}}
       rails:${{matrix.rails}} fle:${{matrix.fle}} ${{matrix.topology}}"
     env:
