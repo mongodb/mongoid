@@ -556,6 +556,27 @@ describe Mongoid::Contextual::Memory do
         expect(context.distinct('label.sales')).to eq([ BigDecimal('1E2') ])
       end
     end
+
+    context 'when the field name is a method name' do
+      let!(:person) do
+        Person.create!(ssn: 'secret-ssn')
+      end
+
+      let!(:address) do
+        person.addresses.create!(street: 'hobrecht')
+      end
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ address ]
+        end
+      end
+
+      it 'does not call the method' do
+        expect(address).not_to receive(:destroy)
+        expect(context.distinct(:destroy)).to eq([ nil ])
+      end
+    end
   end
 
   describe '#each' do
@@ -1714,6 +1735,116 @@ describe Mongoid::Contextual::Memory do
                               ])
       end
     end
+
+    context 'when plucking a dynamic attribute' do
+      let(:criteria) do
+        Band.all.tap do |crit|
+          crit.documents = [ Band.create!(name: 'Depeche Mode', mood: 'dark') ]
+        end
+      end
+
+      it 'returns the value from the attributes' do
+        expect(context.pluck(:mood)).to eq([ 'dark' ])
+      end
+    end
+
+    context 'when the field name is a method name' do
+      let!(:person) do
+        Person.create!(ssn: 'secret-ssn')
+      end
+
+      let!(:address) do
+        person.addresses.create!(street: 'hobrecht')
+      end
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ address ]
+        end
+      end
+
+      it 'does not call the method' do
+        expect(address).not_to receive(:destroy)
+        expect(context.pluck(:destroy)).to eq([ nil ])
+      end
+
+      it 'does not return the attributes hash' do
+        expect(context.pluck(:attributes)).to eq([ nil ])
+      end
+
+      it 'does not traverse to the parent document' do
+        expect(context.pluck('_root.ssn')).to eq([ nil ])
+      end
+
+      it 'does not destroy the parent document' do
+        expect(context.pluck('_root.destroy')).to eq([ nil ])
+        expect(Person.where(_id: person.id).count).to eq(1)
+      end
+    end
+
+    context 'when plucking a belongs_to association' do
+      let!(:band) do
+        Band.create!(name: 'Depeche Mode')
+      end
+
+      let!(:artist) do
+        Artist.create!(band: band)
+      end
+
+      let(:criteria) do
+        Artist.all.tap do |crit|
+          crit.documents = [ artist ]
+        end
+      end
+
+      it 'traverses to the associated document' do
+        expect(context.pluck('band.name')).to eq([ 'Depeche Mode' ])
+      end
+
+      it 'returns the document for the association name' do
+        expect(context.pluck(:band)).to eq([ band ])
+      end
+
+      it 'returns the id for the foreign key' do
+        expect(context.pluck(:band_id)).to eq([ band.id ])
+      end
+    end
+
+    context 'when plucking the foreign key of a many to many association' do
+      let!(:preference) do
+        Preference.create!(name: 'nature')
+      end
+
+      let!(:person) do
+        Person.create!(preferences: [ preference ])
+      end
+
+      let(:criteria) do
+        Person.all.tap do |crit|
+          crit.documents = [ person ]
+        end
+      end
+
+      it 'returns the stored ids' do
+        expect(context.pluck(:preference_ids)).to eq([ [ preference.id ] ])
+      end
+    end
+
+    context 'when the field path has an empty segment' do
+      let!(:band) do
+        Band.create!(name: 'Depeche Mode', label: Label.new(name: 'Mute'))
+      end
+
+      let(:criteria) do
+        Band.all.tap do |crit|
+          crit.documents = [ band ]
+        end
+      end
+
+      it 'returns nil' do
+        expect(context.pluck('label..name')).to eq([ nil ])
+      end
+    end
   end
 
   describe '#pick' do
@@ -1768,6 +1899,27 @@ describe Mongoid::Contextual::Memory do
 
       it 'returns nil' do
         expect(picked).to be_nil
+      end
+    end
+
+    context 'when the field name is a method name' do
+      let!(:person) do
+        Person.create!(ssn: 'secret-ssn')
+      end
+
+      let!(:address) do
+        person.addresses.create!(street: 'hobrecht')
+      end
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ address ]
+        end
+      end
+
+      it 'does not call the method' do
+        expect(address).not_to receive(:destroy)
+        expect(context.pick(:destroy)).to be_nil
       end
     end
   end
@@ -2232,6 +2384,31 @@ describe Mongoid::Contextual::Memory do
           [ 1, 2 ] => 2,
           [ 1, 3 ] => 1
         )
+      end
+    end
+
+    context 'when the field name is a method name' do
+      let!(:person) do
+        Person.create!(ssn: 'secret-ssn')
+      end
+
+      let!(:address) do
+        person.addresses.create!(street: 'hobrecht')
+      end
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ address ]
+        end
+      end
+
+      it 'does not call the method' do
+        expect(address).not_to receive(:destroy)
+        expect(context.tally(:destroy)).to eq(nil => 1)
+      end
+
+      it 'does not disclose the parent document fields' do
+        expect(context.tally('_root.ssn')).to eq(nil => 1)
       end
     end
   end

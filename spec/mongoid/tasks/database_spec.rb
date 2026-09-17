@@ -69,6 +69,24 @@ describe Mongoid::Tasks::Database do
   end
 
   describe '.create_collections' do
+    # Creating a collection sends no document data, so it must not require a
+    # client that can encrypt, even for a model that declares encrypted
+    # fields. Otherwise this task cannot run without KMS credentials.
+    context 'when a model declares encrypted fields' do
+      before do
+        require 'support/crypt/models'
+      end
+
+      after do
+        Mongoid.default_client[Crypt::Patient.collection_name].drop
+      end
+
+      it 'creates the collection using a client without automatic encryption' do
+        expect { Mongoid::Tasks::Database.create_collections([ Crypt::Patient ]) }
+          .not_to raise_error
+      end
+    end
+
     context 'collection_options are specified' do
       let(:models) do
         [ DatabaseSpec::Measurement ]

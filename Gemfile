@@ -23,7 +23,19 @@ end
 
 gem 'i18n', *i18n_versions
 
+# :windows is a Bundler alias for every Windows platform, added in Bundler 2.5.
+# Older Bundlers have to name them, and naming only :mswin would miss the mingw
+# variants that Windows MRI actually reports.
+bundler_version = Gem::Version.new(Bundler::VERSION)
+
+tzinfo_platforms = %i[ jruby ]
+tzinfo_platforms += if bundler_version >= Gem::Version.new('2.5')
+                      %i[ windows ]
+                    else
+                      %i[ mswin mswin64 mingw x64_mingw ]
+                    end
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem "tzinfo-data", platforms: %i[ windows jruby ]
+gem "tzinfo-data", platforms: tzinfo_platforms
 
 gem 'ostruct' if RUBY_VERSION >= '4.0'

@@ -24,18 +24,9 @@ module Mongoid
       def create_indexes
         return unless index_specifications
 
-        default_options = { background: Config.background_indexing }
-
-        index_specifications.each do |spec|
-          key, options = spec.key, default_options.merge(spec.options)
-          if database = options[:database]
-            with(database: database) do |klass|
-              klass.collection.indexes(session: _session).create_one(key, options.except(:database))
-            end
-          else
-            collection.indexes(session: _session).create_one(key, options)
-          end
-        end and true
+        Threaded.with_collection_management do
+          perform_create_indexes
+        end
       end
 
       # Send the actual index removal comments to the MongoDB driver,
@@ -46,20 +37,9 @@ module Mongoid
       #
       # @return [ true ] If the operation succeeded.
       def remove_indexes
-        indexed_database_names.each do |database|
-          with(database: database) do |klass|
-            klass.collection.indexes(session: _session).each do |spec|
-              next if spec['name'] == '_id_'
-
-              klass.collection.indexes(session: _session).drop_one(spec['key'])
-              logger.info(
-                "MONGOID: Removed index '#{spec['name']}' on collection " +
-                "'#{klass.collection.name}' in database '#{database}'."
-              )
-            end
-          rescue Mongo::Error::OperationFailure
-          end
-        end and true
+        Threaded.with_collection_management do
+          perform_remove_indexes
+        end
       end
 
       # Add the default indexes to the root document if they do not already
@@ -118,6 +98,38 @@ module Mongoid
       end
 
       private
+
+      def perform_create_indexes
+        default_options = { background: Config.background_indexing }
+
+        index_specifications.each do |spec|
+          key, options = spec.key, default_options.merge(spec.options)
+          if database = options[:database]
+            with(database: database) do |klass|
+              klass.collection.indexes(session: _session).create_one(key, options.except(:database))
+            end
+          else
+            collection.indexes(session: _session).create_one(key, options)
+          end
+        end and true
+      end
+
+      def perform_remove_indexes
+        indexed_database_names.each do |database|
+          with(database: database) do |klass|
+            klass.collection.indexes(session: _session).each do |spec|
+              next if spec['name'] == '_id_'
+
+              klass.collection.indexes(session: _session).drop_one(spec['key'])
+              logger.info(
+                "MONGOID: Removed index '#{spec['name']}' on collection " +
+                "'#{klass.collection.name}' in database '#{database}'."
+              )
+            end
+          rescue Mongo::Error::OperationFailure
+          end
+        end and true
+      end
 
       # Get the names of all databases for this model that have index
       # definitions.
