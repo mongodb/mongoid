@@ -126,6 +126,8 @@ module Mongoid
 
         client = client.with(options) unless options.empty?
 
+        verify_encryption_schema!(client)
+
         client
       end
     end
@@ -197,6 +199,39 @@ module Mongoid
     def __evaluate__(name)
       return nil unless name
       name.respond_to?(:call) ? name.call.to_sym : name.to_sym
+    end
+
+    # Refuse to use a client that would store a model's encrypted fields in
+    # plaintext.
+    #
+    # The automatic encryption schema is keyed by namespace and is built once,
+    # when the client is created. The driver looks the target namespace up in
+    # that schema, and when it is absent it asks the server for a schema
+    # instead; a collection without a validator then yields no encryption at
+    # all, and no error. Checking the namespace here is what turns that silent
+    # downgrade into a failure.
+    #
+    # @param [ Mongo::Client ] client The client this context resolved to.
+    #
+    # @raise [ Errors::NoEncryptionSchema ] if the model needs an encryption
+    #   schema and the client's schema does not cover the target namespace.
+    def verify_encryption_schema!(client)
+      klass = @object.is_a?(Class) ? @object : @object.class
+      # A model whose encrypted fields all live on embedded models declares no
+      # encryption of its own, and still needs a schema for its collection.
+      return unless klass.respond_to?(:requires_encryption_schema?) && klass.requires_encryption_schema?
+      # An embedded document is persisted as part of its parent, so the
+      # parent's context is what governs the namespace.
+      return if klass.embedded?
+      # Collection and index management sends no document data, so it does not
+      # need an encryption-capable client.
+      return if Threaded.managing_collection?
+
+      schema_map = client.options.dig(:auto_encryption_options, :schema_map)
+      namespace = "#{client.database.name}.#{collection_name}"
+      return if schema_map&.key?(namespace)
+
+      raise Errors::NoEncryptionSchema.new(klass, namespace, client_name)
     end
 
     def client_options

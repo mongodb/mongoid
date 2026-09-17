@@ -2267,6 +2267,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
   end
 
+  # Whether the conditions carry a pattern decides which branch of remove_all
+  # runs, so anything that has to behave the same on both is exercised twice.
+  conditions_variants = [
+    [ 'no regular expression', nil ],
+    [ 'a regular expression', { name: /Test/ } ]
+  ].freeze
+
   %i[ delete_all destroy_all ].each do |method|
     describe "\##{method}" do
       context 'when the relation is not polymorphic' do
@@ -2336,6 +2343,47 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
           it "sets the association locally" do
             expect(person.preferences).to eq([])
+          end
+        end
+
+        context 'when the base holds the foreign keys' do
+          # unbind_one pulls ids out of the base's foreign key array and marks
+          # the base dirty, so which documents get unbound is visible here.
+          # Only what the association already held is unbound, and that has to
+          # hold whether or not the conditions carry a regular expression:
+          # scanning under a regexp budget loads the association first, and
+          # that load must not turn into an unbind of its own. See the note in
+          # HasMany::Proxy#remove_all_bounded.
+          let!(:person) do
+            Person.create!.tap do |base|
+              base.preferences.create!(name: 'Testing')
+              base.preferences.create!(name: 'Test')
+            end
+          end
+
+          let(:ids) { person.preference_ids.dup }
+
+          conditions_variants.each do |description, conditions|
+            context "when the conditions carry #{description}" do
+              context 'when the association is already in memory' do
+                it 'unbinds the deleted documents' do
+                  person.preferences.send(method, conditions)
+                  expect(person.preference_ids).to eq([])
+                  expect(person).to be_changed
+                end
+              end
+
+              context 'when the association has not been loaded' do
+                let(:cold) { Person.find(person._id) }
+
+                it 'leaves the foreign keys alone' do
+                  expect(ids.length).to eq(2)
+                  cold.preferences.send(method, conditions)
+                  expect(cold.preference_ids).to eq(ids)
+                  expect(cold).not_to be_changed
+                end
+              end
+            end
           end
         end
       end

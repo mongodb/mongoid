@@ -41,6 +41,18 @@ describe Mongoid::Config::Defaults do
       end
     end
 
+    shared_examples 'uses settings for 9.0' do
+      it 'uses settings for 9.0' do
+        expect(Mongoid.autosave_saves_unchanged_documents).to be true
+      end
+    end
+
+    shared_examples 'never allows reparenting via nested attributes' do
+      it 'leaves allow_reparenting_via_nested_attributes false' do
+        expect(Mongoid.allow_reparenting_via_nested_attributes).to be false
+      end
+    end
+
     context "when giving a valid version" do
 
       before do
@@ -57,6 +69,8 @@ describe Mongoid::Config::Defaults do
 
         it_behaves_like "uses settings for 8.0"
         it_behaves_like "uses settings for 8.1"
+        it_behaves_like 'uses settings for 9.0'
+        it_behaves_like 'never allows reparenting via nested attributes'
       end
 
       context "when the given version is 8.1" do
@@ -65,6 +79,8 @@ describe Mongoid::Config::Defaults do
 
         it_behaves_like "does not use settings for 8.0"
         it_behaves_like "uses settings for 8.1"
+        it_behaves_like 'uses settings for 9.0'
+        it_behaves_like 'never allows reparenting via nested attributes'
       end
 
       context "when the given version is 9.0" do
@@ -73,6 +89,8 @@ describe Mongoid::Config::Defaults do
 
         it_behaves_like "does not use settings for 8.0"
         it_behaves_like "does not use settings for 8.1"
+        it_behaves_like 'uses settings for 9.0'
+        it_behaves_like 'never allows reparenting via nested attributes'
       end
     end
 
