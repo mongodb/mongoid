@@ -7,6 +7,9 @@ name: Run Mongoid Tests
 - pull_request
 jobs:
   build:
+    # skip this workflow on this branch in favor of evergreen
+    if: false
+
     name: "${{matrix.ruby}} driver-${{matrix.driver}} mongodb-${{matrix.mongodb}}
       ${{matrix.topology}}"
     env:
