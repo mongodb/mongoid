@@ -7,6 +7,33 @@ require_relative './nested_spec_models'
 
 describe Mongoid::Attributes::Nested do
 
+  # Expects the enclosing context to define `build_with_id`, taking an id
+  # value and returning the document built with it in nested attributes.
+  shared_examples 'rejects non-scalar ids' do |klass_name|
+    not_found = /not found for class #{klass_name}/
+
+    context 'when the id is an operator hash' do
+      it 'raises a document not found error' do
+        expect { build_with_id({ '$ne' => nil }) }
+          .to raise_error(Mongoid::Errors::DocumentNotFound, not_found)
+      end
+    end
+
+    context 'when the id is an array' do
+      it 'raises a document not found error' do
+        expect { build_with_id([BSON::ObjectId.new]) }
+          .to raise_error(Mongoid::Errors::DocumentNotFound, not_found)
+      end
+    end
+
+    context 'when the id is a malformed object id hash' do
+      it 'raises a document not found error' do
+        expect { build_with_id({ '$oid' => 'junk' }) }
+          .to raise_error(Mongoid::Errors::DocumentNotFound, not_found)
+      end
+    end
+  end
+
   describe ".accepts_nested_attributes_for" do
 
     context "when the autosave option is not defined" do
@@ -178,6 +205,30 @@ describe Mongoid::Attributes::Nested do
       end
     end
 
+    context 'when the id in the attributes is not a scalar' do
+      let(:person) { Person.create! }
+
+      def build_with_id(id)
+        person.update!(posts_attributes: { '0' => { id: id, title: 'Crafted' } })
+      end
+
+      context 'when the association is empty' do
+        include_examples 'rejects non-scalar ids', 'Post'
+      end
+
+      context 'when the association is not empty' do
+        before { person.posts.create!(title: 'Existing') }
+
+        include_examples 'rejects non-scalar ids', 'Post'
+      end
+
+      context 'when allow_reparenting_via_nested_attributes is true' do
+        config_override :allow_reparenting_via_nested_attributes, true
+
+        include_examples 'rejects non-scalar ids', 'Post'
+      end
+    end
+
     context "when the relation is a references and referenced in many" do
 
       before do
@@ -201,16 +252,100 @@ describe Mongoid::Attributes::Nested do
           )
         end
 
-        it "sets the nested attributes" do
-          expect(person.preferences.map(&:name)).to eq([preference.name])
+        context 'when allow_reparenting_via_nested_attributes is false' do
+          config_override :allow_reparenting_via_nested_attributes, false
+
+          it 'raises a document not found error' do
+            expect { person }.to raise_error(Mongoid::Errors::DocumentNotFound,
+                                             /Document\(s\) not found for class Preference/)
+          end
         end
 
-        it "updates attributes of existing document which is added to relation" do
-          preference_name = 'updated preference'
-          person = Person.new(
-            preferences_attributes: { 0 => { id: preference.id, name: preference_name } }
-          )
-          expect(person.preferences.map(&:name)).to eq([preference_name])
+        context 'when allow_reparenting_via_nested_attributes is true' do
+          config_override :allow_reparenting_via_nested_attributes, true
+
+          it 'sets the nested attributes' do
+            expect(person.preferences.map(&:name)).to eq([preference.name])
+          end
+
+          it 'updates attributes of existing document which is added to relation' do
+            preference_name = 'updated preference'
+            person = Person.new(
+              preferences_attributes: { 0 => { id: preference.id, name: preference_name } }
+            )
+            expect(person.preferences.map(&:name)).to eq([preference_name])
+          end
+
+          context 'when the id does not correspond to an existing document' do
+            let(:person) do
+              Person.new(
+                preferences_attributes: { 0 => { id: BSON::ObjectId.new, name: 'Ghost' } }
+              )
+            end
+
+            context 'when raise_not_found_error is true' do
+              config_override :raise_not_found_error, true
+
+              it 'raises a document not found error' do
+                expect { person }.to raise_error(Mongoid::Errors::DocumentNotFound,
+                                                 /Document\(s\) not found for class Preference/)
+              end
+            end
+
+            context 'when raise_not_found_error is false' do
+              config_override :raise_not_found_error, false
+
+              it 'raises a document not found error' do
+                expect { person }.to raise_error(Mongoid::Errors::DocumentNotFound,
+                                                 /Document\(s\) not found for class Preference/)
+              end
+            end
+          end
+        end
+
+        context 'when _destroy is true for a document not in the relation' do
+          before do
+            Person.send(:undef_method, :preferences_attributes=)
+            Person.accepts_nested_attributes_for :preferences, allow_destroy: true
+          end
+
+          let(:person) do
+            Person.new(
+              preferences_attributes: { 0 => { id: preference.id, _destroy: '1' } }
+            )
+          end
+
+          it 'does not raise UnknownAttribute' do
+            expect { person }.not_to raise_error
+          end
+
+          it 'does not add the document to the relation' do
+            expect(person.preferences).to be_empty
+          end
+        end
+      end
+
+      context 'when the id in the attributes is not a scalar' do
+        let(:target) { Person.create! }
+
+        def build_with_id(id)
+          target.update!(preferences_attributes: { 0 => { id: id, name: 'Crafted' } })
+        end
+
+        context 'when the association is empty' do
+          include_examples 'rejects non-scalar ids', 'Preference'
+        end
+
+        context 'when the association is not empty' do
+          before { target.preferences.create!(name: 'Existing') }
+
+          include_examples 'rejects non-scalar ids', 'Preference'
+        end
+
+        context 'when allow_reparenting_via_nested_attributes is true' do
+          config_override :allow_reparenting_via_nested_attributes, true
+
+          include_examples 'rejects non-scalar ids', 'Preference'
         end
       end
     end
@@ -3015,7 +3150,7 @@ describe Mongoid::Attributes::Nested do
                       { "0" =>
                         { "id" => BSON::ObjectId.new.to_s, "title" => "Rogue" }
                       }
-                  }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Post with id\(s\)/)
+                  }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document not found for class Post/)
                 end
               end
             end
@@ -3049,7 +3184,7 @@ describe Mongoid::Attributes::Nested do
                 expect {
                   person.posts_attributes =
                     { "foo" => { "id" => "test", "title" => "Test" } }
-                }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document\(s\) not found for class Post with id\(s\)/)
+                }.to raise_error(Mongoid::Errors::DocumentNotFound, /Document not found for class Post/)
               end
             end
           end
@@ -4994,6 +5129,65 @@ describe Mongoid::Attributes::Nested do
         author.create_post(title: 'test')
         author.update_attributes(two_levels_params)
         expect(author.post.comments.count).to eq 1
+      end
+    end
+  end
+
+  context 'when an id in nested attributes belongs to another parent' do
+    let(:victim) { Person.create! }
+    let(:attacker) { Person.create! }
+
+    context 'when the association is a has-many' do
+      before do
+        Person.send(:undef_method, :posts_attributes=)
+        Person.accepts_nested_attributes_for :posts
+      end
+
+      let!(:victim_post) { victim.posts.create!(title: 'Private') }
+
+      it 'does not update the other parent\'s document' do
+        expect { attacker.update!(posts_attributes: { '0' => { id: victim_post.id, title: 'Overwritten' } }) }
+          .to raise_error(Mongoid::Errors::DocumentNotFound)
+        expect(victim_post.reload.title).to eq('Private')
+      end
+
+      it 'does not add the other parent\'s document to the association' do
+        expect { attacker.update!(posts_attributes: { '0' => { id: victim_post.id, title: 'Overwritten' } }) }
+          .to raise_error(Mongoid::Errors::DocumentNotFound)
+        expect(attacker.reload.posts).to be_empty
+      end
+
+      it 'does not update via a direct association assignment' do
+        expect { attacker.update!(posts: { '0' => { id: victim_post.id, title: 'Overwritten' } }) }
+          .to raise_error(Mongoid::Errors::DocumentNotFound)
+        expect(victim_post.reload.title).to eq('Private')
+      end
+    end
+
+    context 'when the association is a has-and-belongs-to-many' do
+      before do
+        Person.send(:undef_method, :preferences_attributes=)
+        Person.accepts_nested_attributes_for :preferences
+      end
+
+      let!(:victim_preference) { victim.preferences.create!(name: 'Private') }
+
+      it 'does not update the other parent\'s document' do
+        expect { attacker.update!(preferences_attributes: { '0' => { id: victim_preference.id, name: 'Overwritten' } }) }
+          .to raise_error(Mongoid::Errors::DocumentNotFound)
+        expect(victim_preference.reload.name).to eq('Private')
+      end
+
+      it 'does not add the other parent\'s document to the association' do
+        expect { attacker.update!(preferences_attributes: { '0' => { id: victim_preference.id, name: 'Overwritten' } }) }
+          .to raise_error(Mongoid::Errors::DocumentNotFound)
+        expect(attacker.reload.preferences).to be_empty
+      end
+
+      it 'does not update via a direct association assignment' do
+        expect { attacker.update!(preferences: { '0' => { id: victim_preference.id, name: 'Overwritten' } }) }
+          .to raise_error(Mongoid::Errors::DocumentNotFound)
+        expect(victim_preference.reload.name).to eq('Private')
       end
     end
   end

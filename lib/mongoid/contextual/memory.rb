@@ -2,6 +2,7 @@
 
 require "mongoid/contextual/aggregable/memory"
 require "mongoid/association/eager_loadable"
+require "mongoid/field_readable"
 
 module Mongoid
   module Contextual
@@ -11,6 +12,7 @@ module Mongoid
       include Association::EagerLoadable
       include Queryable
       include Positional
+      include FieldReadable
 
       # @attribute [r] root The root document.
       # @attribute [r] path The atomic path.
@@ -141,10 +143,20 @@ module Mongoid
       # @param [ Criteria ] criteria The criteria.
       def initialize(criteria)
         @criteria, @klass = criteria, criteria.klass
-        @documents = criteria.documents.select do |doc|
-          @root ||= doc._root
-          @collection ||= root.collection
-          doc._matches?(criteria.selector)
+
+        # Resolving the collection can build a Mongo::Client the first time it
+        # runs, so it happens before the budget opens. Where the budget is
+        # enforced with Timeout the exception is asynchronous, and landing in
+        # the middle of that would leave a half-built client behind.
+        if (first = criteria.documents.first)
+          @root = first._root
+          @collection = @root.collection
+        end
+
+        # One regexp budget covers the whole scan, so that the limit bounds the
+        # query rather than each document individually.
+        @documents = Matcher::RegexpBudget.open(criteria.selector) do
+          criteria.documents.select { |doc| doc._matches?(criteria.selector) }
         end
         apply_sorting
         apply_options
@@ -534,11 +546,10 @@ module Mongoid
             # _translations hash so that we can get the specified translation in
             # the remaining
             if field&.localized?
-              document.send("#{segment}_translations")
+              document.public_send("#{segment}_translations")
             end
           end
-          meth = klass.aliased_associations[segment] || segment
-          res.nil? ? document.try(meth) : res
+          res.nil? ? read_field_value(document, segment) : res
         elsif document.is_a?(Hash)
           # TODO: Remove the indifferent access when implementing MONGOID-5410.
           document.key?(segment.to_s) ?
