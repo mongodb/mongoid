@@ -325,6 +325,10 @@ module Mongoid
               end
             end
           end
+          # Every query method that takes a user-supplied expression normalizes
+          # it here, so this is where the operator guard is enforced. See
+          # Selectable#_mongoid_validate_operators! for what it does not cover.
+          _mongoid_validate_operators!(result)
           result
         end
 
@@ -343,6 +347,14 @@ module Mongoid
           if criterion.is_a?(Selectable)
             criterion = criterion.selector
           end
+
+          # The __override__ path writes to the selector directly, so it
+          # bypasses _mongoid_expand_keys where the operator guard normally
+          # runs. Enforce the guard here so chained override methods
+          # (elem_match, exists, eq, gt, in, etc.) cannot smuggle $where or
+          # other JavaScript operators under strict mode.
+          _mongoid_validate_operators!(criterion)
+
           selection(criterion) do |selector, field, value|
             expression = prepare(field, operator, value)
             existing = selector[field]
