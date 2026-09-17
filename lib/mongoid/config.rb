@@ -122,6 +122,68 @@ module Mongoid
     # always return a Hash.
     option :legacy_attributes, default: true
 
+    # The maximum number of seconds that evaluating a single query in memory
+    # may spend executing regular expressions. Queries against an embedded
+    # association are evaluated in the calling thread, so a pattern built from
+    # user input runs locally and can otherwise consume unbounded CPU. The
+    # limit is cumulative over the whole query, since cost grows with the
+    # number of documents and conditions as well as with the pattern.
+    #
+    # Set to nil to remove the limit. On Ruby 3.2 and later the remaining
+    # budget is compiled into the pattern, so the limit counts only the time
+    # spent matching. Earlier Rubies have no per-Regexp timeout, so the query
+    # is bounded with Timeout instead and the limit is wall clock over the
+    # whole in-memory evaluation.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5981 for details.
+    option :in_memory_regexp_time_limit, default: 5.0
+
+    # When false (default), query operators are restricted when building a
+    # selector, so that user-supplied input reaching the query builder cannot
+    # make MongoDB execute arbitrary JavaScript. Two rules are enforced:
+    #
+    # - An operator at the top level of an expression must appear in
+    #   +Criteria::Queryable::Selectable::ALLOWED_QUERY_OPERATORS+.
+    # - +$where+, +$function+, and +$accumulator+ are rejected at any depth,
+    #   including inside +$expr+ and the logical operators.
+    #
+    # This applies to every query method that accepts an expression, including
+    # +where+, +find_by+, +and+, +or+, +nor+, +not+, +any_of+, and +none_of+.
+    # It also governs the string form of +where+, e.g.
+    # +where("this.name == 'admin'")+, which the server evaluates as +$where+.
+    # Applications relying on that form must set this option to true.
+    #
+    # The APIs that request JavaScript explicitly, +Criteria#for_js+ and
+    # +js_query+, are unaffected: there the developer has asked for it.
+    #
+    # Set to true to restore the unrestricted pass-through behavior.
+    #
+    # Note that this option is deliberately not tied to +load_defaults+: an
+    # application that has opted into older defaults still gets the guard, and
+    # must set this option explicitly to turn it off.
+    #
+    # See https://jira.mongodb.org/browse/MONGOID-5939,
+    # https://jira.mongodb.org/browse/MONGOID-5993,
+    # https://jira.mongodb.org/browse/MONGOID-5994 for details.
+    option :allow_unsafe_query_operators, default: false
+
+    # When this flag is true, it will be possible to add a record to a
+    # "has_many" or "has_and_belongs_to_many" association by passing that
+    # record's id in the nested attributes for another parent record, even
+    # when the record does not already belong to that association. For a
+    # "has_many" association this moves the record to the new parent.
+    #
+    # When this flag is false, an id in nested attributes is only resolved
+    # within the association itself, and anything else raises an error.
+    #
+    # The default is `false`. Note that allowing reparenting via nested attributes
+    # is a potential security risk, since it could allow a malicious user to move
+    # records that they do not own to a parent record that they do own.
+    #
+    # This option will be removed in Mongoid 10, and the only behavior will be
+    # as if this option were set to false.
+    option :allow_reparenting_via_nested_attributes, default: false
+
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
     #

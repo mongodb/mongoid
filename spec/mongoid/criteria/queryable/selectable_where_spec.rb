@@ -35,6 +35,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
     it_behaves_like 'requires a non-nil argument'
 
     context "when provided a string" do
+      # String criteria compile to $where, which requires the opt-in.
+      config_override :allow_unsafe_query_operators, true
 
       let(:selection) do
         query.where("this.value = 10")
@@ -583,6 +585,204 @@ describe Mongoid::Criteria::Queryable::Selectable do
         let(:mql_operator) { '$and' }
 
         it_behaves_like 'adds conditions to existing query'
+      end
+    end
+  end
+
+  describe 'top-level operator injection guard' do
+    context 'when allow_unsafe_query_operators is true' do
+      config_override :allow_unsafe_query_operators, true
+
+      context 'when passing $where' do
+        it 'does not raise' do
+          expect do
+            query.where('$where' => 'this.name == "admin"')
+          end.not_to raise_error
+        end
+      end
+
+      context 'when passing a string criterion' do
+        it 'does not raise' do
+          expect do
+            query.where('this.name == "admin"')
+          end.not_to raise_error
+        end
+      end
+
+      context 'when passing a string criterion to a negated query' do
+        it 'does not raise' do
+          expect do
+            query.not.where('this.name == "admin"')
+          end.not_to raise_error
+        end
+      end
+
+      context 'when passing $function' do
+        it 'does not raise' do
+          expect do
+            query.where('$function' => { body: 'function() { return true; }', args: [], lang: 'js' })
+          end.not_to raise_error
+        end
+      end
+    end
+
+    context 'when allow_unsafe_query_operators is false' do
+      config_override :allow_unsafe_query_operators, false
+
+      context 'when passing $where' do
+        it 'raises InvalidQuery' do
+          expect do
+            query.where('$where' => 'this.name == "admin"')
+          end.to raise_error(Mongoid::Errors::InvalidQuery, /\$where/)
+        end
+      end
+
+      context 'when passing $function' do
+        it 'raises InvalidQuery' do
+          expect do
+            query.where('$function' => { body: 'function() { return true; }', args: [], lang: 'js' })
+          end.to raise_error(Mongoid::Errors::InvalidQuery, /\$function/)
+        end
+      end
+
+      context 'when the error mentions allow_unsafe_query_operators' do
+        it 'includes the config opt-in in the message' do
+          expect do
+            query.where('$where' => 'true')
+          end.to raise_error(Mongoid::Errors::InvalidQuery, /allow_unsafe_query_operators/)
+        end
+      end
+
+      context 'when passing a string criterion' do
+        it 'raises InvalidQuery' do
+          expect do
+            query.where('this.name == "admin"')
+          end.to raise_error(Mongoid::Errors::InvalidQuery, /\$where/)
+        end
+
+        it 'includes the config opt-in in the message' do
+          expect do
+            query.where('this.name == "admin"')
+          end.to raise_error(Mongoid::Errors::InvalidQuery, /allow_unsafe_query_operators/)
+        end
+      end
+
+      context 'when passing a string criterion to a negated query' do
+        it 'raises InvalidQuery' do
+          expect do
+            query.not.where('this.name == "admin"')
+          end.to raise_error(Mongoid::Errors::InvalidQuery, /\$where/)
+        end
+      end
+
+      %w[$and $or $nor $not $text $comment $expr $jsonSchema $alwaysFalse $alwaysTrue].each do |op|
+        context "when passing #{op} (allowlisted)" do
+          it 'does not raise' do
+            value = case op
+                    when '$and', '$or', '$nor', '$not' then [ { 'x' => 1 } ]
+                    when '$text' then { '$search' => 'hi' }
+                    when '$expr' then { '$gt' => [ '$a', 1 ] }
+                    when '$jsonSchema' then { 'required' => [ 'x' ] }
+                    else true
+                    end
+            expect { query.where(op => value) }.not_to raise_error
+          end
+        end
+      end
+    end
+  end
+
+  describe 'nested operator injection guard' do
+    js = 'this.name == "admin"'
+
+    function_expr = {
+      '$function' => { 'body' => 'function() { return true; }', 'args' => [], 'lang' => 'js' }
+    }.freeze
+
+    accumulator_expr = {
+      '$accumulator' => {
+        'init' => 'function() { return 0; }',
+        'accumulate' => 'function() { return 0; }',
+        'accumulateArgs' => [],
+        'merge' => 'function() { return 0; }',
+        'lang' => 'js'
+      }
+    }.freeze
+
+    # Every path into the selector that does not route through #expr_query,
+    # plus the nested forms that a top-level key check cannot see.
+    unsafe_queries = {
+      'and with a $where key' => ->(query) { query.and('$where' => js) },
+      'or with a $where key' => ->(query) { query.or('$where' => js) },
+      'nor with a $where key' => ->(query) { query.nor('$where' => js) },
+      'not with a $where key' => ->(query) { query.not('$where' => js) },
+      'any_of with a $where key' => ->(query) { query.any_of('$where' => js) },
+      # none_of is not available on this branch; it landed in 8.1 via MONGOID-5453.
+      'elem_match with a nested $where' => ->(query) { query.elem_match(a: { '$where' => js }) },
+      'where with $where inside $or' => ->(query) { query.where('$or' => [ { '$where' => js } ]) },
+      'where with $function inside $expr' => ->(query) { query.where('$expr' => function_expr) },
+      'where with $accumulator inside $expr' => ->(query) { query.where('$expr' => accumulator_expr) },
+      'where with $where three levels deep' => lambda { |query|
+        query.where('$and' => [ { '$or' => [ { '$where' => js } ] } ])
+      },
+      'where with a symbol $where key inside $or' => ->(query) { query.where('$or' => [ { :$where => js } ]) }
+    }.freeze
+
+    context 'when allow_unsafe_query_operators is false' do
+      config_override :allow_unsafe_query_operators, false
+
+      unsafe_queries.each do |description, builder|
+        context "when querying with #{description}" do
+          it 'raises InvalidQuery' do
+            expect do
+              builder.call(query)
+            end.to raise_error(Mongoid::Errors::InvalidQuery, /\$where|\$function|\$accumulator/)
+          end
+        end
+      end
+
+      it 'includes the config opt-in in the message' do
+        expect do
+          query.or('$where' => js)
+        end.to raise_error(Mongoid::Errors::InvalidQuery, /allow_unsafe_query_operators/)
+      end
+
+      context 'when the nested expression is safe' do
+        it 'permits $or with field expressions' do
+          expect do
+            query.where('$or' => [ { 'a' => 1 }, { 'b' => { '$gt' => 2 } } ])
+          end.not_to raise_error
+        end
+
+        it 'permits $expr with aggregation operators' do
+          expect do
+            query.where('$expr' => { '$gt' => [ '$a', '$b' ] })
+          end.not_to raise_error
+        end
+
+        it 'permits a field whose name resembles a javascript operator' do
+          expect do
+            query.where('where' => js)
+          end.not_to raise_error
+        end
+
+        it 'permits a value that resembles a javascript operator' do
+          expect do
+            query.where('name' => '$where')
+          end.not_to raise_error
+        end
+      end
+    end
+
+    context 'when allow_unsafe_query_operators is true' do
+      config_override :allow_unsafe_query_operators, true
+
+      unsafe_queries.each do |description, builder|
+        context "when querying with #{description}" do
+          it 'does not raise' do
+            expect { builder.call(query) }.not_to raise_error
+          end
+        end
       end
     end
   end

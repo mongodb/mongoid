@@ -3695,6 +3695,8 @@ describe Mongoid::Criteria do
       end
 
       context "when the criteria is not embedded" do
+        # String criteria compile to $where, which requires the opt-in.
+        config_override :allow_unsafe_query_operators, true
 
         let(:criteria) do
           Band.where("this.name == 'Depeche Mode'")
