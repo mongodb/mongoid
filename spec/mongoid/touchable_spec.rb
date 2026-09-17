@@ -1564,5 +1564,69 @@ describe Mongoid::Touchable do
         expect(building.updated_at).to be_within(5).of(Time.now)
       end
     end
+
+    context 'when a sibling in a parent array has a pending touch' do
+      let(:building) do
+        TouchableSpec::Embedded::Building.create!(title: 'Tower')
+      end
+
+      let(:first_floor) do
+        building.floors.create!(level: 1)
+      end
+
+      let(:second_floor) do
+        building.floors.create!(level: 2)
+      end
+
+      let(:pending_touch_time) do
+        Time.now + 60
+      end
+
+      before do
+        first_floor
+        # Leave a pending touch on the other floor, at a different index of
+        # the same array. Rewriting both that touch and the insert's own
+        # touch to the positional operator collapses them onto one path and
+        # touches the wrong floor.
+        second_floor.updated_at = pending_touch_time
+      end
+
+      it 'does not raise when creating a grandchild under the other floor' do
+        expect { first_floor.sofas.create! }.not_to raise_error
+      end
+
+      it 'touches the floor the grandchild was inserted under' do
+        first_floor.sofas.create!
+        building.reload
+        expect(building.floors[0].updated_at).to be_within(5).of(Time.now)
+      end
+
+      it 'preserves the pending touch on the sibling floor' do
+        first_floor.sofas.create!
+        building.reload
+        expect(building.floors[1].updated_at.to_f)
+          .to be_within(1).of(pending_touch_time.to_f)
+      end
+    end
+
+    context 'when the parent touch option names a custom field' do
+      let(:building) do
+        TouchableSpec::Embedded::Building.create!(title: 'Tower')
+      end
+
+      it 'writes the custom touch field when creating an embedded child' do
+        # Materialize the parent before the freeze so its updated_at differs
+        # from the touch time, forcing the touch updates to merge into the
+        # child's insert.
+        building
+        Timecop.freeze(Time.utc(2026, 1, 2, 3, 4, 5)) do
+          building.waiting_rooms.create!
+          building.reload
+          expect(building.last_used_at).not_to be_nil
+          expect(building.last_used_at.to_f)
+            .to be_within(1).of(Time.utc(2026, 1, 2, 3, 4, 5).to_f)
+        end
+      end
+    end
   end
 end

@@ -68,16 +68,77 @@ module Mongoid
         end
       end
 
+      # Determine whether rewriting the indices in the touch updates to the
+      # positional operator, as positionally will do to the final update,
+      # would redirect any touch to an element other than the one the insert
+      # targets. The touches of the parent chain target that element, so
+      # rewriting them is safe. A pending touch on a different element of the
+      # same array, however, would be rewritten to the same positional path
+      # and silently touch the wrong document. Such touches are deferred to
+      # the after_save callback's separate round-trip.
+      #
+      # @api private
+      #
+      # @param [ Hash ] selector The update selector.
+      # @param [ Document ] parent The parent document being touched.
+      # @param [ Symbol, String, nil ] field The parent's custom touch field.
+      # @param [ Hash ] touches The touch updates to merge.
+      #
+      # @return [ true | false ] Whether any touch would be misdirected.
+      def misdirected_touch_paths?(selector, parent, field, touches)
+        rewritten = positionally(selector, { '$set' => touches })['$set']
+
+        touches.keys.any? do |key|
+          path = key.to_s
+          next false if rewritten.key?(path)
+
+          !chain_touch_path?(parent, field, path)
+        end
+      end
+
+      # Whether the given path is written by a touch of the parent chain and
+      # so is safe to merge into the insert.
+      #
+      # @api private
+      #
+      # @param [ Document ] parent The parent document being touched.
+      # @param [ Symbol, String, nil ] field The parent's custom touch field.
+      # @param [ String ] path The touch path.
+      #
+      # @return [ true | false ] Whether the path belongs to the parent chain.
+      def chain_touch_path?(parent, field, path)
+        node = parent
+        field = parent.database_field_name(field) if field
+
+        loop do
+          if node.respond_to?(:updated_at=) &&
+             path == node.atomic_attribute_name(:updated_at).to_s
+            return true
+          end
+
+          if node.equal?(parent) && field &&
+             path == node.atomic_attribute_name(field).to_s
+            return true
+          end
+
+          break unless node._touchable_parent?
+
+          node = node._parent
+        end
+        false
+      end
+
       # Insert the embedded document.
       #
       # When the parent association is touchable (which is the default for
-      # +embedded_in+), the touch timestamp updates are merged into the
-      # same +update_one+ call that performs the insert. This avoids a
-      # second round-trip that the +after_save+ touch callback would
-      # otherwise issue. The merge is skipped when a touch path would
-      # conflict with a path the insert targets (see
-      # +conflicting_touch_paths?+); such touches are deferred to the
-      # callback's separate round-trip.
+      # +embedded_in+), the touch updates are merged into the same
+      # +update_one+ call that performs the insert. This avoids a second
+      # round-trip that the +after_save+ touch callback would otherwise
+      # issue. The merge is skipped when a touch path would conflict with a
+      # path the insert targets (see +conflicting_touch_paths?+) or when
+      # rewriting the touch indices to the positional operator would
+      # misdirect a touch (see +misdirected_touch_paths?+); such touches are
+      # deferred to the callback's separate round-trip.
       #
       # @api private
       #
@@ -95,8 +156,11 @@ module Mongoid
           operations = atomic_inserts
 
           if _touchable_parent?
-            touches = _parent._gather_touch_updates(Time.current)
-            if touches.present? && !conflicting_touch_paths?(operations, touches)
+            field = _association&.inverse_association&.touch_field
+            touches = _parent._gather_touch_updates(Time.current, field)
+            if touches.present? &&
+               !conflicting_touch_paths?(operations, touches) &&
+               !misdirected_touch_paths?(selector, _parent, field, touches)
               operations['$set'] = (operations['$set'] || {}).merge(touches)
               Threaded.begin_touch_merged(self)
             end
