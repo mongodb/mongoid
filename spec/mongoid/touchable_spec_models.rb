@@ -89,6 +89,31 @@ module TouchableSpec
     end
   end
 
+  module Short
+    class Building
+      include Mongoid::Document
+      include Mongoid::Timestamps::Short
+
+      embeds_many :floors, class_name: 'TouchableSpec::Short::Floor'
+    end
+
+    class Floor
+      include Mongoid::Document
+      include Mongoid::Timestamps::Short
+
+      embedded_in :building, touch: true, class_name: 'TouchableSpec::Short::Building'
+
+      embeds_many :gadgets, class_name: 'TouchableSpec::Short::Gadget'
+    end
+
+    class Gadget
+      include Mongoid::Document
+      include Mongoid::Timestamps::Short
+
+      embedded_in :floor, touch: true, class_name: 'TouchableSpec::Short::Floor'
+    end
+  end
+
   module Referenced
     class Building
       include Mongoid::Document

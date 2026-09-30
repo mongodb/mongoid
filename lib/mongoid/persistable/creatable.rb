@@ -74,8 +74,8 @@ module Mongoid
       # targets. The touches of the parent chain target that element, so
       # rewriting them is safe. A pending touch on a different element of the
       # same array, however, would be rewritten to the same positional path
-      # and silently touch the wrong document. Such touches are deferred to
-      # the after_save callback's separate round-trip.
+      # and silently touch the wrong document. Such touches are persisted in
+      # their own round-trip after the insert instead of being merged.
       #
       # @api private
       #
@@ -111,9 +111,9 @@ module Mongoid
         field = parent.database_field_name(field) if field
 
         loop do
-          if node.respond_to?(:updated_at=) &&
-             path == node.atomic_attribute_name(:updated_at).to_s
-            return true
+          if node.respond_to?(:updated_at=)
+            updated_at = node.database_field_name(:updated_at)
+            return true if path == node.atomic_attribute_name(updated_at).to_s
           end
 
           if node.equal?(parent) && field &&
@@ -138,7 +138,8 @@ module Mongoid
       # path the insert targets (see +conflicting_touch_paths?+) or when
       # rewriting the touch indices to the positional operator would
       # misdirect a touch (see +misdirected_touch_paths?+); such touches are
-      # deferred to the callback's separate round-trip.
+      # persisted in their own round-trip right after the insert, so their
+      # persistence does not depend on the callback chain running.
       #
       # @api private
       #
@@ -155,22 +156,49 @@ module Mongoid
           selector = _parent.atomic_selector
           operations = atomic_inserts
 
-          if _touchable_parent?
-            field = _association&.inverse_association&.touch_field
-            touches = _parent._gather_touch_updates(Time.current, field)
-            if touches.present? &&
-               !conflicting_touch_paths?(operations, touches) &&
-               !misdirected_touch_paths?(selector, _parent, field, touches)
-              operations['$set'] = (operations['$set'] || {}).merge(touches)
-              Threaded.begin_touch_merged(self)
-            end
-          end
+          deferred_touches = merge_touch_updates(selector, operations)
 
           _root.collection.find(selector).update_one(
             positionally(selector, operations),
             session: _session
           )
+
+          _root.send(:persist_atomic_operations, '$set' => deferred_touches) if deferred_touches
         end
+      end
+
+      # Merge the parent chain's pending touch updates into the insert
+      # operations when doing so would not produce a conflicting update
+      # (see +conflicting_touch_paths?+ and +misdirected_touch_paths?+).
+      # Either way, marks the touch as merged so the after_save callback
+      # does not persist the updates a second time. Returns the touch
+      # updates that could not be merged; they are persisted in their own
+      # round-trip right after the insert, rather than relying on the
+      # after_save callback, so that an aborted callback chain cannot
+      # silently drop them.
+      #
+      # @api private
+      #
+      # @param [ Hash ] selector The update selector.
+      # @param [ Hash ] operations The atomic insert operations, modified
+      #   in place when the touches are merged.
+      #
+      # @return [ Hash | nil ] The deferred touch updates, if any.
+      def merge_touch_updates(selector, operations)
+        return nil unless _touchable_parent?
+
+        field = _association&.inverse_association&.touch_field
+        touches = _parent._gather_touch_updates(Time.current, field)
+        return nil if touches.blank?
+
+        if conflicting_touch_paths?(operations, touches) ||
+           misdirected_touch_paths?(selector, _parent, field, touches)
+          deferred_touches = touches
+        else
+          operations['$set'] = (operations['$set'] || {}).merge(touches)
+        end
+        Threaded.begin_touch_merged(self)
+        deferred_touches
       end
 
       # Insert the root document.

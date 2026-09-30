@@ -1628,5 +1628,74 @@ describe Mongoid::Touchable do
         end
       end
     end
+
+    context 'when the models use Timestamps::Short' do
+      let(:building) do
+        TouchableSpec::Short::Building.create!
+      end
+
+      let(:floor) do
+        building.floors.create!
+      end
+
+      before do
+        building
+        floor
+      end
+
+      it 'merges the touch updates into the insert round-trip' do
+        expect_query(1) do
+          floor.gadgets.push(TouchableSpec::Short::Gadget.new)
+        end
+      end
+
+      it 'touches the parent chain through the aliased timestamp fields' do
+        original_building_updated_at = building.u_at
+        original_floor_updated_at = floor.u_at
+
+        Timecop.travel(Time.now + 10) do
+          floor.gadgets.push(TouchableSpec::Short::Gadget.new)
+        end
+
+        building.reload
+        expect(building.u_at).to be > original_building_updated_at
+        expect(building.floors.first.u_at).to be > original_floor_updated_at
+      end
+    end
+
+    context 'when a sibling has a pending touch and the touch callback does not run' do
+      let(:building) do
+        TouchableSpec::Embedded::Building.create!(title: 'Tower')
+      end
+
+      let(:first_floor) do
+        building.floors.create!(level: 1)
+      end
+
+      let(:second_floor) do
+        building.floors.create!(level: 2)
+      end
+
+      let(:pending_touch_time) do
+        Time.now + 60
+      end
+
+      before do
+        first_floor
+        # Leave a pending touch on the other floor so the touch updates
+        # conflict with the insert and cannot be merged into it.
+        second_floor.updated_at = pending_touch_time
+      end
+
+      it 'persists the deferred touches at insert time' do
+        Mongoid::Touchable.suppress_touch_callbacks(TouchableSpec::Embedded::Sofa.name) do
+          first_floor.sofas.push(TouchableSpec::Embedded::Sofa.new)
+        end
+
+        building.reload
+        expect(building.floors[1].updated_at.to_f)
+          .to be_within(1).of(pending_touch_time.to_f)
+      end
+    end
   end
 end
