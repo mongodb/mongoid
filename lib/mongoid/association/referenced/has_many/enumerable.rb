@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'mongoid/field_readable'
 require 'mongoid/pluckable'
 
 module Mongoid
@@ -12,6 +13,7 @@ module Mongoid
         class Enumerable
           extend Forwardable
           include ::Enumerable
+          include FieldReadable
           include Pluckable
 
           # The three main instance variables are collections of documents.
@@ -590,7 +592,7 @@ module Mongoid
           #
           # @return [ Array<Numeric> ] The non-nil field values.
           def field_values_for(field)
-            map { |doc| doc.public_send(field) }.compact
+            map { |doc| read_field_value(doc, field) }.compact
           end
 
           def set_base(document)

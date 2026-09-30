@@ -10,11 +10,15 @@ module Mongoid
       included do
         class_attribute :dependents
 
+        # Note the leading underscore: without it, ActiveSupport's
+        # class_attribute would generate a helper method for this attribute
+        # that collides with one it generates for :dependents.
+        #
         # @api private
-        class_attribute :dependents_owner
+        class_attribute :_dependents_owner
 
         self.dependents = []
-        self.dependents_owner = self
+        self._dependents_owner = self
       end
 
       class_methods do
@@ -55,9 +59,9 @@ module Mongoid
       def self.define_dependency!(association)
         validate!(association)
         association.inverse_class.tap do |klass|
-          if klass.dependents_owner != klass
+          if klass._dependents_owner != klass
             klass.dependents = []
-            klass.dependents_owner = klass
+            klass._dependents_owner = klass
           end
 
           klass.dependents.push(association) if association.dependent && !klass.dependents.include?(association)

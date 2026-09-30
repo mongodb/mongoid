@@ -18,10 +18,15 @@ Mongoid is a Ruby Object-Document Mapper (ODM) framework for MongoDB. Mongoid al
 Tests require a running MongoDB instance. Set the URI via the `MONGODB_URI` environment variable:
 
 ```
-MONGODB_URI="mongodb://localhost:27017,localhost:27018,localhost:27019/" bundle exec rspec spec/path/to/spec.rb
+export MONGODB_URI="mongodb://localhost:27017,localhost:27018,localhost:27019/"
+bundle exec rspec spec/path/to/spec.rb
 ```
 
 A replica set is typically available locally at `localhost:27017,27018,27019`.
+
+## Environment Variables
+
+Avoid prefixing a command with environment variables, which makes it harder to teach you about commands that can be executed safely. Prefer instead to set environment variables first, and then invoke the command.
 
 ## Linting
 

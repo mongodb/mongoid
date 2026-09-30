@@ -16,7 +16,12 @@ module Mongoid
     #
     # @return [ true | false ] True if matches, false if not.
     def _matches?(selector)
-      Matcher::Expression.matches?(self, selector)
+      # Opens a regexp budget for this document only. Callers that match many
+      # documents against one selector open a budget of their own first, and
+      # this one joins it rather than giving every document a fresh limit.
+      Matcher::RegexpBudget.open(selector) do
+        Matcher::Expression.matches?(self, selector)
+      end
     end
   end
 end
