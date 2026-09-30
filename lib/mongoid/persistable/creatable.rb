@@ -68,32 +68,35 @@ module Mongoid
         end
       end
 
-      # Determine whether rewriting the indices in the touch updates to the
-      # positional operator, as positionally will do to the final update,
-      # would redirect any touch to an element other than the one the insert
-      # targets. The touches of the parent chain target that element, so
-      # rewriting them is safe. A pending touch on a different element of the
-      # same array, however, would be rewritten to the same positional path
-      # and silently touch the wrong document. Such touches are persisted in
-      # their own round-trip after the insert instead of being merged.
+      # Rewrite the indices in the touch updates to the positional operator,
+      # as the final update will do to the merged operations. The touches of
+      # the parent chain target the inserted element, so rewriting them is
+      # safe, and merging the rewritten keys into the operations lets the
+      # final update reuse them as-is. A pending touch on a different element
+      # of the same array, however, would be rewritten to the same positional
+      # path and silently touch the wrong document; in that case this method
+      # returns nil and the caller persists the touch updates in their own
+      # round-trip after the insert instead of merging them.
       #
       # @api private
       #
       # @param [ Hash ] selector The update selector.
       # @param [ Document ] parent The parent document being touched.
       # @param [ Symbol, String, nil ] field The parent's custom touch field.
-      # @param [ Hash ] touches The touch updates to merge.
+      # @param [ Hash ] touches The touch updates to rewrite.
       #
-      # @return [ true | false ] Whether any touch would be misdirected.
-      def misdirected_touch_paths?(selector, parent, field, touches)
+      # @return [ Hash | nil ] The rewritten touch updates, or nil if any
+      #   touch would be misdirected by the rewriting.
+      def rewritten_touch_updates(selector, parent, field, touches)
         rewritten = positionally(selector, { '$set' => touches })['$set']
 
-        touches.keys.any? do |key|
+        touches.each_key do |key|
           path = key.to_s
-          next false if rewritten.key?(path)
+          next if rewritten.key?(path)
 
-          !chain_touch_path?(parent, field, path)
+          return nil unless chain_touch_path?(parent, field, path)
         end
+        rewritten
       end
 
       # Whether the given path is written by a touch of the parent chain and
@@ -137,7 +140,7 @@ module Mongoid
       # issue. The merge is skipped when a touch path would conflict with a
       # path the insert targets (see +conflicting_touch_paths?+) or when
       # rewriting the touch indices to the positional operator would
-      # misdirect a touch (see +misdirected_touch_paths?+); such touches are
+      # misdirect a touch (see +rewritten_touch_updates+); such touches are
       # persisted in their own round-trip right after the insert, so their
       # persistence does not depend on the callback chain running.
       #
@@ -191,11 +194,15 @@ module Mongoid
         touches = _parent._gather_touch_updates(Time.current, field)
         return nil if touches.blank?
 
-        if conflicting_touch_paths?(operations, touches) ||
-           misdirected_touch_paths?(selector, _parent, field, touches)
+        if conflicting_touch_paths?(operations, touches)
           deferred_touches = touches
         else
-          operations['$set'] = (operations['$set'] || {}).merge(touches)
+          rewritten = rewritten_touch_updates(selector, _parent, field, touches)
+          if rewritten
+            operations['$set'] = (operations['$set'] || {}).merge(rewritten)
+          else
+            deferred_touches = touches
+          end
         end
         Threaded.begin_touch_merged(self)
         deferred_touches

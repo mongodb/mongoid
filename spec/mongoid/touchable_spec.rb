@@ -1424,6 +1424,21 @@ describe Mongoid::Touchable do
         end
       end
 
+      it 'sends the merged touch updates rewritten to the positional operator' do
+        subscriber = Mrss::EventSubscriber.new
+        Mongoid.client(:default).subscribe(Mongo::Monitoring::COMMAND, subscriber)
+        begin
+          floor.sofas.push(TouchableSpec::Embedded::Sofa.new)
+        ensure
+          Mongoid.client(:default).unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
+        end
+
+        command = subscriber.single_command_started_event('update').command
+        sets = command['updates'].first['u']['$set']
+
+        expect(sets.keys).to contain_exactly('floors.$.updated_at', 'updated_at')
+      end
+
       it 'updates updated_at on the parent after push' do
         original_floor_updated_at = floor.updated_at
         original_building_updated_at = building.updated_at
