@@ -94,41 +94,9 @@ module Mongoid
           path = key.to_s
           next if rewritten.key?(path)
 
-          return nil unless chain_touch_path?(parent, field, path)
+          return nil unless parent._touchable_chain_paths(field).include?(path)
         end
         rewritten
-      end
-
-      # Whether the given path is written by a touch of the parent chain and
-      # so is safe to merge into the insert.
-      #
-      # @api private
-      #
-      # @param [ Document ] parent The parent document being touched.
-      # @param [ Symbol, String, nil ] field The parent's custom touch field.
-      # @param [ String ] path The touch path.
-      #
-      # @return [ true | false ] Whether the path belongs to the parent chain.
-      def chain_touch_path?(parent, field, path)
-        node = parent
-        field = parent.database_field_name(field) if field
-
-        loop do
-          if node.respond_to?(:updated_at=)
-            updated_at = node.database_field_name(:updated_at)
-            return true if path == node.atomic_attribute_name(updated_at).to_s
-          end
-
-          if node.equal?(parent) && field &&
-             path == node.atomic_attribute_name(field).to_s
-            return true
-          end
-
-          break unless node._touchable_parent?
-
-          node = node._parent
-        end
-        false
       end
 
       # Insert the embedded document.

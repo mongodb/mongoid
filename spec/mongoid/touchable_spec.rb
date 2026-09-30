@@ -1400,6 +1400,46 @@ describe Mongoid::Touchable do
     end
   end
 
+  describe 'the parent chain touch paths' do
+    context 'on a root document' do
+      it 'contains the root updated_at path' do
+        expect(TouchableParent.new._touchable_chain_paths).to eq(%w[updated_at])
+      end
+    end
+
+    context 'on an embedded document with a touchable parent' do
+      let(:parent) do
+        parent = TouchableParent.create!
+        parent.child = TouchableChild.create!(parent: parent)
+        parent
+      end
+
+      it 'contains the paths of each node in the chain' do
+        expect(parent.child._touchable_chain_paths)
+          .to eq(%w[child.updated_at updated_at])
+      end
+    end
+
+    context 'with a custom touch field' do
+      it 'contains the custom field path of the anchor document' do
+        building = TouchableSpec::Embedded::Building.create!
+
+        expect(building._touchable_chain_paths(:last_used_at))
+          .to eq(%w[updated_at last_used_at])
+      end
+    end
+
+    context 'when the models use Timestamps::Short' do
+      it 'resolves the aliased timestamp fields' do
+        building = TouchableSpec::Short::Building.create!
+        building.floors.create!
+
+        expect(building.reload.floors.first._touchable_chain_paths)
+          .to eq(%w[floors.0.u_at u_at])
+      end
+    end
+  end
+
   describe 'touch merged with embedded insert' do
     context 'when pushing an embedded document with touch: true' do
       let(:building) do
