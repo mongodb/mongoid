@@ -90,11 +90,12 @@ module Mongoid
       def rewritten_touch_updates(selector, parent, field, touches)
         rewritten = positionally(selector, { '$set' => touches })['$set']
 
+        chain_paths = parent._touchable_chain_paths(field)
         touches.each_key do |key|
           path = key.to_s
           next if rewritten.key?(path)
 
-          return nil unless parent._touchable_chain_paths(field).include?(path)
+          return nil unless chain_paths.include?(path)
         end
         rewritten
       end
@@ -129,18 +130,24 @@ module Mongoid
 
           deferred_touches = merge_touch_updates(selector, operations)
 
-          _root.collection.find(selector).update_one(
-            positionally(selector, operations),
-            session: _session
-          )
-
-          _root.send(:persist_atomic_operations, '$set' => deferred_touches) if deferred_touches
+          begin
+            _root.collection.find(selector).update_one(
+              positionally(selector, operations),
+              session: _session
+            )
+            _root.send(:persist_atomic_operations, '$set' => deferred_touches) if deferred_touches
+          rescue StandardError
+            # If the insert failed, the after_save callback will not run to
+            # consume and clear the merged-touch flag, so clear it here.
+            Threaded.exit_touch_merged(self)
+            raise
+          end
         end
       end
 
       # Merge the parent chain's pending touch updates into the insert
       # operations when doing so would not produce a conflicting update
-      # (see +conflicting_touch_paths?+ and +misdirected_touch_paths?+).
+      # (see +conflicting_touch_paths?+ and +rewritten_touch_updates+).
       # Either way, marks the touch as merged so the after_save callback
       # does not persist the updates a second time. Returns the touch
       # updates that could not be merged; they are persisted in their own

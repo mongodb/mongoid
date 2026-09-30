@@ -1737,8 +1737,9 @@ describe Mongoid::Touchable do
 
       before do
         first_floor
-        # Leave a pending touch on the other floor so the touch updates
-        # conflict with the insert and cannot be merged into it.
+        # Leave a pending touch on the other floor: rewriting it and this
+        # chain's own touch would collapse both onto the same positional
+        # path, so the touch updates cannot be merged into the insert.
         second_floor.updated_at = pending_touch_time
       end
 
