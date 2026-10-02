@@ -1400,6 +1400,46 @@ describe Mongoid::Touchable do
     end
   end
 
+  describe 'the parent chain touch paths' do
+    context 'on a root document' do
+      it 'contains the root updated_at path' do
+        expect(TouchableParent.new._touchable_chain_paths).to eq(%w[updated_at])
+      end
+    end
+
+    context 'on an embedded document with a touchable parent' do
+      let(:parent) do
+        parent = TouchableParent.create!
+        parent.child = TouchableChild.create!(parent: parent)
+        parent
+      end
+
+      it 'contains the paths of each node in the chain' do
+        expect(parent.child._touchable_chain_paths)
+          .to eq(%w[child.updated_at updated_at])
+      end
+    end
+
+    context 'with a custom touch field' do
+      it 'contains the custom field path of the anchor document' do
+        building = TouchableSpec::Embedded::Building.create!
+
+        expect(building._touchable_chain_paths(:last_used_at))
+          .to eq(%w[updated_at last_used_at])
+      end
+    end
+
+    context 'when the models use Timestamps::Short' do
+      it 'resolves the aliased timestamp fields' do
+        building = TouchableSpec::Short::Building.create!
+        building.floors.create!
+
+        expect(building.reload.floors.first._touchable_chain_paths)
+          .to eq(%w[floors.0.u_at u_at])
+      end
+    end
+  end
+
   describe 'touch merged with embedded insert' do
     context 'when pushing an embedded document with touch: true' do
       let(:building) do
@@ -1422,6 +1462,21 @@ describe Mongoid::Touchable do
         expect_query(1) do
           floor.sofas.push(sofa)
         end
+      end
+
+      it 'sends the merged touch updates rewritten to the positional operator' do
+        subscriber = Mrss::EventSubscriber.new
+        Mongoid.client(:default).subscribe(Mongo::Monitoring::COMMAND, subscriber)
+        begin
+          floor.sofas.push(TouchableSpec::Embedded::Sofa.new)
+        ensure
+          Mongoid.client(:default).unsubscribe(Mongo::Monitoring::COMMAND, subscriber)
+        end
+
+        command = subscriber.single_command_started_event('update').command
+        sets = command['updates'].first['u']['$set']
+
+        expect(sets.keys).to contain_exactly('floors.$.updated_at', 'updated_at')
       end
 
       it 'updates updated_at on the parent after push' do
@@ -1534,6 +1589,168 @@ describe Mongoid::Touchable do
 
         building.reload
         expect(building.updated_at).to be > original_updated_at
+      end
+    end
+
+    context 'when an existing child of the same array has a pending touch' do
+      let(:building) do
+        TouchableSpec::Embedded::Building.create!(title: 'Tower')
+      end
+
+      before do
+        floor = building.floors.create!(level: 1)
+        # Leave a pending touch on the existing sibling so merging it into
+        # the insert would target a path inside the pushed array.
+        floor.updated_at = Time.now + 60
+      end
+
+      it 'does not raise a conflict error when creating a sibling' do
+        expect { building.floors.create!(level: 2) }.not_to raise_error
+      end
+
+      it 'persists the new sibling' do
+        building.floors.create!(level: 2)
+        expect(building.reload.floors.length).to eq(2)
+      end
+
+      it 'touches the parent' do
+        building.floors.create!(level: 2)
+        building.reload
+        expect(building.updated_at).to be_within(5).of(Time.now)
+      end
+    end
+
+    context 'when a sibling in a parent array has a pending touch' do
+      let(:building) do
+        TouchableSpec::Embedded::Building.create!(title: 'Tower')
+      end
+
+      let(:first_floor) do
+        building.floors.create!(level: 1)
+      end
+
+      let(:second_floor) do
+        building.floors.create!(level: 2)
+      end
+
+      let(:pending_touch_time) do
+        Time.now + 60
+      end
+
+      before do
+        first_floor
+        # Leave a pending touch on the other floor, at a different index of
+        # the same array. Rewriting both that touch and the insert's own
+        # touch to the positional operator collapses them onto one path and
+        # touches the wrong floor.
+        second_floor.updated_at = pending_touch_time
+      end
+
+      it 'does not raise when creating a grandchild under the other floor' do
+        expect { first_floor.sofas.create! }.not_to raise_error
+      end
+
+      it 'touches the floor the grandchild was inserted under' do
+        first_floor.sofas.create!
+        building.reload
+        expect(building.floors[0].updated_at).to be_within(5).of(Time.now)
+      end
+
+      it 'preserves the pending touch on the sibling floor' do
+        first_floor.sofas.create!
+        building.reload
+        expect(building.floors[1].updated_at.to_f)
+          .to be_within(1).of(pending_touch_time.to_f)
+      end
+    end
+
+    context 'when the parent touch option names a custom field' do
+      let(:building) do
+        TouchableSpec::Embedded::Building.create!(title: 'Tower')
+      end
+
+      it 'writes the custom touch field when creating an embedded child' do
+        # Materialize the parent before the freeze so its updated_at differs
+        # from the touch time, forcing the touch updates to merge into the
+        # child's insert.
+        building
+        Timecop.freeze(Time.utc(2026, 1, 2, 3, 4, 5)) do
+          building.waiting_rooms.create!
+          building.reload
+          expect(building.last_used_at).not_to be_nil
+          expect(building.last_used_at.to_f)
+            .to be_within(1).of(Time.utc(2026, 1, 2, 3, 4, 5).to_f)
+        end
+      end
+    end
+
+    context 'when the models use Timestamps::Short' do
+      let(:building) do
+        TouchableSpec::Short::Building.create!
+      end
+
+      let(:floor) do
+        building.floors.create!
+      end
+
+      before do
+        building
+        floor
+      end
+
+      it 'merges the touch updates into the insert round-trip' do
+        expect_query(1) do
+          floor.gadgets.push(TouchableSpec::Short::Gadget.new)
+        end
+      end
+
+      it 'touches the parent chain through the aliased timestamp fields' do
+        original_building_updated_at = building.u_at
+        original_floor_updated_at = floor.u_at
+
+        Timecop.travel(Time.now + 10) do
+          floor.gadgets.push(TouchableSpec::Short::Gadget.new)
+        end
+
+        building.reload
+        expect(building.u_at).to be > original_building_updated_at
+        expect(building.floors.first.u_at).to be > original_floor_updated_at
+      end
+    end
+
+    context 'when a sibling has a pending touch and the touch callback does not run' do
+      let(:building) do
+        TouchableSpec::Embedded::Building.create!(title: 'Tower')
+      end
+
+      let(:first_floor) do
+        building.floors.create!(level: 1)
+      end
+
+      let(:second_floor) do
+        building.floors.create!(level: 2)
+      end
+
+      let(:pending_touch_time) do
+        Time.now + 60
+      end
+
+      before do
+        first_floor
+        # Leave a pending touch on the other floor: rewriting it and this
+        # chain's own touch would collapse both onto the same positional
+        # path, so the touch updates cannot be merged into the insert.
+        second_floor.updated_at = pending_touch_time
+      end
+
+      it 'persists the deferred touches at insert time' do
+        Mongoid::Touchable.suppress_touch_callbacks(TouchableSpec::Embedded::Sofa.name) do
+          first_floor.sofas.push(TouchableSpec::Embedded::Sofa.new)
+        end
+
+        building.reload
+        expect(building.floors[1].updated_at.to_f)
+          .to be_within(1).of(pending_touch_time.to_f)
       end
     end
   end
