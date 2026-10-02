@@ -135,7 +135,7 @@ module Mongoid
               positionally(selector, operations),
               session: _session
             )
-            _root.send(:persist_atomic_operations, '$set' => deferred_touches) if deferred_touches
+            _root.persist_atomic_operations('$set' => deferred_touches) if deferred_touches
           rescue StandardError
             # If the insert failed, the after_save callback will not run to
             # consume and clear the merged-touch flag, so clear it here.

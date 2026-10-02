@@ -49,7 +49,7 @@ module Mongoid
 
         begin
           touches = _gather_touch_updates(Time.current, field)
-          _root.send(:persist_atomic_operations, '$set' => touches) if touches.present?
+          _root.persist_atomic_operations('$set' => touches) if touches.present?
           _run_touch_callbacks_from_root
         ensure
           _clear_touch_updates(field)
