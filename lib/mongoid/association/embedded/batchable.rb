@@ -130,8 +130,16 @@ module Mongoid
         #   batchable.add_atomic_sets([{ field: value }])
         #
         # @param [ Array<Hash> ] sets The atomic sets.
+        #
+        # @return [ Array<Hash> | nil ] The atomic sets, or nil if the base
+        #   document is not persisted or is not being assigned.
         def add_atomic_sets(sets)
-          return unless _assigning?
+          # New embedded documents are persisted whole by their parent with a
+          # $set or $push. A delayed update for one of their associations is
+          # redundant whether or not the document is attached to its parent.
+          # Before attachment, its path is relative to the document instead
+          # of the root.
+          return unless _assigning? && _base.persisted?
 
           _base.delayed_atomic_sets[path].try(:clear)
           _base.collect_children.each do |child|
