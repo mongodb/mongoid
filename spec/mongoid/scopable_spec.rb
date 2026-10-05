@@ -800,10 +800,12 @@ describe Mongoid::Scopable do
           expect(criteria.selector).to eq({
             "$or" => [
               { "ccc" => nil },
-              { "ccc" => { "$gt" => 1.0 }},
+              { "ccc" => { "$gt" => 1.0 }}
+            ],
+            '$and' => ['$or' => [
               { "aaa" => { "$gt" => 0.0 }},
               { "bbb" => { "$gt" => 0.0 }}
-            ]
+            ]]
           })
         end
       end
