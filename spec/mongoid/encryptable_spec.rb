@@ -57,5 +57,31 @@ describe Mongoid::Encryptable do
         expect(Crypt::Drawer.requires_encryption_schema?).to be false
       end
     end
+
+    context 'when an embedded encrypted class is defined after the first check' do
+      after do
+        Crypt.send(:remove_const, :MissingNote) if Crypt.const_defined?(:MissingNote, false)
+        # While the class above existed, resolving it through the association
+        # memoized the class on the association, and a true answer on the
+        # model. Drop both, so the other examples see the model as it was
+        # before the class was defined.
+        Crypt::Drawer.relations['missing_note'].remove_instance_variable(:@klass)
+        Crypt::Drawer.remove_instance_variable(:@requires_encryption_schema)
+      end
+
+      it 'returns true once the class is loaded' do
+        expect(Crypt::Drawer.requires_encryption_schema?).to be false
+
+        missing_note = Class.new do
+          include Mongoid::Document
+
+          embedded_in :drawer, class_name: 'Crypt::Drawer'
+          field :text, type: String, encrypt: true
+        end
+        Crypt.const_set(:MissingNote, missing_note)
+
+        expect(Crypt::Drawer.requires_encryption_schema?).to be true
+      end
+    end
   end
 end
