@@ -32,6 +32,12 @@ describe Mongoid::Matcher::RegexpBudget do
   # exercising one has to hand .open something to bound.
   let(:regexp_selector) { { 'name' => /\Aabc\z/ } }
 
+  describe 'REGEXP_BUDGET_KEY' do
+    it 'is namespaced so a foreign thread-local cannot collide with it' do
+      expect(Mongoid::Threaded::REGEXP_BUDGET_KEY).to start_with('[mongoid]:')
+    end
+  end
+
   describe '.open' do
     context 'when no limit is configured' do
       config_override :in_memory_regexp_time_limit, nil
