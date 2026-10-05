@@ -37,5 +37,10 @@ module Mongoid
     warning :autosave_saves_unchanged_documents, "Autosave associations are currently configured to save documents even if they haven't changed. " \
                                                  'This legacy behavior is deprecated. Set Mongoid.autosave_saves_unchanged_documents to false to ' \
                                                  'skip saving unchanged documents in autosave associations.'
+    warning :bypass_auto_encryption,
+            'auto_encryption_options includes bypass_auto_encryption: true. Mongoid still ' \
+            'generates an encryption schema map for this client, but the driver will not ' \
+            'encrypt anything: fields declared with encrypt: true are written to the ' \
+            'database unencrypted.'
   end
 end
