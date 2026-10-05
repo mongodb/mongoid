@@ -43,15 +43,18 @@ module Mongoid
       # group has no encrypted field of its own, but its collection still needs
       # a schema, otherwise the embedded fields are written in plaintext.
       #
-      # The answer is memoized, since this runs on the persistence path.
-      # Declaring encryption on a model after it has already been persisted is
-      # not supported.
+      # A true answer is memoized, since this runs on the persistence path. A
+      # false answer is not: an embedded class may not be loaded yet, in which
+      # case the answer would be cached too early and the model's namespace
+      # dropped from the encryption schema map.
       #
       # @return [ true | false ] Whether the model needs an encryption schema.
       #
       # @api private
       def requires_encryption_schema?
-        return @requires_encryption_schema if defined?(@requires_encryption_schema)
+        if defined?(@requires_encryption_schema) && @requires_encryption_schema
+          return @requires_encryption_schema
+        end
 
         @requires_encryption_schema = encrypted? || embeds_encrypted?([ self ])
       end
