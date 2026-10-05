@@ -290,6 +290,26 @@ describe Mongoid::Attributes::Nested do
       end
     end
 
+    context 'when a has-many association uses a custom primary key' do
+      before do
+        HmmCompany.accepts_nested_attributes_for :emails
+      end
+
+      after do
+        HmmCompany.send(:undef_method, :emails_attributes=)
+      end
+
+      it 'reports the parent primary key value in the error params' do
+        company = HmmCompany.create!(p: 42)
+
+        expect do
+          company.emails_attributes = { '0' => { 'id' => 'missing', 'f' => 42 } }
+        end.to raise_error(Mongoid::Errors::DocumentNotFound) { |error|
+          expect(error.params).to eq({ _id: 'missing', 'f' => 42 })
+        }
+      end
+    end
+
     context 'when the relation is a has-and-belongs-to-many' do
       before do
         Person.send(:undef_method, :preferences_attributes=)
