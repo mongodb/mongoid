@@ -81,7 +81,7 @@ module Mongoid
       # @return [ Array<Object> ] The distinct values for the field.
       def distinct(field)
         if Mongoid.legacy_pluck_distinct
-          documents.map{ |doc| doc.send(field) }.uniq
+          documents.map { |doc| read_field_value(doc, field) }.uniq
         else
           pluck(field).uniq
         end
