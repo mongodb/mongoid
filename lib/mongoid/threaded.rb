@@ -27,7 +27,7 @@ module Mongoid
     end
 
     # The key for the time left in the current in-memory regexp budget.
-    REGEXP_BUDGET_KEY = 'regexp-budget'
+    REGEXP_BUDGET_KEY = "[mongoid]:regexp-budget"
 
     extend self
 
