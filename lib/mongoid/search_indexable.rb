@@ -421,7 +421,11 @@ module Mongoid
       #
       # @return [ Array<Hash> ] the raw index documents
       def get_indexes(names)
-        collection.search_indexes.select { |i| names.include?(i['name']) }
+        # Reading index metadata sends no document data, so it is exempt from
+        # the encryption schema check, like the other index operations here.
+        Threaded.with_collection_management do
+          collection.search_indexes.select { |i| names.include?(i['name']) }
+        end
       end
 
       # Resolves the index name and vector path from the declared specs,
