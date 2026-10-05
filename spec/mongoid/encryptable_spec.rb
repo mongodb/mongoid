@@ -58,15 +58,35 @@ describe Mongoid::Encryptable do
       end
     end
 
+    context 'when every embedded association resolves' do
+      it 'memoizes a false answer' do
+        expect(Truck.requires_encryption_schema?).to be false
+        expect(Truck.instance_variable_defined?(:@requires_encryption_schema)).to be true
+      end
+    end
+
+    context 'when an embedded association does not resolve' do
+      it 'does not memoize a false answer' do
+        expect(Crypt::Drawer.requires_encryption_schema?).to be false
+        expect(Crypt::Drawer.instance_variable_defined?(:@requires_encryption_schema)).to be false
+      end
+    end
+
     context 'when an embedded encrypted class is defined after the first check' do
       after do
-        Crypt.send(:remove_const, :MissingNote) if Crypt.const_defined?(:MissingNote, false)
+        if Crypt.const_defined?(:MissingNote, false)
+          Mongoid.deregister_model(Crypt::MissingNote)
+          Crypt.send(:remove_const, :MissingNote)
+        end
         # While the class above existed, resolving it through the association
         # memoized the class on the association, and a true answer on the
         # model. Drop both, so the other examples see the model as it was
         # before the class was defined.
-        Crypt::Drawer.relations['missing_note'].remove_instance_variable(:@klass)
-        Crypt::Drawer.remove_instance_variable(:@requires_encryption_schema)
+        relation = Crypt::Drawer.relations['missing_note']
+        relation.remove_instance_variable(:@klass) if relation.instance_variable_defined?(:@klass)
+        if Crypt::Drawer.instance_variable_defined?(:@requires_encryption_schema)
+          Crypt::Drawer.remove_instance_variable(:@requires_encryption_schema)
+        end
       end
 
       it 'returns true once the class is loaded' do
