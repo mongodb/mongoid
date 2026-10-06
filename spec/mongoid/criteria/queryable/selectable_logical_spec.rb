@@ -1351,11 +1351,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.or(field: [ 1, 2 ]).where(foo: 'bar').any_of({a: 1}, {b: 2})
         end
 
-        it 'adds the new condition to top level' do
+        it 'adds the new conditions to the existing top-level $or' do
           expect(selection.selector).to eq(
-            '$or' => [{'field' => [1, 2]}],
+            '$or' => [{'field' => [1, 2]}, {'a' => 1}, {'b' => 2}],
             'foo' => 'bar',
-            '$and' => [{'$or' => [{'a' => 1}, {'b' => 2}]}],
           )
         end
 
@@ -1364,10 +1363,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
             query.or(field: [ 1, 2 ]).where('$and' => [foo: 'bar']).any_of({a: 1}, {b: 2})
           end
 
-          it 'adds the new condition to top level $and' do
+          it 'adds the new conditions to the existing top-level $or' do
             expect(selection.selector).to eq(
-              '$or' => [{'field' => [1, 2]}],
-              '$and' => [{'foo' => 'bar'}, {'$or' => [{'a' => 1}, {'b' => 2}]}],
+              '$or' => [{'field' => [1, 2]}, {'a' => 1}, {'b' => 2}],
+              '$and' => [{'foo' => 'bar'}],
             )
           end
         end
