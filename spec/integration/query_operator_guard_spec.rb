@@ -68,6 +68,11 @@ describe 'query operator injection guard' do
       it 'rejects a $where smuggled through any_of' do
         expect { Band.any_of('$where' => js).first }.to raise_error(Mongoid::Errors::InvalidQuery)
       end
+
+      it 'rejects a $where smuggled through multi-criteria any_of' do
+        expect { Band.any_of({ '$where' => js }, { name: band.name }).first }
+          .to raise_error(Mongoid::Errors::InvalidQuery)
+      end
     end
   end
 

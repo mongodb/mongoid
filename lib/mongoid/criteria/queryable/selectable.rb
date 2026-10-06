@@ -666,22 +666,27 @@ module Mongoid
           else
             # When we have multiple criteria, combine them all with $or
             # and add the result to self.
+            #
+            # Every criterion is normalized through _mongoid_expand_keys, which
+            # runs the operator guard (MONGOID-6005). Note that the plain Hash
+            # branch must use _mongoid_expand_keys too: building the hash by
+            # hand skips the guard, letting a criterion such as
+            # {'$where' => ...} reach the selector.
+            #
+            # The disjunction is stored directly rather than via
+            # and('$or' => exprs). Routing it through #and would nest the new
+            # $or under a top-level $and (the MONGOID-5172 behavior, first
+            # released in 8.0), which changes both the selector shape and the
+            # meaning of a pre-existing top-level $or. On 7.6 the historical
+            # shape is preserved: append to the existing $or when one is
+            # present.
             exprs = criteria.map do |criterion|
               if criterion.is_a?(Selectable)
                 _mongoid_expand_keys(criterion.selector)
               else
-                Hash[criterion.map do |k, v|
-                  if k.is_a?(Symbol)
-                    [k.to_s, v]
-                  else
-                    [k, v]
-                  end
-                end]
+                _mongoid_expand_keys(criterion)
               end
             end
-            # Should be able to do:
-            #where('$or' => exprs)
-            # But since that is broken do instead:
             clone.tap do |query|
               if query.selector['$or']
                 query.selector.store('$or', query.selector['$or'] + exprs)
