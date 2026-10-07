@@ -13,13 +13,8 @@ module Mongoid
       # @param [ Hash ] modifications The add to set modifiers.
       def add_to_set(modifications)
         modifications.each_pair do |field, value|
-          if add_to_sets.has_key?(field)
-            value.each do |val|
-              add_to_sets[field]['$each'].push(val)
-            end
-          else
-            add_to_sets[field] = { '$each' => value }
-          end
+          mods = array_modification_conflict?(field) ? conflicting_add_to_sets : add_to_sets
+          add_operation(mods, field, { '$each' => value })
         end
       end
 
@@ -31,7 +26,8 @@ module Mongoid
       # @param [ Hash ] modifications The pull all modifiers.
       def pull_all(modifications)
         modifications.each_pair do |field, value|
-          add_operation(pull_alls, field, value)
+          mods = array_modification_conflict?(field) ? conflicting_pulls : pull_alls
+          add_operation(mods, field, value)
           pull_fields[field.split('.', 2)[0]] = field
         end
       end
@@ -47,6 +43,14 @@ module Mongoid
           pulls[field] = value
           pull_fields[field.split('.', 2)[0]] = field
         end
+        modifications.each_key do |field|
+          if main_has_root?('$push', field)
+            move_pulls_under_root(field)
+          else
+            move_deeper_pulls(field)
+          end
+          move_conflicting_array_modifications(field)
+        end
       end
 
       # Adds push modifiers to the modifiers hash.
@@ -61,6 +65,7 @@ module Mongoid
           mods = push_conflict?(field) ? conflicting_pushes : pushes
           add_operation(mods, field, { '$each' => Array.wrap(value) })
         end
+        modifications.each_key { |field| move_conflicting_array_modifications(field) }
       end
 
       # Adds set operations to the modifiers hash.
@@ -86,13 +91,11 @@ module Mongoid
       #
       # @param [ Array<String> ] modifications The unset association names.
       def unset(modifications)
-        modifications.each do |field|
+        conflicting, others = modifications.partition { |field| unset_separable?(field.to_s) }
+        others.each do |field|
           field = field.to_s
 
           if unset_conflict?(field)
-            # If the conflicting $set covers the entire parent field (not just a
-            # sub-path), it writes the complete current state, which already
-            # reflects this unset. Skip the $unset — it's redundant.
             next if unset_superseded_by_set?(field)
 
             conflicting_unsets.update(field => true)
@@ -100,6 +103,7 @@ module Mongoid
             unsets.update(field => true)
           end
         end
+        conflicting.each { |field| conflicting_unsets.update(field.to_s => true) }
       end
 
       private
@@ -154,6 +158,86 @@ module Mongoid
       # @return [ Hash ] The $addToSet operations.
       def add_to_sets
         self['$addToSet'] ||= {}
+      end
+
+      private def array_modification_conflict?(field)
+        main_has_root?('$push', field) || main_has_root?('$pull', field)
+      end
+
+      private def unset_separable?(field)
+        main_has_root?('$push', field) && !main_has_root?('$pull', field) &&
+          !root_in?(conflicts['$pull'], field)
+      end
+
+      private def main_has_root?(operator, field)
+        root_in?(self[operator], field)
+      end
+
+      private def root_in?(mods, field)
+        return false if mods.nil?
+
+        name = field.split('.', 2)[0]
+        mods.each_key.any? { |key| key.split('.', 2)[0] == name }
+      end
+
+      private def move_conflicting_array_modifications(field)
+        return unless array_modification_conflict?(field)
+
+        name = field.split('.', 2)[0]
+        move_modifications_to_conflicts('$addToSet', :conflicting_add_to_sets, name)
+        move_modifications_to_conflicts('$pullAll', :conflicting_pulls, name)
+        move_unsets_to_conflicts(name, field)
+      end
+
+      private def move_modifications_to_conflicts(operator, target, name)
+        mods = self[operator]
+        return if mods.nil?
+
+        mods.keys.select { |key| key.split('.', 2)[0] == name }.each do |key|
+          add_operation(send(target), key, mods.delete(key))
+        end
+        delete(operator) if mods.empty?
+      end
+
+      private def move_unsets_to_conflicts(name, field)
+        unsets_in_main = self['$unset']
+        return if unsets_in_main.nil? || !unset_separable?(field)
+
+        unsets_in_main.keys.select { |key| key.split('.', 2)[0] == name }.each do |key|
+          conflicting_unsets.update(key => unsets_in_main.delete(key))
+        end
+        delete('$unset') if unsets_in_main.empty?
+      end
+
+      # A $push appends without changing existing array indexes, so later pulls
+      # can run after it without changing the paths they target.
+      private def move_pulls_under_root(field)
+        name = field.split('.', 2)[0]
+        pulls.keys.select { |key| key.split('.', 2)[0] == name }.each do |key|
+          add_conflicting_pull(key, pulls.delete(key))
+        end
+        delete('$pull') if pulls.empty?
+      end
+
+      private def move_deeper_pulls(field)
+        name = field.split('.', 2)[0]
+        same_root = pulls.keys.select { |key| key.split('.', 2)[0] == name }
+        shallowest = same_root.map { |key| key.count('.') }.min
+        same_root.select { |key| key.count('.') > shallowest }.each do |key|
+          add_conflicting_pull(key, pulls.delete(key))
+        end
+      end
+
+      private def add_conflicting_pull(field, value)
+        conflicting = conflicts.delete('$pull') || {}
+        conflicting[field] = value
+        # update_document pops each conflict group, so store deeper paths first
+        # to apply shallower pulls before deeper pulls.
+        self[:conflicts] = { '$pull' => conflicting.sort_by { |key, _| -key.count('.') }.to_h }.merge(conflicts)
+      end
+
+      private def conflicting_add_to_sets
+        conflicts['$addToSet'] ||= {}
       end
 
       # Is the operation going to be a conflict for a $set?
