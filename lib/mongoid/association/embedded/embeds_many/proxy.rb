@@ -423,6 +423,37 @@ module Mongoid
             doc._id || doc.object_id
           end
 
+          def remap_atomic_update_paths(document, previous_path, current_path)
+            return if previous_path == current_path
+
+            prefix = /\A#{Regexp.escape(previous_path)}(?=\.|\z)/
+            %i[delayed_atomic_sets delayed_atomic_unsets].each do |updates_name|
+              updates = document.public_send(updates_name)
+              remapped = updates.each_with_object({}) do |(path, value), result|
+                result[path.sub(prefix, current_path)] = value
+              end
+              updates.replace(remapped)
+            end
+          end
+
+          def atomic_path_documents(document)
+            documents = []
+            pending = [ document ]
+            seen = {}.compare_by_identity
+
+            until pending.empty?
+              descendant = pending.pop
+              next if seen.key?(descendant)
+
+              seen[descendant] = true
+              documents << descendant
+              pending.concat(descendant._children)
+              pending.concat(descendant.delayed_atomic_unsets.values.flatten)
+            end
+
+            documents
+          end
+
           # Optimized version of #append that handles multiple documents
           # in a more efficient way.
           #
@@ -549,7 +580,13 @@ module Mongoid
           #   person.addresses.reindex
           def reindex
             _unscoped.each_with_index do |doc, index|
+              descendants = atomic_path_documents(doc)
+              previous_paths = descendants.to_h { |descendant| [ descendant, descendant.atomic_position ] }
               doc._index = index
+              descendants.each { |descendant| descendant.instance_variable_set(:@atomic_paths, nil) }
+              previous_paths.each do |descendant, previous_path|
+                remap_atomic_update_paths(descendant, previous_path, descendant.atomic_position)
+              end
             end
           end
 
