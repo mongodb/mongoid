@@ -55,6 +55,29 @@ module StaleEmbeddedPathSpec
   end
 end
 
+module MONGOID5364Spec
+  class House
+    include Mongoid::Document
+
+    embeds_many :rooms, class_name: 'MONGOID5364Spec::Room'
+  end
+
+  class Room
+    include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
+
+    embeds_many :residents, class_name: 'MONGOID5364Spec::Resident'
+    embedded_in :house
+  end
+
+  class Resident
+    include Mongoid::Document
+
+    field :name, type: String
+    embedded_in :room
+  end
+end
+
 describe 'embeds_many associations' do
   context 'when an embedded sibling is removed after an embedded association is changed' do
     it 'writes a replaced association to the current array position' do
@@ -149,7 +172,7 @@ describe 'embeds_many associations' do
       expect(persisted_c.leaves.first.twigs.map(&:name)).to eq([ 'c1a' ])
     end
 
-    it 'does not restore a pushed child after clearing its association following a sibling removal' do
+    it 'preserves push-then-clear behaviour after removing a preceding sibling' do
       root = root_with_items
       (a, b, *_remaining) = root.items.to_a
 
@@ -163,6 +186,25 @@ describe 'embeds_many associations' do
 
       expect(persisted_b.leaves).to be_empty
       expect(persisted_c.leaves.map(&:name)).to eq([ 'c1' ])
+    end
+
+    it 'updates the last nested association after removing an earlier sibling as reported in MONGOID-5364' do
+      house = MONGOID5364Spec::House.new(rooms: [])
+      5.times do |index|
+        house.rooms << MONGOID5364Spec::Room.new(residents: [ { name: "resident #{index}" } ])
+      end
+      house.save!
+      house = MONGOID5364Spec::House.find(house.id)
+
+      house.rooms.last.assign_attributes(residents: [ { name: 'the new resident' } ])
+      house.rooms[2].destroy
+      house.save!
+
+      persisted_house = MONGOID5364Spec::House.find(house.id)
+
+      expect(persisted_house.rooms.size).to eq(4)
+      expect(persisted_house.rooms[-2].residents.map(&:name)).to eq([ 'resident 3' ])
+      expect(persisted_house.rooms.last.residents.map(&:name)).to eq([ 'the new resident' ])
     end
 
     it 'replaces a delayed non-empty association with an empty one after a sibling removal' do

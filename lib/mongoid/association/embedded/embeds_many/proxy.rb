@@ -473,16 +473,14 @@ module Mongoid
           # @return [ Array<Document> ] The loaded embedded children.
           def loaded_atomic_path_children(document)
             document.embedded_relations.each_with_object([]) do |(name, _association), children|
-              relation_name = "@_#{name}"
-              next unless document.instance_variable_defined?(relation_name)
+              relation = document.ivar(name)
+              next if relation == false
 
-              relation = document.instance_variable_get(relation_name)
               children.concat(Array.wrap(relation)) if relation
             end
           end
 
-          # Clear cached atomic paths on a document and its loaded embedded
-          # association proxies after its position changes.
+          # Clear cached atomic paths on documents after their positions change.
           #
           # @api private
           # @param [ Array<Document> ] documents The affected documents.
@@ -491,13 +489,6 @@ module Mongoid
               next unless document.atomic_paths_cached?
 
               document.reset_atomic_paths
-              document.embedded_relations.each_key do |name|
-                relation_name = "@_#{name}"
-                next unless document.instance_variable_defined?(relation_name)
-
-                relation = document.instance_variable_get(relation_name)
-                relation.clear_atomic_path_cache if relation.respond_to?(:clear_atomic_path_cache)
-              end
             end
           end
 
