@@ -160,7 +160,7 @@ module Mongoid
         self['$addToSet'] ||= {}
       end
 
-      # Determines whether an array operation conflicts with another operation.
+      # Check whether an array operation shares a root with another operation.
       #
       # @param [ String ] field The field being modified.
       #
@@ -169,7 +169,7 @@ module Mongoid
         main_has_root?('$push', field) || main_has_root?('$pull', field)
       end
 
-      # Determines whether an unset can be applied independently of array changes.
+      # Check whether an unset can be separated without shifting its target position.
       #
       # @param [ String ] field The field being modified.
       #
@@ -179,7 +179,7 @@ module Mongoid
           !root_in?(conflicts['$pull'], field)
       end
 
-      # Determines whether a main modifier contains the field's array root.
+      # Check whether a main modifier includes this field's array root.
       #
       # @param [ String ] operator The modifier name.
       # @param [ String ] field The field being checked.
@@ -189,7 +189,7 @@ module Mongoid
         root_in?(self[operator], field)
       end
 
-      # Determines whether a modifier contains the root of a field.
+      # Check whether any modifier path shares this field's array root.
       #
       # @param [ Hash | nil ] mods The modifier fields.
       # @param [ String ] field The field being checked.
@@ -202,7 +202,7 @@ module Mongoid
         mods.each_key.any? { |key| key.split('.', 2)[0] == name }
       end
 
-      # Moves conflicting operations on an array root into the conflict queue.
+      # Route array operations that share a root with a main push or pull into separate writes.
       #
       # @param [ String ] field The field being modified.
       def move_conflicting_array_modifications(field)
@@ -214,7 +214,7 @@ module Mongoid
         move_unsets_to_conflicts(name, field)
       end
 
-      # Moves matching $addToSet or $pullAll fields into the corresponding conflict group.
+      # Move matching $addToSet or $pullAll operations into their conflict group.
       #
       # @param [ String ] operator The modifier name.
       # @param [ String ] name The array root.
@@ -234,7 +234,7 @@ module Mongoid
         delete(operator) if mods.empty?
       end
 
-      # Moves separable unsets on an array root into the conflict queue.
+      # Move unsets under this array root when their target positions remain valid.
       #
       # @param [ String ] name The array root.
       # @param [ String ] field The field being modified.
@@ -273,7 +273,7 @@ module Mongoid
         end
       end
 
-      # Adds a pull to the conflict queue in the order expected by update_document.
+      # Queue a pull in the order expected by update_document.
       #
       # @param [ String ] field The field being pulled.
       # @param [ Object ] value The pull condition.
@@ -285,7 +285,7 @@ module Mongoid
         self[:conflicts] = { '$pull' => conflicting.sort_by { |key, _| -key.count('.') }.to_h }.merge(conflicts)
       end
 
-      # Gets the conflicting $addToSet operations or initializes the group.
+      # Return the $addToSet conflict group, creating it when needed.
       #
       # @return [ Hash ] The conflicting $addToSet operations.
       def conflicting_add_to_sets
