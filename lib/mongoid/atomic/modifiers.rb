@@ -209,22 +209,27 @@ module Mongoid
         return unless array_modification_conflict?(field)
 
         name = field.split('.', 2)[0]
-        move_modifications_to_conflicts('$addToSet', :conflicting_add_to_sets, name)
-        move_modifications_to_conflicts('$pullAll', :conflicting_pulls, name)
+        move_modifications_to_conflicts('$addToSet', name)
+        move_modifications_to_conflicts('$pullAll', name)
         move_unsets_to_conflicts(name, field)
       end
 
-      # Moves matching modifier fields into a conflict group.
+      # Moves matching $addToSet or $pullAll fields into the corresponding conflict group.
       #
       # @param [ String ] operator The modifier name.
-      # @param [ Symbol ] target The conflict group accessor.
       # @param [ String ] name The array root.
-      def move_modifications_to_conflicts(operator, target, name)
+      def move_modifications_to_conflicts(operator, name)
         mods = self[operator]
         return if mods.nil?
 
+        target = case operator
+                 when '$addToSet'
+                   conflicting_add_to_sets
+                 when '$pullAll'
+                   conflicting_pulls
+                 end
         mods.keys.select { |key| key.split('.', 2)[0] == name }.each do |key|
-          add_operation(send(target), key, mods.delete(key))
+          add_operation(target, key, mods.delete(key))
         end
         delete(operator) if mods.empty?
       end
