@@ -423,6 +423,12 @@ module Mongoid
             doc._id || doc.object_id
           end
 
+          # Remap delayed updates when an embedded document changes position.
+          #
+          # @api private
+          # @param [ Document ] document The document with delayed updates.
+          # @param [ String ] previous_path The original atomic path.
+          # @param [ String ] current_path The updated atomic path.
           def remap_atomic_update_paths(document, previous_path, current_path)
             return if previous_path == current_path
 
@@ -436,6 +442,12 @@ module Mongoid
             end
           end
 
+          # Collect a document and its embedded descendants without memoizing
+          # their child collections.
+          #
+          # @api private
+          # @param [ Document ] document The root document to traverse.
+          # @return [ Array<Document> ] The document and its descendants.
           def atomic_path_documents(document)
             documents = []
             pending = [ document ]
@@ -447,11 +459,47 @@ module Mongoid
 
               seen[descendant] = true
               documents << descendant
-              pending.concat(descendant._children)
-              pending.concat(descendant.delayed_atomic_unsets.values.flatten)
+              pending.concat(loaded_atomic_path_children(descendant))
+              descendant.delayed_atomic_unsets.each_value { |documents| pending.concat(documents) }
             end
 
             documents
+          end
+
+          # Return already-loaded embedded children without materializing
+          # additional association proxies during reindexing.
+          #
+          # @api private
+          # @param [ Document ] document The document whose children to collect.
+          # @return [ Array<Document> ] The loaded embedded children.
+          def loaded_atomic_path_children(document)
+            document.embedded_relations.each_with_object([]) do |(name, _association), children|
+              relation_name = "@_#{name}"
+              next unless document.instance_variable_defined?(relation_name)
+
+              relation = document.instance_variable_get(relation_name)
+              children.concat(Array.wrap(relation)) if relation
+            end
+          end
+
+          # Clear cached atomic paths on a document and its loaded embedded
+          # association proxies after its position changes.
+          #
+          # @api private
+          # @param [ Array<Document> ] documents The affected documents.
+          def reset_atomic_path_caches(documents)
+            documents.each do |document|
+              next unless document.atomic_paths_cached?
+
+              document.reset_atomic_paths
+              document.embedded_relations.each_key do |name|
+                relation_name = "@_#{name}"
+                next unless document.instance_variable_defined?(relation_name)
+
+                relation = document.instance_variable_get(relation_name)
+                relation.send(:clear_atomic_path_cache) if relation.respond_to?(:clear_atomic_path_cache, true)
+              end
+            end
           end
 
           # Optimized version of #append that handles multiple documents
@@ -580,10 +628,21 @@ module Mongoid
           #   person.addresses.reindex
           def reindex
             _unscoped.each_with_index do |doc, index|
+              next if doc._index == index
+
+              unless doc.atomic_paths_cached? || doc.delayed_atomic_sets.any? || doc.delayed_atomic_unsets.any?
+                doc._index = index
+                next
+              end
+
               descendants = atomic_path_documents(doc)
-              previous_paths = descendants.to_h { |descendant| [ descendant, descendant.atomic_position ] }
+              previous_paths = descendants.each_with_object({}) do |descendant, paths|
+                next if descendant.delayed_atomic_sets.empty? && descendant.delayed_atomic_unsets.empty?
+
+                paths[descendant] = descendant.atomic_position
+              end
               doc._index = index
-              descendants.each { |descendant| descendant.instance_variable_set(:@atomic_paths, nil) }
+              reset_atomic_path_caches(descendants)
               previous_paths.each do |descendant, previous_path|
                 remap_atomic_update_paths(descendant, previous_path, descendant.atomic_position)
               end

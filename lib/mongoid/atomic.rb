@@ -187,6 +187,22 @@ module Mongoid
       paths.tap { @atomic_paths = paths unless new_record? }
     end
 
+    # Clear the cached atomic paths so they are recalculated from the current
+    # embedded document positions.
+    #
+    # @api private
+    def reset_atomic_paths
+      @atomic_paths = nil
+    end
+
+    # Check whether atomic paths have been calculated for this document.
+    #
+    # @api private
+    # @return [ true | false ] Whether atomic paths are cached.
+    def atomic_paths_cached?
+      !@atomic_paths.nil?
+    end
+
     # Get all the attributes that need to be pulled.
     #
     # @example Get the pulls.

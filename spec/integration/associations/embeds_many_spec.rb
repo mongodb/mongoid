@@ -149,6 +149,38 @@ describe 'embeds_many associations' do
       expect(persisted_c.leaves.first.twigs.map(&:name)).to eq([ 'c1a' ])
     end
 
+    it 'does not restore a pushed child after clearing its association following a sibling removal' do
+      root = root_with_items
+      (a, b, *_remaining) = root.items.to_a
+
+      b.leaves.push(StaleEmbeddedPathSpec::Leaf.new(name: 'pushed'))
+      root.items.delete(a)
+      b.leaves.clear
+      root.save!
+
+      persisted_root = StaleEmbeddedPathSpec::Root.find(root.id)
+      persisted_b, persisted_c = persisted_root.items.to_a
+
+      expect(persisted_b.leaves).to be_empty
+      expect(persisted_c.leaves.map(&:name)).to eq([ 'c1' ])
+    end
+
+    it 'replaces a delayed non-empty association with an empty one after a sibling removal' do
+      root = root_with_items
+      (a, b, *_remaining) = root.items.to_a
+
+      b.attributes = { leaves: [ StaleEmbeddedPathSpec::Leaf.new(name: 'new') ] }
+      root.items.delete(a)
+      b.attributes = { leaves: [] }
+      root.save!
+
+      persisted_root = StaleEmbeddedPathSpec::Root.find(root.id)
+      persisted_b, persisted_c = persisted_root.items.to_a
+
+      expect(persisted_b.leaves).to be_empty
+      expect(persisted_c.leaves.map(&:name)).to eq([ 'c1' ])
+    end
+
     def root_with_items
       StaleEmbeddedPathSpec::Root.create!(
         items: [
