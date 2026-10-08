@@ -243,9 +243,9 @@ module Mongoid
         delete('$unset') if unsets_in_main.empty?
       end
 
-      # A $push appends without changing existing array indexes, so later pulls
-      # can run after it without changing the paths they target.
-      # Defers pulls when a push shares their root; appending does not shift indexes.
+      # Defers pulls that share a root with a main $push because the push preserves
+      # existing indexes. The caller handles unsets separately when no same-root
+      # pull can shift the index they target.
       #
       # @param [ String ] field The field being modified.
       def move_pulls_under_root(field)
