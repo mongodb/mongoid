@@ -423,7 +423,7 @@ module Mongoid
             doc._id || doc.object_id
           end
 
-          # Remap delayed updates when an embedded document changes position.
+          # Replace the old path prefix in pending update keys.
           #
           # @api private
           # @param [ Document ] document The document with delayed updates.
@@ -441,8 +441,7 @@ module Mongoid
             end
           end
 
-          # Collect a document and its embedded descendants without memoizing
-          # their child collections.
+          # Walk loaded embedded descendants without memoizing child collections.
           #
           # @api private
           # @param [ Document ] document The root document to traverse.
@@ -465,8 +464,7 @@ module Mongoid
             documents
           end
 
-          # Return already-loaded embedded children without materializing
-          # additional association proxies during reindexing.
+          # Return embedded children already loaded on this document.
           #
           # @api private
           # @param [ Document ] document The document whose children to collect.
@@ -480,7 +478,7 @@ module Mongoid
             end
           end
 
-          # Clear cached atomic paths on documents after their positions change.
+          # Clear cached atomic paths after document positions change.
           #
           # @api private
           # @param [ Array<Document> ] documents The affected documents.

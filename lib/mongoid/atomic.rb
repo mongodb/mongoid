@@ -187,15 +187,14 @@ module Mongoid
       paths.tap { @atomic_paths = paths unless new_record? }
     end
 
-    # Clear the cached atomic paths so they are recalculated from the current
-    # embedded document positions.
+    # Clear cached atomic paths so they use the current embedded positions.
     #
     # @api private
     def reset_atomic_paths
       @atomic_paths = nil
     end
 
-    # Check whether atomic paths have been calculated for this document.
+    # Return whether atomic paths have been cached for this document.
     #
     # @api private
     # @return [ true | false ] Whether atomic paths are cached.
