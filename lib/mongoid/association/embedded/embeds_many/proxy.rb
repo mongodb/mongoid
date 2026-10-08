@@ -433,8 +433,7 @@ module Mongoid
             return if previous_path == current_path
 
             prefix = /\A#{Regexp.escape(previous_path)}(?=\.|\z)/
-            %i[delayed_atomic_sets delayed_atomic_unsets].each do |updates_name|
-              updates = document.public_send(updates_name)
+            [ document.delayed_atomic_sets, document.delayed_atomic_unsets ].each do |updates|
               remapped = updates.each_with_object({}) do |(path, value), result|
                 result[path.sub(prefix, current_path)] = value
               end
@@ -497,7 +496,7 @@ module Mongoid
                 next unless document.instance_variable_defined?(relation_name)
 
                 relation = document.instance_variable_get(relation_name)
-                relation.send(:clear_atomic_path_cache) if relation.respond_to?(:clear_atomic_path_cache, true)
+                relation.clear_atomic_path_cache if relation.respond_to?(:clear_atomic_path_cache)
               end
             end
           end
