@@ -179,6 +179,20 @@ module AtomicModifiersConflictSpec
       expect(persisted_children.map { |child| child['detail']&.fetch('label') }).to eq(%w[ad bd])
     end
 
+    it 'keeps an empty embedded array and sibling pull conflict as a database error' do
+      parent = AtomicModifiersConflictParent.find(parent_id)
+      first, second = parent.children.to_a
+
+      parent.children_attributes = [ { id: first.id, _destroy: true } ]
+      second.attributes = { leaves: [] }
+
+      expect { parent.save! }.to raise_error(Mongo::Error::OperationFailure, /\[40\]/)
+      expect(persisted_children.map { |child| child['label'] }).to eq(%w[a b])
+      expect(persisted_children.map { |child| child['leaves'].map { |leaf| leaf['label'] } }).to eq(
+        [ %w[a1 a2], %w[b1 b2] ]
+      )
+    end
+
     it 'saves nested pulls after removing a preceding child' do
       parent = AtomicModifiersConflictParent.find(parent_id)
       first, second = parent.children.to_a
