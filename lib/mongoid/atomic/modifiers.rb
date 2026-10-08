@@ -160,27 +160,52 @@ module Mongoid
         self['$addToSet'] ||= {}
       end
 
-      private def array_modification_conflict?(field)
+      # Determines whether an array operation conflicts with another operation.
+      #
+      # @param [ String ] field The field being modified.
+      #
+      # @return [ true | false ] Whether the field has a conflicting array operation.
+      def array_modification_conflict?(field)
         main_has_root?('$push', field) || main_has_root?('$pull', field)
       end
 
-      private def unset_separable?(field)
+      # Determines whether an unset can be applied independently of array changes.
+      #
+      # @param [ String ] field The field being modified.
+      #
+      # @return [ true | false ] Whether the unset can be separated.
+      def unset_separable?(field)
         main_has_root?('$push', field) && !main_has_root?('$pull', field) &&
           !root_in?(conflicts['$pull'], field)
       end
 
-      private def main_has_root?(operator, field)
+      # Determines whether a main modifier contains the field's array root.
+      #
+      # @param [ String ] operator The modifier name.
+      # @param [ String ] field The field being checked.
+      #
+      # @return [ true | false ] Whether the modifier contains the root.
+      def main_has_root?(operator, field)
         root_in?(self[operator], field)
       end
 
-      private def root_in?(mods, field)
+      # Determines whether a modifier contains the root of a field.
+      #
+      # @param [ Hash | nil ] mods The modifier fields.
+      # @param [ String ] field The field being checked.
+      #
+      # @return [ true | false ] Whether the root is present.
+      def root_in?(mods, field)
         return false if mods.nil?
 
         name = field.split('.', 2)[0]
         mods.each_key.any? { |key| key.split('.', 2)[0] == name }
       end
 
-      private def move_conflicting_array_modifications(field)
+      # Moves conflicting operations on an array root into the conflict queue.
+      #
+      # @param [ String ] field The field being modified.
+      def move_conflicting_array_modifications(field)
         return unless array_modification_conflict?(field)
 
         name = field.split('.', 2)[0]
@@ -189,7 +214,12 @@ module Mongoid
         move_unsets_to_conflicts(name, field)
       end
 
-      private def move_modifications_to_conflicts(operator, target, name)
+      # Moves matching modifier fields into a conflict group.
+      #
+      # @param [ String ] operator The modifier name.
+      # @param [ Symbol ] target The conflict group accessor.
+      # @param [ String ] name The array root.
+      def move_modifications_to_conflicts(operator, target, name)
         mods = self[operator]
         return if mods.nil?
 
@@ -199,7 +229,11 @@ module Mongoid
         delete(operator) if mods.empty?
       end
 
-      private def move_unsets_to_conflicts(name, field)
+      # Moves separable unsets on an array root into the conflict queue.
+      #
+      # @param [ String ] name The array root.
+      # @param [ String ] field The field being modified.
+      def move_unsets_to_conflicts(name, field)
         unsets_in_main = self['$unset']
         return if unsets_in_main.nil? || !unset_separable?(field)
 
@@ -211,7 +245,10 @@ module Mongoid
 
       # A $push appends without changing existing array indexes, so later pulls
       # can run after it without changing the paths they target.
-      private def move_pulls_under_root(field)
+      # Defers pulls when a push shares their root; appending does not shift indexes.
+      #
+      # @param [ String ] field The field being modified.
+      def move_pulls_under_root(field)
         name = field.split('.', 2)[0]
         pulls.keys.select { |key| key.split('.', 2)[0] == name }.each do |key|
           add_conflicting_pull(key, pulls.delete(key))
@@ -219,7 +256,10 @@ module Mongoid
         delete('$pull') if pulls.empty?
       end
 
-      private def move_deeper_pulls(field)
+      # Defers deeper pulls so shallower array paths are processed first.
+      #
+      # @param [ String ] field The field being modified.
+      def move_deeper_pulls(field)
         name = field.split('.', 2)[0]
         same_root = pulls.keys.select { |key| key.split('.', 2)[0] == name }
         shallowest = same_root.map { |key| key.count('.') }.min
@@ -228,7 +268,11 @@ module Mongoid
         end
       end
 
-      private def add_conflicting_pull(field, value)
+      # Adds a pull to the conflict queue in the order expected by update_document.
+      #
+      # @param [ String ] field The field being pulled.
+      # @param [ Object ] value The pull condition.
+      def add_conflicting_pull(field, value)
         conflicting = conflicts.delete('$pull') || {}
         conflicting[field] = value
         # update_document pops each conflict group, so store deeper paths first
@@ -236,7 +280,10 @@ module Mongoid
         self[:conflicts] = { '$pull' => conflicting.sort_by { |key, _| -key.count('.') }.to_h }.merge(conflicts)
       end
 
-      private def conflicting_add_to_sets
+      # Gets the conflicting $addToSet operations or initializes the group.
+      #
+      # @return [ Hash ] The conflicting $addToSet operations.
+      def conflicting_add_to_sets
         conflicts['$addToSet'] ||= {}
       end
 
