@@ -7,6 +7,87 @@ describe Mongoid::Atomic::Modifiers do
     described_class.new
   end
 
+  describe 'conflicting array modifiers' do
+    let!(:modifiers) do
+      Mongoid::Atomic::Modifiers.new
+    end
+
+    it 'moves addToSet after a push to the same embedded array' do
+      modifiers.push('children' => [ { 'label' => 'new' } ])
+      modifiers.add_to_set('children.0.grade_ids' => [ 'grade-id' ])
+
+      expect(modifiers).to eq(
+        '$push' => { 'children' => { '$each' => [ { 'label' => 'new' } ] } },
+        conflicts: { '$addToSet' => { 'children.0.grade_ids' => { '$each' => [ 'grade-id' ] } } }
+      )
+    end
+
+    it 'moves an earlier addToSet when a push to its parent array is added' do
+      modifiers.add_to_set('children.0.grade_ids' => [ 'grade-id' ])
+      modifiers.push('children' => [ { 'label' => 'new' } ])
+
+      expect(modifiers).to eq(
+        '$push' => { 'children' => { '$each' => [ { 'label' => 'new' } ] } },
+        conflicts: { '$addToSet' => { 'children.0.grade_ids' => { '$each' => [ 'grade-id' ] } } }
+      )
+    end
+
+    it 'moves pullAll after a pull to the same embedded array' do
+      modifiers.pull('children' => { 'label' => 'removed' })
+      modifiers.pull_all('children.0.grade_ids' => [ 'grade-id' ])
+
+      expect(modifiers).to eq(
+        '$pull' => { 'children' => { 'label' => 'removed' } },
+        conflicts: { '$pullAll' => { 'children.0.grade_ids' => [ 'grade-id' ] } }
+      )
+    end
+
+    it 'moves deeper pulls after the shallowest pull and orders them by depth' do
+      shallow_pull = { 'children' => { 'label' => 'removed' } }
+      middle_pull = { 'children.0.leaves' => { 'label' => 'removed' } }
+      deep_pull = { 'children.0.leaves.0.twigs' => { 'label' => 'removed' } }
+
+      modifiers.pull(shallow_pull)
+      modifiers.pull(middle_pull)
+      modifiers.pull(deep_pull)
+
+      expect(modifiers).to eq(
+        '$pull' => shallow_pull,
+        conflicts: { '$pull' => deep_pull.merge(middle_pull) }
+      )
+    end
+
+    it 'moves an unset after a push when no pull can shift its path' do
+      modifiers.unset([ 'children.0.label' ])
+      modifiers.push('children' => [ { 'label' => 'new' } ])
+
+      expect(modifiers).to eq(
+        '$push' => { 'children' => { '$each' => [ { 'label' => 'new' } ] } },
+        conflicts: { '$unset' => { 'children.0.label' => true } }
+      )
+    end
+
+    it 'keeps a pull and unset on the same embedded array in the main update' do
+      modifiers.unset([ 'children.0.label' ])
+      modifiers.pull('children' => { 'label' => 'removed' })
+
+      expect(modifiers).to eq(
+        '$pull' => { 'children' => { 'label' => 'removed' } },
+        '$unset' => { 'children.0.label' => true }
+      )
+    end
+
+    it 'keeps an existing pull and unset on the same embedded array in the main update' do
+      modifiers.pull('children' => { 'label' => 'removed' })
+      modifiers.unset([ 'children.0.label' ])
+
+      expect(modifiers).to eq(
+        '$pull' => { 'children' => { 'label' => 'removed' } },
+        '$unset' => { 'children.0.label' => true }
+      )
+    end
+  end
+
   describe '#push_conflict?' do
     let(:result) { modifiers.send(:push_conflict?, field) }
 
