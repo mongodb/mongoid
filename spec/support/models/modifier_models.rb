@@ -42,5 +42,13 @@ module ModifierModels
 
     field :name, type: String
     embedded_in :drawer, class_name: 'ModifierModels::Drawer'
+    embeds_many :widgets, class_name: 'ModifierModels::Widget'
+  end
+
+  class Widget
+    include Mongoid::Document
+
+    field :label, type: String
+    embedded_in :item, class_name: 'ModifierModels::Item'
   end
 end

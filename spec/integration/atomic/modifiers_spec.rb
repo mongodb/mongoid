@@ -172,5 +172,23 @@ describe Mongoid::Atomic::Modifiers do
         expect(cabinet.drawer.items.map(&:name)).to eq([ 'a' ])
       end
     end
+
+    context 'when an assigned child has its own embedded collection' do
+      let(:item) { ModifierModels::Item.new(name: 'a') }
+
+      before do
+        item.assign_attributes(widgets: [ { label: 'w' } ])
+        cabinet.build_drawer(matcher: 'all')
+        cabinet.drawer.assign_attributes(items: [ item ])
+      end
+
+      it 'does not write the child collection to the root document' do
+        expect { cabinet.save! }.not_to raise_error
+
+        stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+        expect(stored.keys).to contain_exactly('_id', 'drawer')
+        expect(stored['drawer']['items'].first['widgets'].first['label']).to eq('w')
+      end
+    end
   end
 end
