@@ -133,6 +133,11 @@ module Mongoid
         def add_atomic_sets(sets)
           return unless _assigning?
 
+          # If the base document is itself inserted wholesale via a $set of
+          # its atomic path, that $set already contains these documents, and
+          # a nested $set under the same path would conflict with it.
+          return if _base.settable?
+
           _base.delayed_atomic_sets[path].try(:clear)
           _base.collect_children.each do |child|
             child.delayed_atomic_sets.clear

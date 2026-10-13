@@ -134,4 +134,43 @@ describe Mongoid::Atomic::Modifiers do
       expect(library.books[2].foreword).not_to be_nil
     end
   end
+
+  context 'when assigning embeds_many attributes on a new embedded document' do
+    let(:cabinet) do
+      ModifierModels::Cabinet.create!
+    end
+
+    before do
+      cabinet.reload
+    end
+
+    context 'when the nested documents are assigned on the built document' do
+      before do
+        cabinet.build_drawer(matcher: 'all')
+        cabinet.drawer.assign_attributes(items: [ { name: 'a' } ])
+      end
+
+      it 'saves without conflicting $set paths' do
+        expect { cabinet.save! }.not_to raise_error
+
+        cabinet.reload
+        expect(cabinet.drawer.matcher).to eq('all')
+        expect(cabinet.drawer.items.map(&:name)).to eq([ 'a' ])
+      end
+    end
+
+    context 'when the nested documents are assigned via the parent' do
+      before do
+        cabinet.assign_attributes(drawer: { matcher: 'all', items: [ { name: 'a' } ] })
+      end
+
+      it 'saves without conflicting $set paths' do
+        expect { cabinet.save! }.not_to raise_error
+
+        cabinet.reload
+        expect(cabinet.drawer.matcher).to eq('all')
+        expect(cabinet.drawer.items.map(&:name)).to eq([ 'a' ])
+      end
+    end
+  end
 end
