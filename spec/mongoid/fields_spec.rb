@@ -1826,6 +1826,25 @@ describe Mongoid::Fields do
       it_behaves_like 'database_field_name'
     end
 
+    context 'given a plain String field name' do
+      let(:name) { +'title' }
+
+      it 'returns a copy the caller can mutate without changing the input' do
+        result = Person.database_field_name(name)
+        expect(result).to eq 'title'
+        expect(result).not_to be name
+        result << '!'
+        expect(name).to eq 'title'
+      end
+
+      it 'returns a copy of the aliased database name' do
+        result = Person.database_field_name('aliased_timestamp')
+        expect(result).to eq 'at'
+        result << '!'
+        expect(Person.database_field_name('aliased_timestamp')).to eq 'at'
+      end
+    end
+
     context 'when getting the database field name of a belongs_to associations' do
       context 'when the association is the last item' do
         let(:name) do
