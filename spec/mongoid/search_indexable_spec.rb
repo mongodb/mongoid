@@ -118,6 +118,32 @@ describe Mongoid::SearchIndexable do
     end
   end
 
+  describe '.wait_for_search_indexes' do
+    let(:model) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        search_index :idx, mappings: { dynamic: false }
+      end
+    end
+
+    it 'reads the index status inside collection management' do
+      managing = nil
+      search_indexes = [ { 'name' => 'idx', 'queryable' => true, 'status' => 'READY' } ]
+      collection = instance_double(Mongo::Collection)
+      allow(collection).to receive(:search_indexes) do
+        managing = Mongoid::Threaded.managing_collection?
+        search_indexes
+      end
+      allow(model).to receive(:collection).and_return(collection)
+
+      model.wait_for_search_indexes([ 'idx' ])
+
+      expect(managing).to be true
+    end
+  end
+
   describe '.vector_search_index' do
     let(:vector_model) do
       Class.new do

@@ -254,6 +254,19 @@ describe Mongoid::Tasks::Database do
         described_class.create_search_indexes([ searchable_model_spy ], wait: false)
       end
     end
+
+    context 'when waiting for the indexes' do
+      it 'runs the wait inside collection management' do
+        managing = nil
+        allow(described_class).to receive(:wait_for_search_indexes) do
+          managing = Mongoid::Threaded.managing_collection?
+        end
+
+        described_class.create_search_indexes([ searchable_model_spy ], wait: true)
+
+        expect(managing).to be true
+      end
+    end
   end
 
   describe '.remove_search_indexes' do
