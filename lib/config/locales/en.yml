@@ -544,19 +544,23 @@ en:
         no_encryption_schema:
           message: "The encryption schema of client %{client} does not cover
             %{namespace}."
-          summary: "%{klass} declares encrypted fields, but the namespace it
-            resolved to, %{namespace}, is not part of the automatic encryption
-            schema of client %{client}. The encryption schema is built once,
-            when the client is created, and is keyed by namespace, so a
-            database name that is only known later - a callable :database
-            option, Model.with(database:), Mongoid.override_database - is not
-            in it. Routing the model to a client that has no
-            auto_encryption_options has the same effect. Mongoid refuses the
-            operation because the driver would store the declared fields in
-            plaintext without reporting an error."
+          summary: "%{klass} declares encrypted fields, directly or through
+            an embedded model, but the namespace it resolved to, %{namespace},
+            is not part of the automatic encryption schema of client
+            %{client}. The encryption schema is built once, when the client
+            is created, and is keyed by namespace, so a database name that is
+            only known later - a callable :database option,
+            Model.with(database:), Mongoid.override_database - is not in it.
+            The same happens when an embedded model with encrypted fields was
+            not yet loaded when the client was created. Routing the model to a
+            client that has no auto_encryption_options has the same effect.
+            Mongoid refuses the operation because the driver would store the
+            declared fields in plaintext without reporting an error."
           resolution: "Give the model a namespace that is known when the
             client is created, and a client configured with
-            auto_encryption_options. If the model has to live in a database
+            auto_encryption_options. Load all models, including embedded
+            ones, before the first client is created, for example by
+            preloading them at boot. If the model has to live in a database
             chosen at runtime, configure one client per database, each with
             its own auto_encryption_options, and select between them with
             Model.with(client:) instead of switching the database."
