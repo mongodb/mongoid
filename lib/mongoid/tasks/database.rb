@@ -64,15 +64,18 @@ module Mongoid
       # @param [ true | false ] wait whether to wait for the indexes to be
       #   built.
       def create_search_indexes(models = ::Mongoid.models, wait: true)
-        searchable = models.select { |m| m.search_index_specs.any? }
+        Threaded.with_collection_management do
+          searchable = models.select { |m| m.search_index_specs.any? }
 
-        # queue up the search index creation requests
-        index_names_by_model = searchable.each_with_object({}) do |model, obj|
-          logger.info("MONGOID: Creating search indexes on #{model}...")
-          obj[model] = model.create_search_indexes
+          # queue up the search index creation requests
+          index_names_by_model = searchable.each_with_object({}) do |model, obj|
+            logger.info("MONGOID: Creating search indexes on #{model}...")
+            obj[model] = model.create_search_indexes
+          end
+
+          wait_for_search_indexes(index_names_by_model) if wait
+          index_names_by_model
         end
-
-        wait_for_search_indexes(index_names_by_model) if wait
       end
 
       # Return the list of indexes by model that exist in the database but aren't

@@ -290,6 +290,35 @@ describe Mongoid::Attributes::Nested do
       end
     end
 
+    context 'when a has-many association uses a custom primary key' do
+      # A throwaway class, so that accepts_nested_attributes_for does not
+      # leave autosave callbacks and nested attributes on a shared model.
+      let(:company_class) do
+        stub_const('NestedSpecCompany', Class.new do
+          include Mongoid::Document
+
+          store_in collection: 'hmm_companies'
+          field :p, type: Integer
+          has_many :emails, primary_key: :p, foreign_key: :f, class_name: 'HmmEmail', inverse_of: nil
+          accepts_nested_attributes_for :emails
+        end)
+      end
+
+      after do
+        Mongoid.deregister_model(company_class)
+      end
+
+      it 'reports the parent primary key value in the error params' do
+        company = company_class.create!(p: 42)
+
+        expect do
+          company.emails_attributes = { '0' => { 'id' => 'missing', 'f' => 42 } }
+        end.to raise_error(Mongoid::Errors::DocumentNotFound) { |error|
+          expect(error.params).to eq({ _id: 'missing', 'f' => 42 })
+        }
+      end
+    end
+
     context 'when the relation is a has-and-belongs-to-many' do
       before do
         Person.send(:undef_method, :preferences_attributes=)

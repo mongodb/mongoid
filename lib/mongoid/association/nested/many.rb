@@ -230,7 +230,7 @@ module Mongoid
             # the id is only ever resolved within the association itself.
             id
           else
-            { _id: id, association.foreign_key => parent.id }
+            { _id: id, association.foreign_key => parent.send(association.primary_key) }
           end
         end
       end
