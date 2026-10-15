@@ -4,7 +4,6 @@ require 'spec_helper'
 require_relative 'attributes/nested_spec_models'
 
 describe Mongoid::Attributes do
-
   describe '#attribute_missing?' do
     context 'when the document was not loaded with a projection' do
       let(:person) { Person.new(title: 'sir') }
@@ -26,6 +25,7 @@ describe Mongoid::Attributes do
       end
     end
   end
+
   describe "\#{attribute}" do
     context 'when setting the value in the getter' do
       let(:account) do
