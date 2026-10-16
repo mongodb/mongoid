@@ -135,6 +135,103 @@ describe Mongoid::Atomic::Modifiers do
     end
   end
 
+  context 'when adding to a set on an existing embedded document and pushing a new one' do
+    let(:badges) { Array.new(2) { ModifierModels::Badge.create! } }
+    let(:roster) do
+      ModifierModels::Roster.create!(players: [
+                                       ModifierModels::Player.new(badges: [ badges[0] ]),
+                                       ModifierModels::Player.new(badges: [ badges[0] ])
+                                     ])
+    end
+
+    before do
+      roster.reload
+      roster.players.build
+      player = roster.players[0]
+      player.badge_ids = player.badge_ids + [ badges[1].id ]
+      roster.save!
+      roster.reload
+    end
+
+    it 'applies both operations' do
+      expect(roster.players.size).to eq(3)
+      expect(roster.players[0].badge_ids).to eq([ badges[0].id, badges[1].id ])
+      expect(roster.players[1].badge_ids).to eq([ badges[0].id ])
+    end
+  end
+
+  context 'when pulling all from an existing embedded document and pushing a new one' do
+    let(:badges) { Array.new(2) { ModifierModels::Badge.create! } }
+    let(:roster) do
+      ModifierModels::Roster.create!(players: [
+                                       ModifierModels::Player.new(badges: badges),
+                                       ModifierModels::Player.new
+                                     ])
+    end
+
+    before do
+      roster.reload
+      roster.players.build
+      player = roster.players[0]
+      player.badge_ids = player.badge_ids.drop(1)
+      roster.save!
+      roster.reload
+    end
+
+    it 'applies both operations' do
+      expect(roster.players.size).to eq(3)
+      expect(roster.players[0].badge_ids).to eq([ badges[1].id ])
+    end
+  end
+
+  context 'when unsetting a field on an existing embedded document and pushing a new one' do
+    let(:roster) do
+      ModifierModels::Roster.create!(players: [
+                                       ModifierModels::Player.new(medal: ModifierModels::Medal.new),
+                                       ModifierModels::Player.new
+                                     ])
+    end
+
+    before do
+      roster.reload
+      roster.players.build
+      roster.players[0].assign_attributes(medal: nil)
+      roster.save!
+      roster.reload
+    end
+
+    it 'applies both operations' do
+      expect(roster.players.size).to eq(3)
+      expect(roster.players[0].medal).to be_nil
+    end
+  end
+
+  context 'when unsetting an embedded field and pulling a sibling' do
+    let(:roster) do
+      ModifierModels::Roster.create!(players: [
+                                       ModifierModels::Player.new(medal: ModifierModels::Medal.new),
+                                       ModifierModels::Player.new(medal: ModifierModels::Medal.new)
+                                     ])
+    end
+
+    before do
+      roster.reload
+      roster.add_atomic_pull(roster.players[0])
+      roster.players[1].assign_attributes(medal: nil)
+    end
+
+    it 'fails without changing stored data' do
+      # $pull shifts array elements, so these operations cannot be safely
+      # applied in separate writes; MongoDB rejects them in a single write.
+      expect { roster.save! }.to raise_error(Mongo::Error::OperationFailure)
+
+      roster.reload
+      expect(roster.players.size).to eq(2)
+      expect(roster.players[0].medal).not_to be_nil
+      expect(roster.players[1].medal).not_to be_nil
+    end
+  end
+
   context 'when assigning embeds_many attributes on a new embedded document' do
     let(:cabinet) do
       ModifierModels::Cabinet.create!

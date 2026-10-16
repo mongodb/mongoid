@@ -23,6 +23,31 @@ module ModifierModels
     field :text, type: String
   end
 
+  class Roster
+    include Mongoid::Document
+
+    embeds_many :players, class_name: 'ModifierModels::Player'
+  end
+
+  class Player
+    include Mongoid::Document
+
+    embedded_in :roster, class_name: 'ModifierModels::Roster'
+    embeds_one :medal, class_name: 'ModifierModels::Medal'
+    has_and_belongs_to_many :badges, inverse_of: nil, class_name: 'ModifierModels::Badge'
+    field :nickname, type: String
+  end
+
+  class Medal
+    include Mongoid::Document
+
+    embedded_in :player, class_name: 'ModifierModels::Player'
+  end
+
+  class Badge
+    include Mongoid::Document
+  end
+
   class Cabinet
     include Mongoid::Document
 

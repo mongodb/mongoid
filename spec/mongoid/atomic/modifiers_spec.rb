@@ -74,6 +74,78 @@ describe Mongoid::Atomic::Modifiers do
         end
       end
     end
+
+    context 'when a conflicting modification exists' do
+      context 'when the conflicting modification is a set' do
+        let(:sets) do
+          { 'addresses.0.street' => 'Bond' }
+        end
+
+        let(:adds) do
+          { 'addresses.0.tags' => %w[tag] }
+        end
+
+        before do
+          modifiers.set(sets)
+          modifiers.add_to_set(adds)
+        end
+
+        it 'adds the add to set modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$set' => { 'addresses.0.street' => 'Bond' },
+              conflicts: { '$addToSet' =>
+                { 'addresses.0.tags' => { '$each' => %w[tag] } } } }
+          )
+        end
+      end
+
+      context 'when the conflicting modification is a push' do
+        let(:pushes) do
+          { 'addresses' => { 'street' => 'Oxford St' } }
+        end
+
+        let(:adds) do
+          { 'addresses.0.tags' => %w[tag] }
+        end
+
+        before do
+          modifiers.push(pushes)
+          modifiers.add_to_set(adds)
+        end
+
+        it 'adds the add to set modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$push' => { 'addresses' => { '$each' => [ { 'street' => 'Oxford St' } ] } },
+              conflicts: { '$addToSet' =>
+                { 'addresses.0.tags' => { '$each' => %w[tag] } } } }
+          )
+        end
+      end
+
+      context 'when the conflicting modification is a pull' do
+        let(:pulls) do
+          { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } }
+        end
+
+        let(:adds) do
+          { 'addresses.0.tags' => %w[tag] }
+        end
+
+        before do
+          modifiers.pull(pulls)
+          modifiers.add_to_set(adds)
+        end
+
+        it 'does not split the operations, leaving MongoDB to reject the update' do
+          # A $pull shifts array elements, so applying the $addToSet in a
+          # separate write afterwards could target a different element.
+          expect(modifiers).to eq(
+            { '$pull' => { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } },
+              '$addToSet' => { 'addresses.0.tags' => { '$each' => %w[tag] } } }
+          )
+        end
+      end
+    end
   end
 
   describe '#pull' do
@@ -121,6 +193,100 @@ describe Mongoid::Atomic::Modifiers do
         it 'overwrites the previous pulls' do
           expect(modifiers).to eq(
             { '$pull' => { 'addresses' => { '_id' => { '$in' => [ 'two' ] } } } }
+          )
+        end
+      end
+    end
+
+    context 'when a conflicting modification exists' do
+      context 'when the conflicting modification is a set' do
+        let(:sets) do
+          { 'addresses.0.street' => 'Bond' }
+        end
+
+        let(:pulls) do
+          { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } }
+        end
+
+        before do
+          modifiers.set(sets)
+          modifiers.pull(pulls)
+        end
+
+        it 'adds the pull modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$set' => { 'addresses.0.street' => 'Bond' },
+              conflicts: { '$pull' =>
+                { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } } } }
+          )
+        end
+      end
+
+      context 'when the conflicting modification is a push' do
+        let(:pushes) do
+          { 'addresses' => { 'street' => 'Oxford St' } }
+        end
+
+        let(:pulls) do
+          { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } }
+        end
+
+        before do
+          modifiers.push(pushes)
+          modifiers.pull(pulls)
+        end
+
+        it 'adds the pull modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$push' => { 'addresses' => { '$each' => [ { 'street' => 'Oxford St' } ] } },
+              conflicts: { '$pull' =>
+                { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } } } }
+          )
+        end
+      end
+
+      context 'when the conflicting modification is an add to set' do
+        let(:adds) do
+          { 'addresses.0.tags' => %w[tag] }
+        end
+
+        let(:pulls) do
+          { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } }
+        end
+
+        before do
+          modifiers.add_to_set(adds)
+          modifiers.pull(pulls)
+        end
+
+        it 'adds the pull modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$addToSet' => { 'addresses.0.tags' => { '$each' => %w[tag] } },
+              conflicts: { '$pull' =>
+                { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } } } }
+          )
+        end
+      end
+
+      context 'when the conflicting modification is a pull all' do
+        let(:pull_alls) do
+          { 'addresses' => [ { '_id' => 'one' } ] }
+        end
+
+        let(:pulls) do
+          { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } }
+        end
+
+        before do
+          modifiers.pull_all(pull_alls)
+          modifiers.pull(pulls)
+        end
+
+        it 'adds the pull modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$pullAll' => { 'addresses' => [ { '_id' => 'one' } ] },
+              conflicts: { '$pull' =>
+                { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } } } }
           )
         end
       end
@@ -179,6 +345,54 @@ describe Mongoid::Atomic::Modifiers do
                 { 'street' => 'Hobrechtstr.' },
                 { 'street' => 'Pflugerstr.' }
               ] } }
+          )
+        end
+      end
+    end
+
+    context 'when a conflicting modification exists' do
+      context 'when the conflicting modification is a pull' do
+        let(:pulls) do
+          { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } }
+        end
+
+        let(:pull_alls) do
+          { 'addresses' => [ { '_id' => 'one' } ] }
+        end
+
+        before do
+          modifiers.pull(pulls)
+          modifiers.pull_all(pull_alls)
+        end
+
+        it 'adds the pull all modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$pull' => { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } },
+              conflicts: { '$pullAll' =>
+                { 'addresses' => [ { '_id' => 'one' } ] } } }
+          )
+        end
+      end
+
+      context 'when the conflicting modification is a push' do
+        let(:pushes) do
+          { 'addresses' => { 'street' => 'Oxford St' } }
+        end
+
+        let(:pull_alls) do
+          { 'addresses' => [ { '_id' => 'one' } ] }
+        end
+
+        before do
+          modifiers.push(pushes)
+          modifiers.pull_all(pull_alls)
+        end
+
+        it 'adds the pull all modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$push' => { 'addresses' => { '$each' => [ { 'street' => 'Oxford St' } ] } },
+              conflicts: { '$pullAll' =>
+                { 'addresses' => [ { '_id' => 'one' } ] } } }
           )
         end
       end
@@ -321,6 +535,56 @@ describe Mongoid::Atomic::Modifiers do
           )
         end
       end
+
+      context 'when the conflicting modification is an add to set' do
+        let(:adds) do
+          { 'addresses.0.tags' => %w[tag] }
+        end
+
+        let(:pushes) do
+          { 'addresses' => { 'street' => 'Oxford St' } }
+        end
+
+        before do
+          modifiers.add_to_set(adds)
+          modifiers.push(pushes)
+        end
+
+        it 'adds the push modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$addToSet' => { 'addresses.0.tags' => { '$each' => %w[tag] } },
+              conflicts: { '$push' =>
+                { 'addresses' => { '$each' => [
+                  { 'street' => 'Oxford St' }
+                ] } } } }
+          )
+        end
+      end
+
+      context 'when the conflicting modification is an unset' do
+        let(:unsets) do
+          [ 'addresses.0.street' ]
+        end
+
+        let(:pushes) do
+          { 'addresses' => { 'street' => 'Oxford St' } }
+        end
+
+        before do
+          modifiers.unset(unsets)
+          modifiers.push(pushes)
+        end
+
+        it 'adds the push modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$unset' => { 'addresses.0.street' => true },
+              conflicts: { '$push' =>
+                { 'addresses' => { '$each' => [
+                  { 'street' => 'Oxford St' }
+                ] } } } }
+          )
+        end
+      end
     end
 
     context 'when there is another operation on a sibling of a key which is nested' do
@@ -419,6 +683,30 @@ describe Mongoid::Atomic::Modifiers do
           )
         end
       end
+
+      context 'when the conflicting modification is an add to set' do
+        let(:adds) do
+          { 'addresses.0.tags' => %w[tag] }
+        end
+
+        let(:sets) do
+          { 'addresses.0.title' => 'Sir' }
+        end
+
+        before do
+          modifiers.add_to_set(adds)
+          modifiers.set(sets)
+        end
+
+        it 'adds the set modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$addToSet' =>
+              { 'addresses.0.tags' => { '$each' => %w[tag] } },
+              conflicts:
+                { '$set' => { 'addresses.0.title' => 'Sir' } } }
+          )
+        end
+      end
     end
   end
 
@@ -486,6 +774,67 @@ describe Mongoid::Atomic::Modifiers do
               { '$set' => { 'books' => [ { 'title' => '1984' } ] } }
             )
           end
+        end
+      end
+
+      context 'when the unsets conflict with a prior push' do
+        # A $push appends to the array and does not shift existing element
+        # positions, so the $unset can be applied safely in a separate write.
+        let(:pushes) { { 'books' => { 'title' => '1984' } } }
+
+        let(:unsets) { [ 'books.0.title' ] }
+
+        before do
+          modifiers.push(pushes)
+          modifiers.unset(unsets)
+        end
+
+        it 'adds the unset modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$push' => { 'books' => { '$each' => [ { 'title' => '1984' } ] } },
+              conflicts: { '$unset' => { 'books.0.title' => true } } }
+          )
+        end
+      end
+
+      context 'when the unsets conflict with a prior add to set' do
+        let(:adds) { { 'books.0.tags' => %w[tag] } }
+
+        let(:unsets) { [ 'books.0.title' ] }
+
+        before do
+          modifiers.add_to_set(adds)
+          modifiers.unset(unsets)
+        end
+
+        it 'adds the unset modifiers to the conflicts hash' do
+          expect(modifiers).to eq(
+            { '$addToSet' => { 'books.0.tags' => { '$each' => %w[tag] } },
+              conflicts: { '$unset' => { 'books.0.title' => true } } }
+          )
+        end
+      end
+
+      context 'when there is a pending pull on the same field' do
+        # A $pull shifts array elements, so routing the $unset into a separate
+        # write could make it target a different element. The operations are
+        # left together so MongoDB rejects the update (code 40) atomically.
+        let(:pulls) do
+          { 'books' => { '_id' => { '$in' => [ 'one' ] } } }
+        end
+
+        let(:unsets) { [ 'books.0.title' ] }
+
+        before do
+          modifiers.pull(pulls)
+          modifiers.unset(unsets)
+        end
+
+        it 'does not split the operations' do
+          expect(modifiers).to eq(
+            { '$pull' => { 'books' => { '_id' => { '$in' => [ 'one' ] } } },
+              '$unset' => { 'books.0.title' => true } }
+          )
         end
       end
     end
