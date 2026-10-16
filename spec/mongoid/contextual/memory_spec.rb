@@ -468,6 +468,31 @@ describe Mongoid::Contextual::Memory do
           }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
         end
       end
+
+      context "when the field name is a method name" do
+        let!(:person) do
+          Person.create!(ssn: "secret-ssn")
+        end
+
+        let!(:address) do
+          person.addresses.create!(street: "hobrecht")
+        end
+
+        let(:criteria) do
+          Address.all.tap do |crit|
+            crit.documents = [ address ]
+          end
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "does not call the method" do
+          expect(address).not_to receive(:destroy)
+          expect(context.distinct(:destroy)).to eq([ nil ])
+        end
+      end
     end
 
     context "when legacy_pluck_distinct is false" do
