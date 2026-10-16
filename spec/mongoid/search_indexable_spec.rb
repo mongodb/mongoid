@@ -62,7 +62,7 @@ class SearchIndexHelper
 end
 
 # rubocop:disable RSpec/MultipleMemoizedHelpers
-describe Mongoid::SearchIndexable do
+describe Mongoid::SearchIndexable do # rubocop:disable RSpec/MultipleDescribes
   before do
     skip "#{described_class} requires at Atlas environment (set ATLAS_URI)" if ENV['ATLAS_URI'].nil?
   end
@@ -145,3 +145,32 @@ describe Mongoid::SearchIndexable do
   end
 end
 # rubocop:enable RSpec/MultipleMemoizedHelpers
+
+# A unit test that does not need an Atlas connection.
+describe Mongoid::SearchIndexable, '.wait_for_search_indexes' do
+  context 'when an index is ready' do
+    let(:model) do
+      Class.new do
+        include Mongoid::Document
+
+        store_in collection: BSON::ObjectId.new.to_s
+        search_index :idx, mappings: { dynamic: false }
+      end
+    end
+
+    it 'reads the index status inside collection management' do
+      managing = nil
+      search_indexes = [ { 'name' => 'idx', 'queryable' => true, 'status' => 'READY' } ]
+      collection = instance_double(Mongo::Collection)
+      allow(collection).to receive(:search_indexes) do
+        managing = Mongoid::Threaded.managing_collection?
+        search_indexes
+      end
+      allow(model).to receive(:collection).and_return(collection)
+
+      model.wait_for_search_indexes([ 'idx' ])
+
+      expect(managing).to be true
+    end
+  end
+end
