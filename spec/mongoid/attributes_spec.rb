@@ -4,6 +4,28 @@ require 'spec_helper'
 require_relative 'attributes/nested_spec_models'
 
 describe Mongoid::Attributes do
+  describe '#attribute_missing?' do
+    context 'when the document was not loaded with a projection' do
+      let(:person) { Person.new(title: 'sir') }
+
+      it 'reports no attribute missing without building a Projector' do
+        expect(Mongoid::Attributes::Projector).not_to receive(:new)
+        expect(person.attribute_missing?('title')).to be false
+        expect(person.attribute_missing?('age')).to be false
+      end
+    end
+
+    context 'when the document was loaded with a projection' do
+      let!(:person) { Person.create!(title: 'sir', age: 50) }
+      let(:projected) { Person.only(:title).find(person.id) }
+
+      it 'reports the fields left out of the projection' do
+        expect(projected.attribute_missing?('title')).to be false
+        expect(projected.attribute_missing?('age')).to be true
+      end
+    end
+  end
+
   describe "\#{attribute}" do
     context 'when setting the value in the getter' do
       let(:account) do

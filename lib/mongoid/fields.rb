@@ -412,6 +412,9 @@ module Mongoid
         return '' unless name.present?
 
         key = name.to_s
+        # Plain field names (no association path) are the common case on every attribute read.
+        return aliased_fields[key]&.dup || key.dup unless key.include?('.')
+
         segment, remaining = key.split('.', 2)
 
         # Don't get the alias for the field when a belongs_to association
