@@ -331,6 +331,42 @@ describe Mongoid::Clients::Factory do
           end
         end
       end
+
+      context 'when bypass_auto_encryption is set' do
+        it 'warns that encryption is bypassed' do
+          expect(Mongoid::Warnings).to receive(:warn_bypass_auto_encryption)
+
+          described_class.send(
+            :build_auto_encryption_options,
+            { auto_encryption_options: { bypass_auto_encryption: true, schema_map: {} } },
+            database_id
+          )
+        end
+      end
+
+      context 'when bypass_auto_encryption is not set' do
+        it 'does not warn' do
+          expect(Mongoid::Warnings).not_to receive(:warn_bypass_auto_encryption)
+
+          described_class.send(
+            :build_auto_encryption_options,
+            { auto_encryption_options: { schema_map: {} } },
+            database_id
+          )
+        end
+      end
+
+      context 'when bypass_auto_encryption is false' do
+        it 'does not warn' do
+          expect(Mongoid::Warnings).not_to receive(:warn_bypass_auto_encryption)
+
+          described_class.send(
+            :build_auto_encryption_options,
+            { auto_encryption_options: { bypass_auto_encryption: false, schema_map: {} } },
+            database_id
+          )
+        end
+      end
     end
 
     context 'when no name is provided' do

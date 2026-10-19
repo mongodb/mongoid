@@ -22,4 +22,58 @@ module ModifierModels
     embedded_in :book, class_name: 'ModifierModels::Book'
     field :text, type: String
   end
+
+  class Roster
+    include Mongoid::Document
+
+    embeds_many :players, class_name: 'ModifierModels::Player'
+  end
+
+  class Player
+    include Mongoid::Document
+
+    embedded_in :roster, class_name: 'ModifierModels::Roster'
+    embeds_one :medal, class_name: 'ModifierModels::Medal'
+    has_and_belongs_to_many :badges, inverse_of: nil, class_name: 'ModifierModels::Badge'
+    field :nickname, type: String
+  end
+
+  class Medal
+    include Mongoid::Document
+
+    embedded_in :player, class_name: 'ModifierModels::Player'
+  end
+
+  class Badge
+    include Mongoid::Document
+  end
+
+  class Cabinet
+    include Mongoid::Document
+
+    embeds_one :drawer, class_name: 'ModifierModels::Drawer', autobuild: true
+  end
+
+  class Drawer
+    include Mongoid::Document
+
+    field :matcher, type: String
+    embedded_in :cabinet, class_name: 'ModifierModels::Cabinet'
+    embeds_many :items, class_name: 'ModifierModels::Item'
+  end
+
+  class Item
+    include Mongoid::Document
+
+    field :name, type: String
+    embedded_in :drawer, class_name: 'ModifierModels::Drawer'
+    embeds_many :widgets, class_name: 'ModifierModels::Widget'
+  end
+
+  class Widget
+    include Mongoid::Document
+
+    field :label, type: String
+    embedded_in :item, class_name: 'ModifierModels::Item'
+  end
 end

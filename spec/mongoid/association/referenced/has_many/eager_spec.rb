@@ -323,6 +323,39 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
           expect(eager.ordered_posts.max(:rating)).to eq(30)
         end
       end
+
+      context 'when the field name is a method name' do
+        it 'does not call the method for sum' do
+          eager.ordered_posts.each { |post| expect(post).not_to receive(:destroy) }
+          expect(eager.ordered_posts.sum(:destroy)).to eq(0)
+        end
+
+        it 'returns zero from sum' do
+          expect(eager.ordered_posts.sum(:object_id)).to eq(0)
+        end
+
+        it 'returns nil from avg' do
+          expect(eager.ordered_posts.avg(:object_id)).to be_nil
+        end
+
+        it 'returns nil from min' do
+          expect(eager.ordered_posts.min(:object_id)).to be_nil
+        end
+
+        it 'returns nil from max' do
+          expect(eager.ordered_posts.max(:object_id)).to be_nil
+        end
+      end
+
+      context 'when the field is not defined' do
+        it 'returns zero from sum' do
+          expect(eager.ordered_posts.sum(:not_a_field)).to eq(0)
+        end
+
+        it 'returns nil from avg' do
+          expect(eager.ordered_posts.avg(:not_a_field)).to be_nil
+        end
+      end
     end
   end
 end

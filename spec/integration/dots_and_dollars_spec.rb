@@ -253,10 +253,20 @@ describe 'Dots and Dollars' do
         DADMUser.where('$_amount': 0).first
       end
 
-      it 'raise an error' do
+      it 'raises an error' do
         expect do
           queried
-        end.to raise_error(Mongo::Error::OperationFailure)
+        end.to raise_error(Mongoid::Errors::InvalidQuery)
+      end
+
+      context 'when allow_unsafe_query_operators is true' do
+        config_override :allow_unsafe_query_operators, true
+
+        it 'raises an error from the server' do
+          expect do
+            queried
+          end.to raise_error(Mongo::Error::OperationFailure)
+        end
       end
     end
   end

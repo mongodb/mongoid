@@ -32,6 +32,9 @@ module Mongoid
       hash[key] = "#{key}-stack"
     end
 
+    # The name of the stack tracking collection and index management.
+    COLLECTION_MANAGEMENT = :collection_management
+
     # The key for the current thread's sessions.
     SESSIONS_KEY = 'sessions'
 
@@ -41,6 +44,9 @@ module Mongoid
     # The key storing the default value for whether or not callbacks are
     # executed on documents.
     EXECUTE_CALLBACKS = 'execute-callbacks'
+
+    # The key for the time left in the current in-memory regexp budget.
+    REGEXP_BUDGET_KEY = 'regexp-budget'
 
     extend self
 
@@ -163,6 +169,36 @@ module Mongoid
     # @return [ true ] If the stack is being executed.
     def executing?(name)
       !stack(name).empty?
+    end
+
+    # Execute the block as collection or index management.
+    #
+    # Creating, dropping and inspecting collections and indexes sends no
+    # document data, so these operations are exempt from the encryption schema
+    # check that PersistenceContext applies to reads and writes. Without the
+    # exemption, tasks such as db:mongoid:create_collections would need an
+    # encryption-capable client to run.
+    #
+    # @example Create a collection.
+    #   Threaded.with_collection_management { model.create_collection }
+    #
+    # @return [ Object ] The result of the block.
+    def with_collection_management
+      begin_execution(COLLECTION_MANAGEMENT)
+      yield
+    ensure
+      exit_execution(COLLECTION_MANAGEMENT)
+    end
+
+    # Is collection or index management being executed?
+    #
+    # @example Is a collection being managed?
+    #   Threaded.managing_collection?
+    #
+    # @return [ true | false ] Whether collection or index management is in
+    #   progress on the current thread.
+    def managing_collection?
+      executing?(COLLECTION_MANAGEMENT)
     end
 
     # Exit from a named thread local stack.

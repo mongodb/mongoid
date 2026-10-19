@@ -49,7 +49,7 @@ module Mongoid
 
         begin
           touches = _gather_touch_updates(Time.current, field)
-          _root.send(:persist_atomic_operations, '$set' => touches) if touches.present?
+          _root.persist_atomic_operations('$set' => touches) if touches.present?
           _run_touch_callbacks_from_root
         ensure
           _clear_touch_updates(field)
@@ -102,6 +102,33 @@ module Mongoid
 
         _parent._run_touch_callbacks_from_root if _touchable_parent?
         run_callbacks(:touch)
+      end
+
+      # The root-relative paths that a touch of this document's parent chain
+      # writes: the (possibly aliased) +updated_at+ field of each touchable
+      # node in the chain, plus this document's custom touch field, if any.
+      #
+      # @api private
+      #
+      # @param [ Symbol, String, nil ] field The custom touch field.
+      #
+      # @return [ Array<String> ] The touchable paths.
+      def _touchable_chain_paths(field = nil)
+        field = database_field_name(field) if field
+
+        node = self
+        paths = []
+        loop do
+          if node.respond_to?(:updated_at=)
+            paths << node.atomic_attribute_name(node.database_field_name(:updated_at))
+          end
+          paths << node.atomic_attribute_name(field) if node.equal?(self) && field
+
+          break unless node._touchable_parent?
+
+          node = node._parent
+        end
+        paths
       end
 
       # Indicates whether the parent exists and is touchable.
