@@ -134,4 +134,158 @@ describe Mongoid::Atomic::Modifiers do
       expect(library.books[2].foreword).not_to be_nil
     end
   end
+
+  context 'when adding to a set on an existing embedded document and pushing a new one' do
+    let(:badges) { Array.new(2) { ModifierModels::Badge.create! } }
+    let(:roster) do
+      ModifierModels::Roster.create!(players: [
+                                       ModifierModels::Player.new(badges: [ badges[0] ]),
+                                       ModifierModels::Player.new(badges: [ badges[0] ])
+                                     ])
+    end
+
+    before do
+      roster.reload
+      roster.players.build
+      player = roster.players[0]
+      player.badge_ids = player.badge_ids + [ badges[1].id ]
+      roster.save!
+      roster.reload
+    end
+
+    it 'applies both operations' do
+      expect(roster.players.size).to eq(3)
+      expect(roster.players[0].badge_ids).to eq([ badges[0].id, badges[1].id ])
+      expect(roster.players[1].badge_ids).to eq([ badges[0].id ])
+    end
+  end
+
+  context 'when pulling all from an existing embedded document and pushing a new one' do
+    let(:badges) { Array.new(2) { ModifierModels::Badge.create! } }
+    let(:roster) do
+      ModifierModels::Roster.create!(players: [
+                                       ModifierModels::Player.new(badges: badges),
+                                       ModifierModels::Player.new
+                                     ])
+    end
+
+    before do
+      roster.reload
+      roster.players.build
+      player = roster.players[0]
+      player.badge_ids = player.badge_ids.drop(1)
+      roster.save!
+      roster.reload
+    end
+
+    it 'applies both operations' do
+      expect(roster.players.size).to eq(3)
+      expect(roster.players[0].badge_ids).to eq([ badges[1].id ])
+    end
+  end
+
+  context 'when unsetting a field on an existing embedded document and pushing a new one' do
+    let(:roster) do
+      ModifierModels::Roster.create!(players: [
+                                       ModifierModels::Player.new(medal: ModifierModels::Medal.new),
+                                       ModifierModels::Player.new
+                                     ])
+    end
+
+    before do
+      roster.reload
+      roster.players.build
+      roster.players[0].assign_attributes(medal: nil)
+      roster.save!
+      roster.reload
+    end
+
+    it 'applies both operations' do
+      expect(roster.players.size).to eq(3)
+      expect(roster.players[0].medal).to be_nil
+    end
+  end
+
+  context 'when unsetting an embedded field and pulling a sibling' do
+    let(:roster) do
+      ModifierModels::Roster.create!(players: [
+                                       ModifierModels::Player.new(medal: ModifierModels::Medal.new),
+                                       ModifierModels::Player.new(medal: ModifierModels::Medal.new)
+                                     ])
+    end
+
+    before do
+      roster.reload
+      roster.add_atomic_pull(roster.players[0])
+      roster.players[1].assign_attributes(medal: nil)
+    end
+
+    it 'fails without changing stored data' do
+      # $pull shifts array elements, so these operations cannot be safely
+      # applied in separate writes; MongoDB rejects them in a single write.
+      expect { roster.save! }.to raise_error(Mongo::Error::OperationFailure)
+
+      roster.reload
+      expect(roster.players.size).to eq(2)
+      expect(roster.players[0].medal).not_to be_nil
+      expect(roster.players[1].medal).not_to be_nil
+    end
+  end
+
+  context 'when assigning embeds_many attributes on a new embedded document' do
+    let(:cabinet) do
+      ModifierModels::Cabinet.create!
+    end
+
+    before do
+      cabinet.reload
+    end
+
+    context 'when the nested documents are assigned on the built document' do
+      before do
+        cabinet.build_drawer(matcher: 'all')
+        cabinet.drawer.assign_attributes(items: [ { name: 'a' } ])
+      end
+
+      it 'saves without conflicting $set paths' do
+        expect { cabinet.save! }.not_to raise_error
+
+        cabinet.reload
+        expect(cabinet.drawer.matcher).to eq('all')
+        expect(cabinet.drawer.items.map(&:name)).to eq([ 'a' ])
+      end
+    end
+
+    context 'when the nested documents are assigned via the parent' do
+      before do
+        cabinet.assign_attributes(drawer: { matcher: 'all', items: [ { name: 'a' } ] })
+      end
+
+      it 'saves without conflicting $set paths' do
+        expect { cabinet.save! }.not_to raise_error
+
+        cabinet.reload
+        expect(cabinet.drawer.matcher).to eq('all')
+        expect(cabinet.drawer.items.map(&:name)).to eq([ 'a' ])
+      end
+    end
+
+    context 'when an assigned child has its own embedded collection' do
+      let(:item) { ModifierModels::Item.new(name: 'a') }
+
+      before do
+        item.assign_attributes(widgets: [ { label: 'w' } ])
+        cabinet.build_drawer(matcher: 'all')
+        cabinet.drawer.assign_attributes(items: [ item ])
+      end
+
+      it 'does not write the child collection to the root document' do
+        expect { cabinet.save! }.not_to raise_error
+
+        stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+        expect(stored.keys).to contain_exactly('_id', 'drawer')
+        expect(stored['drawer']['items'].first['widgets'].first['label']).to eq('w')
+      end
+    end
+  end
 end

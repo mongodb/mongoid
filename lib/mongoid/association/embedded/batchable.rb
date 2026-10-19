@@ -137,6 +137,14 @@ module Mongoid
           _base.collect_children.each do |child|
             child.delayed_atomic_sets.clear
           end
+
+          # If the base document is itself inserted wholesale via a $set of
+          # its atomic path, that $set already contains these documents, and
+          # a nested $set under the same path would conflict with it. The
+          # cleanup above has already cleared the delayed sets the assigned
+          # children recorded, so skipping the recording here is safe.
+          return if _base.settable?
+
           _base.delayed_atomic_sets[path] = sets
         end
 

@@ -64,15 +64,18 @@ module Mongoid
       # @param [ true | false ] wait whether to wait for the indexes to be
       #   built.
       def create_search_indexes(models = ::Mongoid.models, wait: true)
-        searchable = models.select { |m| m.search_index_specs.any? }
+        Threaded.with_collection_management do
+          searchable = models.select { |m| m.search_index_specs.any? }
 
-        # queue up the search index creation requests
-        index_names_by_model = searchable.each_with_object({}) do |model, obj|
-          logger.info("MONGOID: Creating search indexes on #{model}...")
-          obj[model] = model.create_search_indexes
+          # queue up the search index creation requests
+          index_names_by_model = searchable.each_with_object({}) do |model, obj|
+            logger.info("MONGOID: Creating search indexes on #{model}...")
+            obj[model] = model.create_search_indexes
+          end
+
+          wait_for_search_indexes(index_names_by_model) if wait
+          index_names_by_model
         end
-
-        wait_for_search_indexes(index_names_by_model) if wait
       end
 
       # Return the list of indexes by model that exist in the database but aren't
@@ -83,6 +86,12 @@ module Mongoid
       #
       # @return [ Array<Hash> ] The list of undefined indexes by model.
       def undefined_indexes(models = ::Mongoid.models)
+        Threaded.with_collection_management do
+          undefined_indexes_for(models)
+        end
+      end
+
+      def undefined_indexes_for(models)
         undefined_by_model = {}
 
         models.each do |model|
@@ -116,15 +125,17 @@ module Mongoid
       #
       # @return [ Hash{Class => Array(Hash)}] The list of indexes that were removed by model.
       def remove_undefined_indexes(models = ::Mongoid.models)
-        undefined_indexes(models).each do |model, indexes|
-          indexes.each do |index|
-            key = index['key'].symbolize_keys
-            collection = model.collection
-            collection.indexes(session: model.send(:_session)).drop_one(key)
-            logger.info(
-              "MONGOID: Removed index '#{index['name']}' on collection " +
-              "'#{collection.name}' in database '#{collection.database.name}'."
-            )
+        Threaded.with_collection_management do
+          undefined_indexes(models).each do |model, indexes|
+            indexes.each do |index|
+              key = index['key'].symbolize_keys
+              collection = model.collection
+              collection.indexes(session: model.send(:_session)).drop_one(key)
+              logger.info(
+                "MONGOID: Removed index '#{index['name']}' on collection " +
+                "'#{collection.name}' in database '#{collection.database.name}'."
+              )
+            end
           end
         end
       end
@@ -172,6 +183,12 @@ module Mongoid
       #
       # @return [ Array<Class> ] The sharded models
       def shard_collections(models = ::Mongoid.models)
+        Threaded.with_collection_management do
+          shard_collections_for(models)
+        end
+      end
+
+      def shard_collections_for(models)
         models.map do |model|
           next if model.shard_config.nil?
 

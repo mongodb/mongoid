@@ -16,24 +16,23 @@ module Mongoid
       #
       # @api private
       module_function def matches?(_exists, value, condition)
-        condition = case condition
-                    when Regexp
-                      condition
-                    when BSON::Regexp::Raw
-                      condition.compile
-                    else
-                      # Note that strings must have been converted to a regular expression
-                      # instance already (with $options taken into account, if provided).
-                      raise Errors::InvalidQuery, "$regex requires a regular expression argument: #{Errors::InvalidQuery.truncate_expr(condition)}"
-                    end
+        unless condition.is_a?(Regexp) || condition.is_a?(BSON::Regexp::Raw)
+          # Note that strings must have been converted to a regular expression
+          # instance already (with $options taken into account, if provided).
+          raise Errors::InvalidQuery, "$regex requires a regular expression argument: #{Errors::InvalidQuery.truncate_expr(condition)}"
+        end
 
+        # The condition is compiled by RegexpBudget rather than here, so that
+        # the budget's timeout can be baked into the pattern.
         case value
         when Array
+          # Object#=~ is gone as of Ruby 3.2, so an element that cannot be
+          # matched against has to be rejected rather than passed to =~.
           value.any? do |v|
-            v =~ condition
+            v.respond_to?(:=~) && RegexpBudget.match?(v, condition)
           end
         when String
-          value =~ condition
+          RegexpBudget.match?(value, condition)
         else
           false
         end

@@ -142,6 +142,21 @@ module Mongoid
       raise Errors::Callback.new(self.class, method)
     end
 
+    # Persist the atomic operations.
+    #
+    # @api private
+    #
+    # @example Persist the atomic operations.
+    #   persist_atomic_operations(ops)
+    #
+    # @param [ Hash ] operations The atomic operations.
+    def persist_atomic_operations(operations)
+      return unless persisted? && operations && !operations.empty?
+
+      selector = atomic_selector
+      _root.collection.find(selector).update_one(positionally(selector, operations), session: _session)
+    end
+
     private
 
     # Are we executing an atomically block on the current document?
@@ -299,21 +314,6 @@ module Mongoid
       else
         persist_atomic_operations(operation)
       end
-    end
-
-    # Persist the atomic operations.
-    #
-    # @api private
-    #
-    # @example Persist the atomic operations.
-    #   persist_atomic_operations(ops)
-    #
-    # @param [ Hash ] operations The atomic operations.
-    def persist_atomic_operations(operations)
-      return unless persisted? && operations && !operations.empty?
-
-      selector = atomic_selector
-      _root.collection.find(selector).update_one(positionally(selector, operations), session: _session)
     end
   end
 end
