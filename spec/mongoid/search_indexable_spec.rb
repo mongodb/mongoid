@@ -148,6 +148,10 @@ end
 
 # A unit test that does not need an Atlas connection.
 describe Mongoid::SearchIndexable, '.wait_for_search_indexes' do
+  # Mongo::Collection#search_indexes was added in driver 2.19; the
+  # driver-min and driver-oldstable CI jobs pin the driver to 2.18-stable.
+  min_driver_version '2.19'
+
   context 'when an index is ready' do
     let(:model) do
       Class.new do
