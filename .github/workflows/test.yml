@@ -8,7 +8,7 @@ name: Run Mongoid Tests
 jobs:
   build:
     name: "${{matrix.ruby}} db:${{matrix.mongodb}}
-      rails:${{matrix.rails}} fle:${{matrix.fle}} ${{matrix.topology}}"
+      rails:${{matrix.rails}} fle:${{matrix.fle}} ${{matrix.topology}} cache:${{matrix.cache}}"
     env:
       CI: true
       TESTOPTS: "-v"
@@ -23,6 +23,7 @@ jobs:
         rails: [ ~, "8.1" ]
         fle: [ ~, "helper" ]
         topology: [ replica_set, sharded_cluster ]
+        cache: [ "0", "1" ]
 
     steps:
     - name: repo checkout
@@ -60,4 +61,5 @@ jobs:
       env:
         BUNDLE_GEMFILE: "${{env.BUNDLE_GEMFILE}}"
         FLE: "${{matrix.fle}}"
+        MONGOID_CACHING_ENABLED: "${{matrix.cache}}"
         MONGODB_URI: "${{ steps.start-mongodb.outputs.cluster-uri }}"
