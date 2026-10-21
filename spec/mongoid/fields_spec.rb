@@ -1814,6 +1814,14 @@ describe Mongoid::Fields do
       it { is_expected.to eq '' }
     end
 
+    context 'when the returned name is mutated' do
+      it 'does not corrupt the aliased field map' do
+        Person.database_field_name('test') << '_mutated'
+
+        expect(Person.database_field_name('test')).to eq('t')
+      end
+    end
+
     context 'given a String' do
       subject { Person.database_field_name(key.to_s) }
 
