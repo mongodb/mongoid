@@ -400,7 +400,7 @@ module Mongoid
     # @return [ Object ] The result of the chain execution.
     def run_targeted_callbacks(place, kind)
       name = "_run__#{place}__#{kind}__callbacks"
-      unless respond_to?(name)
+      unless respond_to?(name, true)
         chain = ActiveSupport::Callbacks::CallbackChain.new(name, {})
         send("_#{kind}_callbacks").each do |callback|
           chain.append(callback) if callback.kind == place
