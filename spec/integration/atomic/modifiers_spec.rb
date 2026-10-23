@@ -299,7 +299,9 @@ describe Mongoid::Atomic::Modifiers do
         let(:remove) { destroy_sibling_through_nested_attributes }
 
         it 'targets the moved sibling at its current index' do
-          expect(roster.atomic_updates['$addToSet']&.keys).to eq([ 'players.0.badge_ids' ])
+          updates = roster.atomic_updates
+          keys = [ updates, updates[:conflicts] || {} ].flat_map { |mods| mods.fetch('$addToSet', {}).keys }
+          expect(keys).to eq([ 'players.0.badge_ids' ])
         end
       end
     end
