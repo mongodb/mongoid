@@ -233,17 +233,17 @@ describe Mongoid::Atomic::Modifiers do
   end
 
   context 'when removing a preceding sibling after the atomic updates were built without being saved' do
-    let(:badge) { ModifierModels::Badge.create! }
+    let(:badges) { Array.new(2) { ModifierModels::Badge.create! } }
     let(:roster) do
       ModifierModels::Roster.create!(players: %w[a b c].map do |nickname|
-        ModifierModels::Player.new(nickname: nickname, badges: [ badge ])
+        ModifierModels::Player.new(nickname: nickname, badges: [ badges[0] ])
       end)
     end
 
     before do
       roster.reload
       first_player, second_player, = roster.players.to_a
-      second_player.badge_ids = []
+      change.call(second_player)
       # Builds the atomic updates while the second player is still at
       # index 1.
       roster.touch
@@ -252,28 +252,65 @@ describe Mongoid::Atomic::Modifiers do
       roster.reload
     end
 
-    shared_examples 'does not apply the change to the following sibling' do
-      it 'does not apply the change to the following sibling' do
+    shared_examples 'changes only the moved sibling' do
+      it 'changes only the moved sibling' do
         expect(roster.players.map(&:nickname)).to eq(%w[b c])
-        expect(roster.players[0].badge_ids).to eq([])
-        expect(roster.players[1].badge_ids).to eq([ badge.id ])
+        expect(roster.players[0].badge_ids).to eq(expected_badge_ids)
+        expect(roster.players[1].badge_ids).to eq([ badges[0].id ])
       end
     end
 
-    context 'when the sibling is deleted immediately' do
-      let(:remove) do
-        ->(parent, player) { parent.players.delete(player) }
+    shared_examples 'with each way to remove the sibling' do
+      context 'when the sibling is deleted immediately' do
+        let(:remove) do
+          ->(parent, player) { parent.players.delete(player) }
+        end
+
+        it_behaves_like 'changes only the moved sibling'
       end
 
-      include_examples 'does not apply the change to the following sibling'
+      context 'when the sibling is destroyed through nested attributes' do
+        let(:remove) do
+          ->(parent, player) { parent.players_attributes = [ { id: player.id, _destroy: true } ] }
+        end
+
+        it_behaves_like 'changes only the moved sibling'
+      end
     end
 
-    context 'when the sibling is destroyed through nested attributes' do
-      let(:remove) do
-        ->(parent, player) { parent.players_attributes = [ { id: player.id, _destroy: true } ] }
-      end
+    context 'when removing from the foreign keys' do
+      let(:change) { ->(player) { player.badge_ids = [] } }
+      let(:expected_badge_ids) { [] }
 
-      include_examples 'does not apply the change to the following sibling'
+      include_examples 'with each way to remove the sibling'
+    end
+
+    context 'when adding to the foreign keys' do
+      let(:change) { ->(player) { player.badge_ids = player.badge_ids + [ badges[1].id ] } }
+      let(:expected_badge_ids) { [ badges[0].id, badges[1].id ] }
+
+      include_examples 'with each way to remove the sibling'
+    end
+  end
+
+  context 'when reverting a foreign key change after the atomic updates were built without being saved' do
+    let(:badges) { Array.new(2) { ModifierModels::Badge.create! } }
+    let(:roster) do
+      ModifierModels::Roster.create!(players: [ ModifierModels::Player.new(badges: [ badges[0] ]) ])
+    end
+
+    before do
+      roster.reload
+      player = roster.players.first
+      player.badge_ids = player.badge_ids + [ badges[1].id ]
+      roster.touch
+      player.badge_ids = [ badges[0].id ]
+      roster.save!
+      roster.reload
+    end
+
+    it 'does not write the reverted change' do
+      expect(roster.players[0].badge_ids).to eq([ badges[0].id ])
     end
   end
 
