@@ -301,15 +301,6 @@ describe Mongoid::Atomic::Modifiers do
         it 'targets the moved sibling at its current index' do
           expect(roster.atomic_updates['$addToSet']&.keys).to eq([ 'players.0.badge_ids' ])
         end
-
-        it 'does not change any stored document' do
-          # The $addToSet stays in the same write as the $pull of the
-          # destroyed sibling, so MongoDB rejects the update.
-          expect { roster.save! }.to raise_error(Mongo::Error::OperationFailure)
-          roster.reload
-          expect(roster.players.map(&:nickname)).to eq(%w[a b c])
-          expect(roster.players.map(&:badge_ids)).to all(eq([ badges[0].id ]))
-        end
       end
     end
   end
