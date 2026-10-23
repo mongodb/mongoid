@@ -27,6 +27,7 @@ module ModifierModels
     include Mongoid::Document
 
     embeds_many :players, class_name: 'ModifierModels::Player'
+    accepts_nested_attributes_for :players, allow_destroy: true
   end
 
   class Player

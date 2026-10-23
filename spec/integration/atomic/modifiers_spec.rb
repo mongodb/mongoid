@@ -232,6 +232,51 @@ describe Mongoid::Atomic::Modifiers do
     end
   end
 
+  context 'when removing a preceding sibling after the atomic updates were built without being saved' do
+    let(:badge) { ModifierModels::Badge.create! }
+    let(:roster) do
+      ModifierModels::Roster.create!(players: %w[a b c].map do |nickname|
+        ModifierModels::Player.new(nickname: nickname, badges: [ badge ])
+      end)
+    end
+
+    before do
+      roster.reload
+      first_player, second_player, = roster.players.to_a
+      second_player.badge_ids = []
+      # Builds the atomic updates while the second player is still at
+      # index 1.
+      roster.touch
+      remove.call(roster, first_player)
+      roster.save!
+      roster.reload
+    end
+
+    shared_examples 'does not apply the change to the following sibling' do
+      it 'does not apply the change to the following sibling' do
+        expect(roster.players.map(&:nickname)).to eq(%w[b c])
+        expect(roster.players[0].badge_ids).to eq([])
+        expect(roster.players[1].badge_ids).to eq([ badge.id ])
+      end
+    end
+
+    context 'when the sibling is deleted immediately' do
+      let(:remove) do
+        ->(parent, player) { parent.players.delete(player) }
+      end
+
+      include_examples 'does not apply the change to the following sibling'
+    end
+
+    context 'when the sibling is destroyed through nested attributes' do
+      let(:remove) do
+        ->(parent, player) { parent.players_attributes = [ { id: player.id, _destroy: true } ] }
+      end
+
+      include_examples 'does not apply the change to the following sibling'
+    end
+  end
+
   context 'when assigning embeds_many attributes on a new embedded document' do
     let(:cabinet) do
       ModifierModels::Cabinet.create!
