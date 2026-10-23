@@ -300,8 +300,8 @@ describe Mongoid::Atomic::Modifiers do
 
         it 'targets the moved sibling at its current index' do
           updates = roster.atomic_updates
-          keys = [ updates, updates[:conflicts] || {} ].flat_map { |mods| mods.fetch('$addToSet', {}).keys }
-          expect(keys).to eq([ 'players.0.badge_ids' ])
+          add_to_sets = updates.fetch('$addToSet', {}).merge(updates.fetch(:conflicts, {}).fetch('$addToSet', {}))
+          expect(add_to_sets.keys).to eq([ 'players.0.badge_ids' ])
         end
       end
     end
