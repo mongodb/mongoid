@@ -2289,6 +2289,164 @@ describe Mongoid::Criteria::Includable do
         end
       end
     end
+
+    context 'when a document is saved after eager loading' do
+      context 'when the reference lives inside an embedded document' do
+        before(:all) do
+          class Device
+            include Mongoid::Document
+          end
+
+          class Port
+            include Mongoid::Document
+
+            embedded_in :computer
+            belongs_to :device
+          end
+
+          class Computer
+            include Mongoid::Document
+
+            embeds_many :ports
+          end
+        end
+
+        after(:all) do
+          Object.send(:remove_const, :Computer)
+          Object.send(:remove_const, :Port)
+          Object.send(:remove_const, :Device)
+        end
+
+        let!(:device) { Device.create! }
+        let!(:computer) { Computer.create!(ports: [ Port.new(device: device) ]) }
+
+        it 'does not persist the eager-loaded association data' do
+          loaded = Computer.eager_load(ports: :device).first
+
+          # Reassigning the collection makes the save rewrite the whole array,
+          # serializing each already-hydrated port.
+          loaded.ports = loaded.ports.to_a + [ Port.new(device: Device.create!) ]
+          loaded.save!
+
+          # With the bug present, the persisted port comes back as:
+          #
+          #   {
+          #     '_id' => ...,
+          #     'device_id' => ...,
+          #     'device' => [ { ...the whole device document... } ]  # <-- the $lookup left this
+          #   }
+          raw_ports = Computer.collection.find(_id: computer.id).first['ports']
+          expect(raw_ports.first).to eq('_id' => computer.ports.first.id, 'device_id' => device.id)
+        end
+      end
+
+      context 'when the reference lives on a referenced document' do
+        before(:all) do
+          class Device
+            include Mongoid::Document
+          end
+
+          class Port
+            include Mongoid::Document
+
+            belongs_to :computer
+            belongs_to :device
+          end
+
+          class Computer
+            include Mongoid::Document
+
+            has_many :ports
+          end
+        end
+
+        after(:all) do
+          Object.send(:remove_const, :Computer)
+          Object.send(:remove_const, :Port)
+          Object.send(:remove_const, :Device)
+        end
+
+        let!(:device) { Device.create! }
+        let!(:computer) { Computer.create!(ports: [ Port.new(device: device) ]) }
+
+        it 'does not persist the eager-loaded association data' do
+          loaded = Computer.eager_load(ports: :device).first
+          port = loaded.ports.first
+
+          # An upsert rewrites the whole document, so everything the port
+          # carries gets serialized.
+          port.upsert
+
+          # With the bug present, the persisted port comes back as:
+          #
+          #   {
+          #     '_id' => ...,
+          #     'computer_id' => ...,
+          #     'device_id' => ...,
+          #     'device' => [ { ...the whole device document... } ]  # <-- the $lookup left this
+          #   }
+          expect(Port.collection.find(_id: port.id).first)
+            .to eq('_id' => port.id, 'computer_id' => computer.id, 'device_id' => device.id)
+        end
+      end
+
+      context 'when more than one subclass defines the association' do
+        before(:all) do
+          class Cog
+            include Mongoid::Document
+
+            belongs_to :machine, optional: true
+          end
+
+          class Belt
+            include Mongoid::Document
+
+            belongs_to :machine, optional: true
+          end
+
+          class Machine
+            include Mongoid::Document
+          end
+
+          class Lathe < Machine
+            has_many :widgets, class_name: 'Cog', inverse_of: :machine
+          end
+
+          class Press < Machine
+            has_many :widgets, class_name: 'Belt', inverse_of: :machine
+          end
+        end
+
+        after(:all) do
+          Object.send(:remove_const, :Press)
+          Object.send(:remove_const, :Lathe)
+          Object.send(:remove_const, :Machine)
+          Object.send(:remove_const, :Belt)
+          Object.send(:remove_const, :Cog)
+        end
+
+        let!(:lathe) { Lathe.create! }
+        let!(:cog) { Cog.create!(machine: lathe) }
+
+        it 'does not persist the eager-loaded association data' do
+          loaded = Machine.eager_load(:widgets).first
+
+          # An upsert rewrites the whole document, so everything the lathe
+          # carries gets serialized.
+          loaded.upsert
+
+          # With the bug present, the persisted lathe comes back as:
+          #
+          #   {
+          #     '_id' => ...,
+          #     '_type' => 'Lathe',
+          #     'widgets' => [ { '_id' => ..., 'machine_id' => ... } ]  # <-- the $lookup left this
+          #   }
+          expect(Machine.collection.find(_id: lathe.id).first)
+            .to eq('_id' => lathe.id, '_type' => 'Lathe')
+        end
+      end
+    end
   end
 
   describe '#inclusions' do
