@@ -240,6 +240,14 @@ describe Mongoid::Atomic::Modifiers do
       end)
     end
 
+    let(:delete_sibling) do
+      ->(parent, player) { parent.players.delete(player) }
+    end
+
+    let(:destroy_sibling_through_nested_attributes) do
+      ->(parent, player) { parent.players_attributes = [ { id: player.id, _destroy: true } ] }
+    end
+
     before do
       roster.reload
       first_player, second_player, = roster.players.to_a
@@ -248,33 +256,15 @@ describe Mongoid::Atomic::Modifiers do
       # index 1.
       roster.touch
       remove.call(roster, first_player)
-      roster.save!
-      roster.reload
     end
 
     shared_examples 'changes only the moved sibling' do
       it 'changes only the moved sibling' do
+        roster.save!
+        roster.reload
         expect(roster.players.map(&:nickname)).to eq(%w[b c])
         expect(roster.players[0].badge_ids).to eq(expected_badge_ids)
         expect(roster.players[1].badge_ids).to eq([ badges[0].id ])
-      end
-    end
-
-    shared_examples 'with each way to remove the sibling' do
-      context 'when the sibling is deleted immediately' do
-        let(:remove) do
-          ->(parent, player) { parent.players.delete(player) }
-        end
-
-        it_behaves_like 'changes only the moved sibling'
-      end
-
-      context 'when the sibling is destroyed through nested attributes' do
-        let(:remove) do
-          ->(parent, player) { parent.players_attributes = [ { id: player.id, _destroy: true } ] }
-        end
-
-        it_behaves_like 'changes only the moved sibling'
       end
     end
 
@@ -282,14 +272,45 @@ describe Mongoid::Atomic::Modifiers do
       let(:change) { ->(player) { player.badge_ids = [] } }
       let(:expected_badge_ids) { [] }
 
-      include_examples 'with each way to remove the sibling'
+      context 'when the sibling is deleted immediately' do
+        let(:remove) { delete_sibling }
+
+        it_behaves_like 'changes only the moved sibling'
+      end
+
+      context 'when the sibling is destroyed through nested attributes' do
+        let(:remove) { destroy_sibling_through_nested_attributes }
+
+        it_behaves_like 'changes only the moved sibling'
+      end
     end
 
     context 'when adding to the foreign keys' do
       let(:change) { ->(player) { player.badge_ids = player.badge_ids + [ badges[1].id ] } }
       let(:expected_badge_ids) { [ badges[0].id, badges[1].id ] }
 
-      include_examples 'with each way to remove the sibling'
+      context 'when the sibling is deleted immediately' do
+        let(:remove) { delete_sibling }
+
+        it_behaves_like 'changes only the moved sibling'
+      end
+
+      context 'when the sibling is destroyed through nested attributes' do
+        let(:remove) { destroy_sibling_through_nested_attributes }
+
+        it 'targets the moved sibling at its current index' do
+          expect(roster.atomic_updates['$addToSet']&.keys).to eq([ 'players.0.badge_ids' ])
+        end
+
+        it 'does not change any stored document' do
+          # The $addToSet stays in the same write as the $pull of the
+          # destroyed sibling, so MongoDB rejects the update.
+          expect { roster.save! }.to raise_error(Mongo::Error::OperationFailure)
+          roster.reload
+          expect(roster.players.map(&:nickname)).to eq(%w[a b c])
+          expect(roster.players.map(&:badge_ids)).to all(eq([ badges[0].id ]))
+        end
+      end
     end
   end
 
