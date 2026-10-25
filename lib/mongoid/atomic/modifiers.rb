@@ -38,11 +38,18 @@ module Mongoid
       # @example Add pull all operations.
       #   modifiers.pull({ "addresses" => { "_id" => { "$in" => [ 1, 2, 3 ]}}})
       #
+      # A $pull is never split out into a separate write. It shifts the
+      # positions of the remaining array elements, and the paths of the other
+      # operations on that array are built for the positions after the $pull.
+      # In a separate write the $pull could run after them, so they would hit
+      # a different element. Kept in the main update, an operation that
+      # conflicts with the $pull is rejected by MongoDB (code 40) without
+      # changing stored data.
+      #
       # @param [ Hash ] modifications The pull all modifiers.
       def pull(modifications)
         modifications.each_pair do |field, value|
-          mods = pull_conflict?(field) ? conflicting_pulls : pulls
-          mods[field] = value
+          pulls[field] = value
           pull_fields[field.split('.', 2)[0]] = field
         end
       end
@@ -219,17 +226,6 @@ module Mongoid
         set_fields.has_key?(name) || push_fields.has_key?(name)
       end
 
-      # Is the operation going to be a conflict for a $pull?
-      #
-      # @param [ String ] field The field.
-      #
-      # @return [ true | false ] If this field is a conflict.
-      def pull_conflict?(field)
-        name = field.split('.', 2)[0]
-        set_fields.has_key?(name) || push_fields.has_key?(name) ||
-          add_to_set_fields.has_key?(name) || pull_all_root?(name)
-      end
-
       # Is the operation going to be a conflict for a $pullAll?
       #
       # @param [ String ] field The field.
@@ -261,16 +257,6 @@ module Mongoid
       # @return [ Hash ] The conflicting add to set operations.
       def conflicting_add_to_sets
         conflicts['$addToSet'] ||= {}
-      end
-
-      # Get the conflicting pull modifications.
-      #
-      # @example Get the conflicting pulls.
-      #   modifiers.conflicting_pulls
-      #
-      # @return [ Hash ] The conflicting pull operations.
-      def conflicting_pulls
-        conflicts['$pull'] ||= {}
       end
 
       # Get the conflicting pull all modifications.
@@ -430,16 +416,6 @@ module Mongoid
       # @return [ true | false ] If a $pull touches this field.
       def pull_root?(name)
         (self['$pull'] || {}).keys.any? { |key| key.split('.', 2)[0] == name }
-      end
-
-      # Is there a $pullAll on the given root-level field? Does not
-      # initialize the $pullAll operations.
-      #
-      # @param [ String ] name The root-level field name.
-      #
-      # @return [ true | false ] If a $pullAll touches this field.
-      def pull_all_root?(name)
-        (self['$pullAll'] || {}).keys.any? { |key| key.split('.', 2)[0] == name }
       end
     end
   end

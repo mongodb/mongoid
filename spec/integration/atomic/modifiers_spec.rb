@@ -232,6 +232,135 @@ describe Mongoid::Atomic::Modifiers do
     end
   end
 
+  context 'when changing foreign keys of a remaining nested document after pulling its sibling' do
+    let(:badges) { Array.new(2) { ModifierModels::Badge.create! } }
+    let(:roster) do
+      ModifierModels::Roster.create!(players: [
+                                       ModifierModels::Player.new(badges: [ badges[0] ]),
+                                       ModifierModels::Player.new(
+                                         badges: [ badges[0] ],
+                                         awards: [
+                                           ModifierModels::Award.new(name: 'first', badges: [ badges[0] ]),
+                                           ModifierModels::Award.new(name: 'second', badges: [ badges[0] ])
+                                         ]
+                                       )
+                                     ])
+    end
+
+    before do
+      roster.reload
+      first_player, second_player = roster.players.to_a
+      first_award, second_award = second_player.awards.to_a
+      # The change on the first player comes before the nested $pull on the
+      # same root. The change on the second award uses its position after
+      # the $pull.
+      change.call(first_player)
+      roster.players_attributes = [
+        { id: second_player.id, awards_attributes: [ { id: first_award.id, _destroy: true } ] }
+      ]
+      change.call(second_award)
+    end
+
+    context 'when adding to the foreign keys' do
+      let(:change) do
+        ->(doc) { doc.badge_ids = doc.badge_ids + [ badges[1].id ] }
+      end
+
+      it 'fails without changing stored data' do
+        # The $addToSet for the second award would hit the first award if it
+        # were applied before the $pull, so it stays in the same update.
+        expect { roster.save! }.to raise_error(Mongo::Error::OperationFailure)
+
+        roster.reload
+        expect(roster.players[0].badge_ids).to eq([ badges[0].id ])
+        expect(roster.players[1].awards.map(&:name)).to eq(%w[first second])
+        expect(roster.players[1].awards.map(&:badge_ids)).to eq([ [ badges[0].id ], [ badges[0].id ] ])
+      end
+    end
+
+    context 'when removing from the foreign keys' do
+      let(:change) do
+        ->(doc) { doc.badge_ids = [] }
+      end
+
+      it 'applies the change to the remaining nested document' do
+        roster.save!
+
+        roster.reload
+        expect(roster.players[0].badge_ids).to eq([])
+        expect(roster.players[1].awards.map(&:name)).to eq([ 'second' ])
+        expect(roster.players[1].awards[0].badge_ids).to eq([])
+      end
+    end
+  end
+
+  context 'when renaming a remaining nested document after pulling a preceding sibling and its sibling' do
+    let(:roster) do
+      ModifierModels::Roster.create!(players: [
+                                       ModifierModels::Player.new(nickname: 'a'),
+                                       ModifierModels::Player.new(nickname: 'b'),
+                                       ModifierModels::Player.new(
+                                         nickname: 'c',
+                                         awards: [
+                                           ModifierModels::Award.new(name: 'first'),
+                                           ModifierModels::Award.new(name: 'second')
+                                         ]
+                                       )
+                                     ])
+    end
+
+    before do
+      roster.reload
+      first_player, second_player, third_player = roster.players.to_a
+      first_award, second_award = third_player.awards.to_a
+      roster.players_attributes = [
+        { id: first_player.id, _destroy: true },
+        { id: second_player.id, nickname: 'B' },
+        { id: third_player.id, awards_attributes: [
+          { id: first_award.id, _destroy: true },
+          { id: second_award.id, name: 'SECOND' }
+        ] }
+      ]
+    end
+
+    it 'fails without changing stored data' do
+      # Both $pulls stay in the main update. The rename of the second award
+      # would hit the first award if it were applied before the nested $pull.
+      expect { roster.save! }.to raise_error(Mongo::Error::OperationFailure)
+
+      roster.reload
+      expect(roster.players.map(&:nickname)).to eq(%w[a b c])
+      expect(roster.players[2].awards.map(&:name)).to eq(%w[first second])
+    end
+  end
+
+  context 'when adding a nested document and pulling a sibling' do
+    let(:roster) do
+      ModifierModels::Roster.create!(players: [
+                                       ModifierModels::Player.new(nickname: 'a'),
+                                       ModifierModels::Player.new(
+                                         nickname: 'b',
+                                         awards: [ ModifierModels::Award.new(name: 'first') ]
+                                       )
+                                     ])
+    end
+
+    before do
+      roster.reload
+      first_player, second_player = roster.players.to_a
+      second_player.awards.build(name: 'second')
+      roster.players_attributes = [ { id: first_player.id, _destroy: true } ]
+    end
+
+    it 'applies both operations' do
+      roster.save!
+
+      roster.reload
+      expect(roster.players.map(&:nickname)).to eq([ 'b' ])
+      expect(roster.players[0].awards.map(&:name)).to eq(%w[first second])
+    end
+  end
+
   context 'when assigning embeds_many attributes on a new embedded document' do
     let(:cabinet) do
       ModifierModels::Cabinet.create!

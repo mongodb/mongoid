@@ -27,6 +27,7 @@ module ModifierModels
     include Mongoid::Document
 
     embeds_many :players, class_name: 'ModifierModels::Player'
+    accepts_nested_attributes_for :players, allow_destroy: true
   end
 
   class Player
@@ -35,7 +36,17 @@ module ModifierModels
     embedded_in :roster, class_name: 'ModifierModels::Roster'
     embeds_one :medal, class_name: 'ModifierModels::Medal'
     has_and_belongs_to_many :badges, inverse_of: nil, class_name: 'ModifierModels::Badge'
+    embeds_many :awards, class_name: 'ModifierModels::Award'
+    accepts_nested_attributes_for :awards, allow_destroy: true
     field :nickname, type: String
+  end
+
+  class Award
+    include Mongoid::Document
+
+    embedded_in :player, class_name: 'ModifierModels::Player'
+    has_and_belongs_to_many :badges, inverse_of: nil, class_name: 'ModifierModels::Badge'
+    field :name, type: String
   end
 
   class Medal
