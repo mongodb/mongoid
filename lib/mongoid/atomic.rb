@@ -332,6 +332,14 @@ module Mongoid
     # @param [ Modifiers ] mods The atomic modifications.
     # @param [ Document ] doc The document to update for.
     def generate_atomic_updates(mods, doc)
+      # The foreign key array buffers are filled by #atomic_sets below and
+      # are only cleared after a successful save. Clear them first so that
+      # entries left over from an earlier call (for example from #touch or a
+      # failed save) are not written: their keys may point at a different
+      # document after a sibling was removed, and their values may no longer
+      # match the current changes.
+      doc.atomic_array_add_to_sets.clear
+      doc.atomic_array_pulls.clear
       mods.unset(doc.atomic_unsets)
       mods.pull(doc.atomic_pulls)
       mods.set(doc.atomic_sets)
