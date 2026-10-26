@@ -94,7 +94,11 @@ module Mongoid
           next unless as = assoc_map.delete(klass)
 
           as.each do |assoc|
-            queue << assoc.class_name
+            # The queue is matched against the assoc_map keys, which are
+            # inverse_class_name values (resolved class names). Push the
+            # resolved class name so a class_name such as "::Photo" or a
+            # module-relative "Item" still matches its nested associations.
+            queue << (assoc.polymorphic? ? assoc.class_name : assoc.klass.name)
 
             # If this class is nested in the inclusion tree, only load documents
             # for the association above it. If there is no parent association,

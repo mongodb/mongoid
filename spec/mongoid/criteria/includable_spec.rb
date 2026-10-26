@@ -1408,6 +1408,73 @@ describe Mongoid::Criteria::Includable do
 
   describe '#includes' do
     it_behaves_like 'eager loading', :includes
+
+    context 'when a nested association sits behind a parent whose class_name is not the resolved class name' do
+      before(:all) do
+        class IncEagerGallery
+          include Mongoid::Document
+
+          has_many :rooted_photos, class_name: '::IncEagerPhoto', inverse_of: :gallery
+        end
+
+        class IncEagerPhoto
+          include Mongoid::Document
+
+          belongs_to :gallery, class_name: 'IncEagerGallery', inverse_of: :rooted_photos
+          belongs_to :author, class_name: '::IncEagerAuthor'
+        end
+
+        class IncEagerAuthor
+          include Mongoid::Document
+        end
+
+        module IncEagerShop
+          class Order
+            include Mongoid::Document
+
+            has_many :items, class_name: 'Item', inverse_of: :order
+          end
+
+          class Item
+            include Mongoid::Document
+
+            belongs_to :order, class_name: 'Order', inverse_of: :items
+            belongs_to :author, class_name: '::IncEagerAuthor'
+          end
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :IncEagerShop)
+        Object.send(:remove_const, :IncEagerAuthor)
+        Object.send(:remove_const, :IncEagerPhoto)
+        Object.send(:remove_const, :IncEagerGallery)
+      end
+
+      let!(:gallery) { IncEagerGallery.create! }
+      let!(:order) { IncEagerShop::Order.create! }
+
+      before do
+        IncEagerPhoto.create!(gallery: gallery, author: IncEagerAuthor.create!)
+        IncEagerShop::Item.create!(order: order, author: IncEagerAuthor.create!)
+      end
+
+      it 'eager loads a nested association behind a class_name with a leading ::' do
+        result = IncEagerGallery.includes(rooted_photos: :author).first
+
+        expect_query(0) do
+          expect(result.rooted_photos.first.author).to be_a(IncEagerAuthor)
+        end
+      end
+
+      it 'eager loads a nested association behind a module-relative class_name' do
+        result = IncEagerShop::Order.includes(items: :author).first
+
+        expect_query(0) do
+          expect(result.items.first.author).to be_a(IncEagerAuthor)
+        end
+      end
+    end
   end
 
   describe '#eager_load' do
