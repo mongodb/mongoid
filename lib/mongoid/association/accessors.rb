@@ -86,6 +86,24 @@ module Mongoid
         instance_variable_set("@_#{name}", relation)
       end
 
+      # Loads the documents the query preloaded for this one, kept apart from the
+      # attributes so they are not part of the document. A name this class
+      # doesn't define is dropped: a $lookup writes its field on every document
+      # it returns, including those of a sibling subclass that has no such
+      # association.
+      #
+      # @param [ Hash ] preloaded The preloaded documents by the field they
+      #   travelled in.
+      #
+      # @api private
+      def load_preloaded_associations(preloaded)
+        preloaded.each do |field, documents|
+          name = field.delete_prefix(PRELOADED_PREFIX)
+          association = relations[name]
+          __build__(name, documents, association) if association
+        end
+      end
+
       private
 
       # Get the association. Extracted out from the getter method to avoid
@@ -127,10 +145,6 @@ module Mongoid
             _loading do
               if object && needs_no_database_query?(object, association)
                 __build__(name, object, association)
-              # Check if data was loaded via $lookup aggregation
-              elsif !association.embedded? && attributes.key?(name.to_s)
-                # Use the pre-loaded association data from $lookup
-                __build__(name, attributes[name.to_s], association)
               else
                 selected_fields = _mongoid_filter_selected_fields(association.key)
                 __build__(name, attributes[association.key], association, selected_fields)
