@@ -126,8 +126,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(A)
         Object.send(:remove_const, :A)
+        Mongoid.deregister_model(B)
         Object.send(:remove_const, :B)
+        Mongoid.deregister_model(C)
         Object.send(:remove_const, :C)
       end
 
@@ -186,9 +189,13 @@ describe Mongoid::Criteria::Includable do
         end
 
         after(:all) do
+          Mongoid.deregister_model(A)
           Object.send(:remove_const, :A)
+          Mongoid.deregister_model(B)
           Object.send(:remove_const, :B)
+          Mongoid.deregister_model(C)
           Object.send(:remove_const, :C)
+          Mongoid.deregister_model(D)
           Object.send(:remove_const, :D)
         end
 
@@ -255,9 +262,13 @@ describe Mongoid::Criteria::Includable do
         end
 
         after(:all) do
+          Mongoid.deregister_model(A)
           Object.send(:remove_const, :A)
+          Mongoid.deregister_model(B)
           Object.send(:remove_const, :B)
+          Mongoid.deregister_model(C)
           Object.send(:remove_const, :C)
+          Mongoid.deregister_model(D)
           Object.send(:remove_const, :D)
         end
 
@@ -1121,9 +1132,13 @@ describe Mongoid::Criteria::Includable do
         end
 
         after(:all) do
+          Mongoid.deregister_model(A)
           Object.send(:remove_const, :A)
+          Mongoid.deregister_model(B)
           Object.send(:remove_const, :B)
+          Mongoid.deregister_model(C)
           Object.send(:remove_const, :C)
+          Mongoid.deregister_model(D)
           Object.send(:remove_const, :D)
         end
 
@@ -1442,12 +1457,34 @@ describe Mongoid::Criteria::Includable do
             belongs_to :author, class_name: '::IncEagerAuthor'
           end
         end
+
+        class IncEagerAlbum
+          include Mongoid::Document
+
+          has_many :poly_photos, class_name: '::IncEagerPolyPhoto', as: :imageable, inverse_of: :imageable
+        end
+
+        class IncEagerPolyPhoto
+          include Mongoid::Document
+
+          belongs_to :imageable, polymorphic: true, inverse_of: :poly_photos
+          belongs_to :author, class_name: '::IncEagerAuthor'
+        end
       end
 
       after(:all) do
+        Mongoid.deregister_model(IncEagerAlbum)
+        Object.send(:remove_const, :IncEagerAlbum)
+        Mongoid.deregister_model(IncEagerPolyPhoto)
+        Object.send(:remove_const, :IncEagerPolyPhoto)
+        Mongoid.deregister_model(IncEagerShop::Order)
+        Mongoid.deregister_model(IncEagerShop::Item)
         Object.send(:remove_const, :IncEagerShop)
+        Mongoid.deregister_model(IncEagerAuthor)
         Object.send(:remove_const, :IncEagerAuthor)
+        Mongoid.deregister_model(IncEagerPhoto)
         Object.send(:remove_const, :IncEagerPhoto)
+        Mongoid.deregister_model(IncEagerGallery)
         Object.send(:remove_const, :IncEagerGallery)
       end
 
@@ -1472,6 +1509,17 @@ describe Mongoid::Criteria::Includable do
 
         expect_query(0) do
           expect(result.items.first.author).to be_a(IncEagerAuthor)
+        end
+      end
+
+      it 'eager loads a nested association behind a polymorphic parent with a leading ::' do
+        album = IncEagerAlbum.create!
+        IncEagerPolyPhoto.create!(imageable: album, author: IncEagerAuthor.create!)
+
+        result = IncEagerAlbum.includes(poly_photos: :author).first
+
+        expect_query(0) do
+          expect(result.poly_photos.first.author).to be_a(IncEagerAuthor)
         end
       end
     end
@@ -1509,9 +1557,13 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Mouse)
         Object.send(:remove_const, :Mouse)
+        Mongoid.deregister_model(Webcam)
         Object.send(:remove_const, :Webcam)
+        Mongoid.deregister_model(Peripheral)
         Object.send(:remove_const, :Peripheral)
+        Mongoid.deregister_model(Machine)
         Object.send(:remove_const, :Machine)
       end
 
@@ -1551,10 +1603,15 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Mouse)
         Object.send(:remove_const, :Mouse)
+        Mongoid.deregister_model(Peripheral)
         Object.send(:remove_const, :Peripheral)
+        Mongoid.deregister_model(Laptop)
         Object.send(:remove_const, :Laptop)
+        Mongoid.deregister_model(Machine)
         Object.send(:remove_const, :Machine)
+        Mongoid.deregister_model(Brand)
         Object.send(:remove_const, :Brand)
       end
 
@@ -1589,8 +1646,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Cable)
         Object.send(:remove_const, :Cable)
+        Mongoid.deregister_model(Speaker)
         Object.send(:remove_const, :Speaker)
+        Mongoid.deregister_model(Gadget)
         Object.send(:remove_const, :Gadget)
       end
 
@@ -1623,8 +1683,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Cable)
         Object.send(:remove_const, :Cable)
+        Mongoid.deregister_model(Speaker)
         Object.send(:remove_const, :Speaker)
+        Mongoid.deregister_model(Gadget)
         Object.send(:remove_const, :Gadget)
       end
 
@@ -1657,8 +1720,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Speaker)
         Object.send(:remove_const, :Speaker)
+        Mongoid.deregister_model(Gadget)
         Object.send(:remove_const, :Gadget)
+        Mongoid.deregister_model(Cable)
         Object.send(:remove_const, :Cable)
       end
 
@@ -1694,8 +1760,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1742,8 +1811,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1793,9 +1865,13 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Panel)
         Object.send(:remove_const, :Panel)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1834,9 +1910,13 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(UsbPort)
         Object.send(:remove_const, :UsbPort)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1872,8 +1952,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1910,8 +1993,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1946,8 +2032,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1989,9 +2078,13 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Desk)
         Object.send(:remove_const, :Desk)
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -2041,10 +2134,15 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Desk)
         Object.send(:remove_const, :Desk)
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Pin)
         Object.send(:remove_const, :Pin)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -2094,10 +2192,15 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Desk)
         Object.send(:remove_const, :Desk)
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Card)
         Object.send(:remove_const, :Card)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -2139,8 +2242,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Cartridge)
         Object.send(:remove_const, :Cartridge)
+        Mongoid.deregister_model(Scanner)
         Object.send(:remove_const, :Scanner)
+        Mongoid.deregister_model(Printer)
         Object.send(:remove_const, :Printer)
       end
 
@@ -2178,8 +2284,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Accessory)
         Object.send(:remove_const, :Accessory)
+        Mongoid.deregister_model(RemoteDevice)
         Object.send(:remove_const, :RemoteDevice)
+        Mongoid.deregister_model(LocalDevice)
         Object.send(:remove_const, :LocalDevice)
       end
 
@@ -2222,7 +2331,9 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Workstation)
         Object.send(:remove_const, :Workstation)
+        Mongoid.deregister_model(RemoteServer)
         Object.send(:remove_const, :RemoteServer)
       end
 
@@ -2281,11 +2392,17 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Press)
         Object.send(:remove_const, :Press)
+        Mongoid.deregister_model(Lathe)
         Object.send(:remove_const, :Lathe)
+        Mongoid.deregister_model(Machine)
         Object.send(:remove_const, :Machine)
+        Mongoid.deregister_model(Belt)
         Object.send(:remove_const, :Belt)
+        Mongoid.deregister_model(Cog)
         Object.send(:remove_const, :Cog)
+        Mongoid.deregister_model(Supplier)
         Object.send(:remove_const, :Supplier)
       end
 
@@ -2339,9 +2456,13 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Board)
         Object.send(:remove_const, :Board)
+        Mongoid.deregister_model(Cable)
         Object.send(:remove_const, :Cable)
+        Mongoid.deregister_model(Chip)
         Object.send(:remove_const, :Chip)
+        Mongoid.deregister_model(Part)
         Object.send(:remove_const, :Part)
       end
 

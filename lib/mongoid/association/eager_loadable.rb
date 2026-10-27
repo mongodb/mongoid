@@ -98,7 +98,10 @@ module Mongoid
             # inverse_class_name values (resolved class names). Push the
             # resolved class name so a class_name such as "::Photo" or a
             # module-relative "Item" still matches its nested associations.
-            queue << (assoc.polymorphic? ? assoc.class_name : assoc.klass.name)
+            # A truly polymorphic association (a polymorphic belongs_to) has
+            # no single resolvable target class, so fall back to the raw name.
+            target = assoc.try_relation_class
+            queue << (target ? target.name : assoc.class_name)
 
             # If this class is nested in the inclusion tree, only load documents
             # for the association above it. If there is no parent association,
