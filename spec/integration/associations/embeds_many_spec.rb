@@ -22,7 +22,224 @@ module EmbedsManySpec
   end
 end
 
+module StaleEmbeddedPathSpec
+  class Root
+    include Mongoid::Document
+
+    embeds_many :items, class_name: 'StaleEmbeddedPathSpec::Item'
+    accepts_nested_attributes_for :items, allow_destroy: true
+  end
+
+  class Item
+    include Mongoid::Document
+
+    field :name, type: String
+    field :label, type: String
+    embedded_in :root
+    embeds_many :leaves, class_name: 'StaleEmbeddedPathSpec::Leaf'
+  end
+
+  class Leaf
+    include Mongoid::Document
+
+    field :name, type: String
+    embedded_in :item
+    embeds_many :twigs, class_name: 'StaleEmbeddedPathSpec::Twig'
+  end
+
+  class Twig
+    include Mongoid::Document
+
+    field :name, type: String
+    embedded_in :leaf
+  end
+end
+
+module MONGOID5364Spec
+  class House
+    include Mongoid::Document
+
+    embeds_many :rooms, class_name: 'MONGOID5364Spec::Room'
+  end
+
+  class Room
+    include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
+
+    embeds_many :residents, class_name: 'MONGOID5364Spec::Resident'
+    embedded_in :house
+  end
+
+  class Resident
+    include Mongoid::Document
+
+    field :name, type: String
+    embedded_in :room
+  end
+end
+
 describe 'embeds_many associations' do
+  context 'when an embedded sibling is removed after an embedded association is changed' do
+    it 'writes a replaced association to the current array position' do
+      root = root_with_items
+      (a, b, *_remaining) = root.items.to_a
+      b.attributes = { leaves: [ StaleEmbeddedPathSpec::Leaf.new(name: 'new') ] }
+      root.items.delete(a)
+      root.save!
+
+      persisted_root = StaleEmbeddedPathSpec::Root.find(root.id)
+      persisted_b, persisted_c = persisted_root.items.to_a
+
+      expect(persisted_b.leaves.map(&:name)).to eq([ 'new' ])
+      expect(persisted_c.leaves.map(&:name)).to eq([ 'c1' ])
+    end
+
+    it 'writes a replaced association to the current array position when a sibling is destroyed with nested attributes' do
+      root = root_with_items
+      (a, b, *_remaining) = root.items.to_a
+      b.attributes = { leaves: [ StaleEmbeddedPathSpec::Leaf.new(name: 'new') ] }
+      root.items_attributes = [ { id: a.id, _destroy: '1' } ]
+      root.save!
+
+      persisted_root = StaleEmbeddedPathSpec::Root.find(root.id)
+      persisted_b, persisted_c = persisted_root.items.to_a
+
+      expect(persisted_b.leaves.map(&:name)).to eq([ 'new' ])
+      expect(persisted_c.leaves.map(&:name)).to eq([ 'c1' ])
+    end
+
+    it 'unsets a replaced association at the current array position' do
+      root = root_with_items
+      (a, b, *_remaining) = root.items.to_a
+      b.attributes = { leaves: [] }
+      root.items.delete(a)
+      root.save!
+
+      persisted_root = StaleEmbeddedPathSpec::Root.find(root.id)
+      persisted_b, persisted_c = persisted_root.items.to_a
+
+      expect(persisted_b.leaves).to be_empty
+      expect(persisted_c.leaves.map(&:name)).to eq([ 'c1' ])
+    end
+
+    it 'unsets a removed attribute at the current array position' do
+      root = root_with_items
+      (a, b, *_remaining) = root.items.to_a
+      b.remove_attribute(:label)
+      root.items.delete(a)
+      root.save!
+
+      persisted_root = StaleEmbeddedPathSpec::Root.find(root.id)
+      persisted_b, persisted_c = persisted_root.items.to_a
+
+      expect(persisted_b.label).to be_nil
+      expect(persisted_c.label).to eq('c-label')
+    end
+
+    it 'unsets a nested empty association at its current array position' do
+      root = StaleEmbeddedPathSpec::Root.create!(
+        items: [
+          StaleEmbeddedPathSpec::Item.new(name: 'a'),
+          StaleEmbeddedPathSpec::Item.new(
+            name: 'b',
+            leaves: [
+              StaleEmbeddedPathSpec::Leaf.new(
+                name: 'b1',
+                twigs: [ StaleEmbeddedPathSpec::Twig.new(name: 'b1a') ]
+              )
+            ]
+          ),
+          StaleEmbeddedPathSpec::Item.new(
+            name: 'c',
+            leaves: [
+              StaleEmbeddedPathSpec::Leaf.new(
+                name: 'c1',
+                twigs: [ StaleEmbeddedPathSpec::Twig.new(name: 'c1a') ]
+              )
+            ]
+          )
+        ]
+      )
+      (a, b, *_remaining) = root.items.to_a
+      b.leaves.first.attributes = { twigs: [] }
+      root.items.delete(a)
+      root.save!
+
+      persisted_root = StaleEmbeddedPathSpec::Root.find(root.id)
+      persisted_b, persisted_c = persisted_root.items.to_a
+
+      expect(persisted_b.leaves.first.twigs).to be_empty
+      expect(persisted_c.leaves.first.twigs.map(&:name)).to eq([ 'c1a' ])
+    end
+
+    it 'preserves push-then-clear behaviour after removing a preceding sibling' do
+      root = root_with_items
+      (a, b, *_remaining) = root.items.to_a
+
+      b.leaves.push(StaleEmbeddedPathSpec::Leaf.new(name: 'pushed'))
+      root.items.delete(a)
+      b.leaves.clear
+      root.save!
+
+      persisted_root = StaleEmbeddedPathSpec::Root.find(root.id)
+      persisted_b, persisted_c = persisted_root.items.to_a
+
+      expect(persisted_b.leaves).to be_empty
+      expect(persisted_c.leaves.map(&:name)).to eq([ 'c1' ])
+    end
+
+    it 'updates the last nested association after removing an earlier sibling as reported in MONGOID-5364' do
+      house = MONGOID5364Spec::House.new(rooms: [])
+      5.times do |index|
+        house.rooms << MONGOID5364Spec::Room.new(residents: [ { name: "resident #{index}" } ])
+      end
+      house.save!
+      house = MONGOID5364Spec::House.find(house.id)
+
+      house.rooms.last.assign_attributes(residents: [ { name: 'the new resident' } ])
+      house.rooms[2].destroy
+      house.save!
+
+      persisted_house = MONGOID5364Spec::House.find(house.id)
+
+      expect(persisted_house.rooms.size).to eq(4)
+      expect(persisted_house.rooms[-2].residents.map(&:name)).to eq([ 'resident 3' ])
+      expect(persisted_house.rooms.last.residents.map(&:name)).to eq([ 'the new resident' ])
+    end
+
+    it 'replaces a delayed non-empty association with an empty one after a sibling removal' do
+      root = root_with_items
+      (a, b, *_remaining) = root.items.to_a
+
+      b.attributes = { leaves: [ StaleEmbeddedPathSpec::Leaf.new(name: 'new') ] }
+      root.items.delete(a)
+      b.attributes = { leaves: [] }
+      root.save!
+
+      persisted_root = StaleEmbeddedPathSpec::Root.find(root.id)
+      persisted_b, persisted_c = persisted_root.items.to_a
+
+      expect(persisted_b.leaves).to be_empty
+      expect(persisted_c.leaves.map(&:name)).to eq([ 'c1' ])
+    end
+
+    def root_with_items
+      StaleEmbeddedPathSpec::Root.create!(
+        items: [
+          StaleEmbeddedPathSpec::Item.new(
+            name: 'a', label: 'a-label', leaves: [ StaleEmbeddedPathSpec::Leaf.new(name: 'a1') ]
+          ),
+          StaleEmbeddedPathSpec::Item.new(
+            name: 'b', label: 'b-label', leaves: [ StaleEmbeddedPathSpec::Leaf.new(name: 'b1') ]
+          ),
+          StaleEmbeddedPathSpec::Item.new(
+            name: 'c', label: 'c-label', leaves: [ StaleEmbeddedPathSpec::Leaf.new(name: 'c1') ]
+          )
+        ]
+      )
+    end
+  end
+
   context 're-associating the same object' do
     context 'with dependent: destroy' do
       let(:canvas) do
