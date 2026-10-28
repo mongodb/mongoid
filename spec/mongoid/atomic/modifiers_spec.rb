@@ -199,6 +199,8 @@ describe Mongoid::Atomic::Modifiers do
     end
 
     context 'when a conflicting modification exists' do
+      # A $pull shifts the positions of the remaining elements, so it stays in
+      # the main update. MongoDB rejects the update if the paths overlap.
       context 'when the conflicting modification is a set' do
         let(:sets) do
           { 'addresses.0.street' => 'Bond' }
@@ -213,11 +215,10 @@ describe Mongoid::Atomic::Modifiers do
           modifiers.pull(pulls)
         end
 
-        it 'adds the pull modifiers to the conflicts hash' do
+        it 'keeps the pull modifiers in the main update' do
           expect(modifiers).to eq(
             { '$set' => { 'addresses.0.street' => 'Bond' },
-              conflicts: { '$pull' =>
-                { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } } } }
+              '$pull' => { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } } }
           )
         end
       end
@@ -236,11 +237,10 @@ describe Mongoid::Atomic::Modifiers do
           modifiers.pull(pulls)
         end
 
-        it 'adds the pull modifiers to the conflicts hash' do
+        it 'keeps the pull modifiers in the main update' do
           expect(modifiers).to eq(
             { '$push' => { 'addresses' => { '$each' => [ { 'street' => 'Oxford St' } ] } },
-              conflicts: { '$pull' =>
-                { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } } } }
+              '$pull' => { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } } }
           )
         end
       end
@@ -259,11 +259,10 @@ describe Mongoid::Atomic::Modifiers do
           modifiers.pull(pulls)
         end
 
-        it 'adds the pull modifiers to the conflicts hash' do
+        it 'keeps the pull modifiers in the main update' do
           expect(modifiers).to eq(
             { '$addToSet' => { 'addresses.0.tags' => { '$each' => %w[tag] } },
-              conflicts: { '$pull' =>
-                { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } } } }
+              '$pull' => { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } } }
           )
         end
       end
@@ -282,11 +281,10 @@ describe Mongoid::Atomic::Modifiers do
           modifiers.pull(pulls)
         end
 
-        it 'adds the pull modifiers to the conflicts hash' do
+        it 'keeps the pull modifiers in the main update' do
           expect(modifiers).to eq(
             { '$pullAll' => { 'addresses' => [ { '_id' => 'one' } ] },
-              conflicts: { '$pull' =>
-                { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } } } }
+              '$pull' => { 'addresses' => { '_id' => { '$in' => [ 'one' ] } } } }
           )
         end
       end
