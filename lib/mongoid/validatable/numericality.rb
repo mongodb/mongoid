@@ -28,10 +28,11 @@ module Mongoid
       end
 
       # Fetches the raw value from the record, prior to any typecasting being
-      # applied.
+      # applied. Attributes that are not fields are read as ActiveModel does.
       def raw_value_for_validation(record, attr)
         attribute = record.database_field_name(attr)
         return nil if record.relations.key?(attribute)
+        return record.read_attribute_for_validation(attr) if !record.fields.key?(attribute) && record.respond_to?(attr, true)
 
         record.read_attribute_before_type_cast(attribute)
       end
