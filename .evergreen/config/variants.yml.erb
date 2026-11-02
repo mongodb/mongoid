@@ -123,21 +123,10 @@ buildvariants:
 
 - matrix_name: "driver-oldstable"
   matrix_spec:
-    driver: [oldstable, min]
+    driver: [oldstable]
     ruby: ["ruby-2.7"]
     mongodb-version: "4.4"
     topology: ['replica_set', 'sharded_cluster']
-    os: ubuntu-20.04
-  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
-  tasks:
-     - name: "test"
-
-- matrix_name: "driver-min"
-  matrix_spec:
-    driver: [min]
-    ruby: ["ruby-2.7"]
-    mongodb-version: "4.4"
-    topology: "server"
     os: ubuntu-20.04
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   tasks:
