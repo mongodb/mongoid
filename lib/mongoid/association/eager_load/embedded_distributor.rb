@@ -22,15 +22,15 @@ module Mongoid
       #     'from' => 'devices',               # the embedded port, so they are
       #     'localField' => 'port.device_id',  # collected in a temp top-level
       #     'foreignField' => '_id',           # field instead
-      #     'as' => '__eager_load_port_device'
+      #     'as' => '__mongoid_eager_loaded_device_port'
       #   } },
       #   { '$set' => {
-      #     'port' => { '$mergeObjects' => [   # merge a 'device' key onto the port
+      #     'port' => { '$mergeObjects' => [   # merge the devices onto the port
       #       '$port',
-      #       { 'device' => { '$filter' => { ... } } }   # this port's matches
+      #       { '__mongoid_eager_loaded_device' => { '$filter' => { ... } } }   # this port's matches
       #     ] }
       #   } },
-      #   { '$unset' => '__eager_load_port_device' }  # drop the temp field
+      #   { '$unset' => '__mongoid_eager_loaded_device_port' }  # drop the temp field
       #
       # @api private
       class EmbeddedDistributor
@@ -92,7 +92,7 @@ module Mongoid
         end
 
         def temporary_field
-          "__eager_load_#{path.tr('.', '_')}_#{@association.name}"
+          @association.temporary_field(path.tr('.', '_'))
         end
 
         # An embedded collection (embeds_many) is rebuilt with $map so each element
@@ -104,7 +104,7 @@ module Mongoid
           element = many ? "$$#{head.store_as}" : node
           child =
             if rest.empty?
-              { @association.name.to_s => correlated_matches(element) }
+              { @association.preloaded_field => correlated_matches(element) }
             else
               segment = rest.first.store_as
               { segment => distributed_value(rest, "#{element}.#{segment}") }

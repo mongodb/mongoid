@@ -33,6 +33,14 @@ module Mongoid
     include Macros
     include Reflections
 
+    # Prefixes the field a $lookup writes an association's preloaded documents
+    # into. They travel apart from the document's own fields, so the hydration
+    # can keep them out of the attributes instead of leaving them on the
+    # document, where a later save would persist them.
+    #
+    # @api private
+    PRELOADED_PREFIX = '__mongoid_eager_loaded_'
+
     # Map the macros to their corresponding Association classes.
     #
     # @return [ Hash ] The mapping from macros to their Association class.

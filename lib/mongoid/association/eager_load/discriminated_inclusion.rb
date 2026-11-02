@@ -15,15 +15,15 @@ module Mongoid
       # For Machine.eager_load(:widgets), where Lathe#widgets => Cog and
       # Press#widgets => Belt, it emits:
       #
-      #   { '$lookup' => { 'from' => 'cogs',  ..., 'as' => '__eager_load_widgets_Lathe' } },
-      #   { '$lookup' => { 'from' => 'belts', ..., 'as' => '__eager_load_widgets_Press' } },
+      #   { '$lookup' => { 'from' => 'cogs',  ..., 'as' => '__mongoid_eager_loaded_widgets_Lathe' } },
+      #   { '$lookup' => { 'from' => 'belts', ..., 'as' => '__mongoid_eager_loaded_widgets_Press' } },
       #   { '$set' => {
-      #     'widgets' => { '$switch' => { 'branches' => [   # route each document to its
-      #       { 'case' => { '$eq' => [ '$_type', 'Lathe' ] }, 'then' => '$__eager_load_widgets_Lathe' },  # own type's matches
-      #       { 'case' => { '$eq' => [ '$_type', 'Press' ] }, 'then' => '$__eager_load_widgets_Press' }
+      #     '__mongoid_eager_loaded_widgets' => { '$switch' => { 'branches' => [   # route each document to its
+      #       { 'case' => { '$eq' => [ '$_type', 'Lathe' ] }, 'then' => '$__mongoid_eager_loaded_widgets_Lathe' },  # own type's matches
+      #       { 'case' => { '$eq' => [ '$_type', 'Press' ] }, 'then' => '$__mongoid_eager_loaded_widgets_Press' }
       #     ], 'default' => [] } }
       #   } },
-      #   { '$unset' => [ '__eager_load_widgets_Lathe', '__eager_load_widgets_Press' ] }
+      #   { '$unset' => [ '__mongoid_eager_loaded_widgets_Lathe', '__mongoid_eager_loaded_widgets_Press' ] }
       #
       # @api private
       class DiscriminatedInclusion < Inclusion
@@ -56,7 +56,7 @@ module Mongoid
         end
 
         def temporary_field(node)
-          "__eager_load_#{node.association.name}_#{owner(node).discriminator_value}"
+          node.association.temporary_field(owner(node).discriminator_value)
         end
 
         # The $set that fills the association on each document from the temporary
@@ -68,15 +68,15 @@ module Mongoid
               'then' => "$#{field}"
             }
           end
-          { '$set' => { name => { '$switch' => { 'branches' => branches, 'default' => [] } } } }
+          { '$set' => { preloaded_field => { '$switch' => { 'branches' => branches, 'default' => [] } } } }
         end
 
         def owner(node)
           node.association.inverse_class
         end
 
-        def name
-          @nodes.first.association.name.to_s
+        def preloaded_field
+          @nodes.first.association.preloaded_field
         end
 
         def discriminator_key

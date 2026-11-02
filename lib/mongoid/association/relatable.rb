@@ -217,6 +217,24 @@ module Mongoid
         stores_foreign_key? ? foreign_key : primary_key
       end
 
+      # The field a $lookup writes this association's preloaded documents into.
+      #
+      # @return [ String ] The field.
+      def preloaded_field
+        "#{PRELOADED_PREFIX}#{name}"
+      end
+
+      # A field where the aggregation collects this association's documents
+      # before moving them to where they belong. The qualifier tells it apart
+      # from the other temporary fields of the same association.
+      #
+      # @param [ String ] qualifier What tells this temporary field apart.
+      #
+      # @return [ String ] The field.
+      def temporary_field(qualifier)
+        "#{preloaded_field}_#{qualifier}"
+      end
+
       # The name of the setter on this object for assigning an associated object.
       #
       # @return [ String ] The setter name.

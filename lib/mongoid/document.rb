@@ -410,6 +410,8 @@ module Mongoid
       def instantiate_document(attrs = nil, selected_fields = nil, options = {}, &block)
         execute_callbacks = options.fetch(:execute_callbacks, Threaded.execute_callbacks?)
         attributes = attrs.to_h
+        preloaded_fields = attributes.keys.select { |key| key.start_with?(Association::PRELOADED_PREFIX) }
+        preloaded = attributes.extract!(*preloaded_fields)
 
         doc = allocate
         doc.__selected_fields = selected_fields
@@ -417,6 +419,7 @@ module Mongoid
         doc.instance_variable_set(:@attributes_before_type_cast, attributes.dup)
 
         doc._handle_callbacks_after_instantiation(execute_callbacks, &block)
+        doc.load_preloaded_associations(preloaded)
 
         doc.remember_storage_options!
         doc
