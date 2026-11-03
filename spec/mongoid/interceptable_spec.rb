@@ -513,6 +513,13 @@ describe Mongoid::Interceptable do
     it 'does not run the before callbacks' do
       expect(object.before_save_called).to be_nil
     end
+
+    it 'defines the targeted callbacks method only once' do
+      allow(TestClass).to receive(:define_method).and_call_original
+      3.times { TestClass.new.run_after_callbacks(:save) }
+      expect(TestClass).to have_received(:define_method)
+        .with('_run__after__save__callbacks').at_most(:once)
+    end
   end
 
   describe '#run_before_callbacks' do
