@@ -110,6 +110,7 @@ module Mongoid
               batch_remove(_target.dup)
             end
           elsif _target != docs
+            clear_atomic_path_cache
             _base.delayed_atomic_sets.delete(path) unless _assigning?
             docs = normalize_docs(docs).compact
             _target.clear and _unscoped.clear
