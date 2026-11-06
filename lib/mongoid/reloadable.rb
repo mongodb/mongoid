@@ -42,6 +42,7 @@ module Mongoid
       @attributes = attributes
       @attributes_before_type_cast = @attributes.dup
       @changed_attributes = {}
+      @pre_create_changed_attributes = nil
       @previous_changes = {}
       @previous_attributes = {}
       @previously_new_record = false

@@ -166,6 +166,12 @@ module Mongoid
     def internal_state=(state)
       self._id = state[:id]
       @changed_attributes = state[:changed_attributes]
+      # The document was constructed as new in #becomes, collecting
+      # pre-create change markers. Drop them when the copied state is that
+      # of a persisted document: its pending changes were all tracked after
+      # the document was persisted, and stale markers would let in-place
+      # changes to readonly attributes bypass the dirty filter.
+      @pre_create_changed_attributes = nil unless state[:new_record]
       @errors = ActiveModel::Errors.new(self).tap { |e| e.copy!(state[:errors]) }
       @new_record = state[:new_record]
       @destroyed = state[:destroyed]
@@ -337,6 +343,10 @@ module Mongoid
           relation = __send__(name)
           Array.wrap(relation).each do |r|
             r.instance_variable_set(:@new_record, new_record)
+            # The embedded documents were also constructed as new; drop
+            # their pre-create change markers when they are marked as
+            # persisted, as #internal_state= does for the parent document.
+            r.instance_variable_set(:@pre_create_changed_attributes, nil) unless new_record
           end
         end
       end
