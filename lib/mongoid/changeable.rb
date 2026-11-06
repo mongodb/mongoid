@@ -80,6 +80,7 @@ module Mongoid
       @children_may_have_changed = false
       reset_atomic_updates!
       changed_attributes.clear
+      @pre_create_changed_attributes = nil
     end
 
     # Things that need to execute after a document has been persisted.
@@ -266,6 +267,13 @@ module Mongoid
     def attribute_changed?(attr, from: ATTRIBUTE_UNCHANGED, to: ATTRIBUTE_UNCHANGED)
       attr = database_field_name(attr)
       return false unless changed_attributes.key?(attr)
+      # An in-place change to a readonly attribute of a persisted document
+      # is not part of the dirty tracking API and will not be persisted. A
+      # change tracked while the document was new initializes the document,
+      # and new documents may set readonly attributes, so it is still
+      # reported as a saved change.
+      return false if !new_record? && self.class.readonly_attributes.include?(attr) &&
+                      !@pre_create_changed_attributes&.include?(attr)
       return false if changed_attributes[attr] == attributes[attr]
       return false if from != changed_attributes[attr]
       return false if to != attributes[attr]
@@ -328,6 +336,13 @@ module Mongoid
     def attribute_will_change!(attr)
       return if changed_attributes.key?(attr)
 
+      # The snapshot is taken for readonly attributes as well. Their changes
+      # are hidden from the dirty tracking API (see #attribute_changed?), but
+      # the snapshot is needed to reset an in-place change. Changes tracked
+      # while the document is new initialize it, and new documents may set
+      # readonly attributes, so they are remembered here and still reported
+      # when the document is created.
+      (@pre_create_changed_attributes ||= ::Set.new).add(attr) if new_record?
       changed_attributes[attr] = read_raw_attribute(attr).__deep_copy__
     end
 
@@ -341,7 +356,10 @@ module Mongoid
     # @return [ Object ] The old value.
     def reset_attribute!(attr)
       attr = database_field_name(attr)
-      attributes[attr] = changed_attributes.delete(attr) if attribute_changed?(attr)
+      return unless changed_attributes.key?(attr)
+      return if changed_attributes[attr] == attributes[attr]
+
+      attributes[attr] = changed_attributes.delete(attr)
     end
 
     def reset_attribute_to_default!(attr)

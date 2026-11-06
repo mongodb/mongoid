@@ -1410,6 +1410,24 @@ describe Mongoid::Changeable do
         expect(person.title).to be_nil
       end
     end
+
+    context 'when a resizable attribute was read but its value has not changed' do
+      let(:person) do
+        Person.create!(map: { 'enabled' => false })
+      end
+
+      it 'keeps the current value object so held references stay attached' do
+        map = person.map
+        person.reset_map!
+
+        expect(person.attributes['map']).to equal(map)
+
+        map['enabled'] = true
+        person.save!
+
+        expect(person.reload.map).to eq('enabled' => true)
+      end
+    end
   end
 
   describe '#reset_attribute_to_default!' do

@@ -21,7 +21,25 @@ module Mongoid
       # @return [ true | false ] If the document is new, or if the field is not
       #   readonly.
       def attribute_writable?(name)
-        new_record? || (!self.class.readonly_attributes.include?(name) && _loaded?(name))
+        return true if new_record?
+
+        readonly = self.class.readonly_attributes
+        return _loaded?(name) if readonly.empty?
+
+        path = name.to_s
+        return false if readonly.include?(path)
+
+        readonly.each do |field|
+          # A readonly attribute that is a declared field with a dotted name
+          # is that literal field, not a path prefix.
+          next if field.include?('.') && self.class.fields.key?(field)
+
+          # A path that is a declared field with a dotted name addresses that
+          # literal field, not a descendant of the readonly attribute.
+          return false if path.start_with?("#{field}.") && !self.class.fields.key?(path)
+        end
+
+        _loaded?(name)
       end
 
       private
