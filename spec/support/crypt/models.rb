@@ -204,4 +204,100 @@ module Crypt
 
     embeds_one :missing_note, class_name: 'Crypt::MissingNote'
   end
+
+  # Two unrelated models stored in one collection, each with its own encrypted
+  # field.
+  class Badge
+    include Mongoid::Document
+
+    store_in collection: 'crypt_badges'
+
+    encrypt_with key_id: 'grolrnFVSSW9Gq04Q87R9Q==', deterministic: true
+
+    field :serial, type: String, encrypt: true
+  end
+
+  class BadgeScan
+    include Mongoid::Document
+
+    store_in collection: 'crypt_badges'
+
+    encrypt_with key_id: 'grolrnFVSSW9Gq04Q87R9Q==', deterministic: true
+
+    field :holder, type: String, encrypt: true
+  end
+
+  # Single collection inheritance. Only Member is registered in
+  # Mongoid.models; the subclasses are not.
+  class Member
+    include Mongoid::Document
+
+    encrypt_with key_id: 'grolrnFVSSW9Gq04Q87R9Q==', deterministic: true
+
+    field :ssn, type: String, encrypt: true
+  end
+
+  class Employee < Member
+    field :salary, type: String, encrypt: true
+  end
+
+  class Contractor < Member
+    field :rate, type: String, encrypt: true
+  end
+
+  # Single collection inheritance where only the subclass is encrypted.
+  class Listing
+    include Mongoid::Document
+
+    field :title, type: String
+  end
+
+  class PrivateListing < Listing
+    encrypt_with key_id: 'grolrnFVSSW9Gq04Q87R9Q==', deterministic: true
+
+    field :owner_ssn, type: String, encrypt: true
+  end
+
+  # An embeds_one target whose subclass adds an encrypted field.
+  class Box
+    include Mongoid::Document
+
+    encrypt_with key_id: 'grolrnFVSSW9Gq04Q87R9Q==', deterministic: true
+
+    embeds_one :item, class_name: 'Crypt::Item'
+  end
+
+  class Item
+    include Mongoid::Document
+
+    field :label, type: String, encrypt: true
+
+    embedded_in :box, class_name: 'Crypt::Box'
+  end
+
+  class SealedItem < Item
+    field :seal, type: String, encrypt: true
+  end
+
+  # An embeds_one target with no encrypted field, whose subclass has one.
+  # Nothing on Locker or Content declares encryption.
+  class Locker
+    include Mongoid::Document
+
+    embeds_one :content, class_name: 'Crypt::Content'
+  end
+
+  class Content
+    include Mongoid::Document
+
+    field :label, type: String
+
+    embedded_in :locker, class_name: 'Crypt::Locker'
+  end
+
+  class SecretContent < Content
+    encrypt_with key_id: 'grolrnFVSSW9Gq04Q87R9Q==', deterministic: true
+
+    field :code, type: String, encrypt: true
+  end
 end

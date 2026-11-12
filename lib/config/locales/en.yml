@@ -239,6 +239,13 @@ en:
             Mongoid does not support."
           resolution: "Valid field operators are: %{valid_operators}.
             Ensure you are using one of these operators."
+        invalid_encryption_schema:
+          message: "The encryption schema for %{namespace} is invalid."
+          summary: "Two models writing to %{namespace} describe %{path}
+            differently. The encryption schema has one entry per namespace,
+            so the two descriptions cannot both be used."
+          resolution: "Make the models agree on the encryption options of the
+            conflicting field, or store them in different collections."
         invalid_estimated_count_criteria:
           message: "Invalid criteria for estimated_count."
           summary: "Estimated count is strictly a collection-level operation and cannot be called
@@ -564,6 +571,15 @@ en:
             chosen at runtime, configure one client per database, each with
             its own auto_encryption_options, and select between them with
             Model.with(client:) instead of switching the database."
+        no_encryption_schema_field:
+          message: "The encryption schema of client %{client} does not cover
+            the field %{field} of %{namespace}."
+          summary: "The namespace %{namespace} is in the automatic encryption
+            schema of client %{client}, but its entry does not encrypt
+            %{field}, which %{klass} declares as encrypted. Mongoid refuses
+            the operation rather than storing the field in plaintext."
+          resolution: "Regenerate the schema map of the client, or add
+            %{field} to the schema entry for %{namespace}."
         no_map_reduce_output:
           message: "No output location was specified for the map/reduce
             operation."

@@ -29,6 +29,14 @@ describe Mongoid::Encryptable do
       end
     end
 
+    # Any subclass of the declared class can be assigned to an embeds_one
+    # association, so the check has to look at the subclasses too.
+    context 'when only a subclass of an embedded model is encrypted' do
+      it 'returns true' do
+        expect(Crypt::Locker.requires_encryption_schema?).to be true
+      end
+    end
+
     context 'when the model declares no encryption anywhere' do
       it 'returns false' do
         expect(Person.requires_encryption_schema?).to be false
