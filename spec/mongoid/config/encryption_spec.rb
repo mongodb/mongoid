@@ -373,5 +373,228 @@ describe Mongoid::Config::Encryption do
         )
       end
     end
+
+    # The map has one entry per namespace. Every model that writes to the
+    # namespace, including subclasses that are never registered in
+    # Mongoid.models, has to be covered by that entry, or its encrypted fields
+    # are written in plaintext.
+    context 'when more than one model writes to a namespace' do
+      let(:encrypt_metadata) do
+        {
+          'keyId' => [ BSON::Binary.new(Base64.decode64('grolrnFVSSW9Gq04Q87R9Q=='), :uuid) ],
+          'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+        }
+      end
+
+      let(:encrypted_string) do
+        { 'encrypt' => { 'bsonType' => 'string' } }
+      end
+
+      context 'when two models are stored in one collection' do
+        let(:expected_entry) do
+          {
+            'bsonType' => 'object',
+            'encryptMetadata' => encrypt_metadata,
+            'properties' => {
+              'serial' => encrypted_string,
+              'holder' => encrypted_string
+            }
+          }
+        end
+
+        context 'when the models are registered in one order' do
+          let(:models) do
+            [ Crypt::Badge, Crypt::BadgeScan ]
+          end
+
+          it 'maps the fields of both models' do
+            expect(encryption_schema_map['mongoid_test.crypt_badges']).to eq(expected_entry)
+          end
+        end
+
+        context 'when the models are registered in the other order' do
+          let(:models) do
+            [ Crypt::BadgeScan, Crypt::Badge ]
+          end
+
+          it 'maps the fields of both models' do
+            expect(encryption_schema_map['mongoid_test.crypt_badges']).to eq(expected_entry)
+          end
+        end
+      end
+
+      context 'when a subclass adds an encrypted field to an encrypted parent' do
+        let(:expected_entry) do
+          {
+            'bsonType' => 'object',
+            'encryptMetadata' => encrypt_metadata,
+            'properties' => {
+              'ssn' => encrypted_string,
+              'salary' => encrypted_string,
+              'rate' => encrypted_string
+            }
+          }
+        end
+
+        # Subclasses are not registered in Mongoid.models, so only the parent
+        # is passed in.
+        context 'when only the parent is registered' do
+          let(:models) do
+            [ Crypt::Member ]
+          end
+
+          it 'maps the fields of the parent and of every subclass' do
+            expect(encryption_schema_map['mongoid_test.crypt_members']).to eq(expected_entry)
+          end
+        end
+
+        context 'when a subclass is registered as well' do
+          let(:models) do
+            [ Crypt::Member, Crypt::Employee ]
+          end
+
+          it 'maps the fields of the parent and of every subclass' do
+            expect(encryption_schema_map['mongoid_test.crypt_members']).to eq(expected_entry)
+          end
+        end
+      end
+
+      context 'when only a subclass has encrypted fields' do
+        let(:models) do
+          [ Crypt::Listing ]
+        end
+
+        it 'maps the fields of the subclass' do
+          expect(encryption_schema_map['mongoid_test.crypt_listings']).to eq(
+            'bsonType' => 'object',
+            'encryptMetadata' => encrypt_metadata,
+            'properties' => {
+              'owner_ssn' => encrypted_string
+            }
+          )
+        end
+      end
+
+      context 'when a subclass of an embeds_one target adds an encrypted field' do
+        let(:models) do
+          [ Crypt::Box ]
+        end
+
+        it 'maps the fields of the target and of its subclass' do
+          expect(encryption_schema_map.dig('mongoid_test.crypt_boxes', 'properties', 'item')).to eq(
+            'bsonType' => 'object',
+            'properties' => {
+              'label' => encrypted_string,
+              'seal' => encrypted_string
+            }
+          )
+        end
+      end
+
+      context 'when only a subclass of an embeds_one target has encrypted fields' do
+        let(:models) do
+          [ Crypt::Locker ]
+        end
+
+        it 'maps the fields of the subclass' do
+          expect(encryption_schema_map.dig('mongoid_test.crypt_lockers', 'properties', 'content')).to eq(
+            'bsonType' => 'object',
+            'encryptMetadata' => encrypt_metadata,
+            'properties' => {
+              'code' => encrypted_string
+            }
+          )
+        end
+      end
+
+      # These models are not added to the shared support file: every client
+      # with automatic encryption builds the map over all registered models,
+      # and a conflict would make every such client fail to build.
+      context 'when models on one collection disagree on encryption' do
+        let(:defined_models) { [] }
+
+        after do
+          defined_models.each { |model| Mongoid.deregister_model(model) }
+        end
+
+        def define_model(&block)
+          model = Class.new do
+            include Mongoid::Document
+
+            store_in collection: 'crypt_conflicts'
+          end
+          model.class_eval(&block)
+          defined_models << model
+          model
+        end
+
+        context 'when the same field is encrypted the same way' do
+          let(:models) do
+            [
+              define_model { field :code, type: String, encrypt: { deterministic: true } },
+              define_model { field :code, type: String, encrypt: { deterministic: true } }
+            ]
+          end
+
+          it 'maps the field once' do
+            expect(encryption_schema_map['mongoid_test.crypt_conflicts']).to eq(
+              'bsonType' => 'object',
+              'properties' => {
+                'code' => {
+                  'encrypt' => {
+                    'bsonType' => 'string',
+                    'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+                  }
+                }
+              }
+            )
+          end
+        end
+
+        context 'when the same field is encrypted differently' do
+          let(:models) do
+            [
+              define_model { field :code, type: String, encrypt: { deterministic: true } },
+              define_model { field :code, type: String, encrypt: { deterministic: false } }
+            ]
+          end
+
+          it 'raises' do
+            expect { encryption_schema_map }.to raise_error(Mongoid::Errors::InvalidEncryptionSchema)
+          end
+        end
+
+        context 'when the collection metadata differs' do
+          let(:models) do
+            [
+              define_model do
+                encrypt_with key_id: 'grolrnFVSSW9Gq04Q87R9Q==', deterministic: true
+                field :code, type: String, encrypt: true
+              end,
+              define_model do
+                encrypt_with key_id: 'grolrnFVSSW9Gq04Q87R9Q==', deterministic: false
+                field :name, type: String, encrypt: true
+              end
+            ]
+          end
+
+          it 'raises' do
+            expect { encryption_schema_map }.to raise_error(Mongoid::Errors::InvalidEncryptionSchema)
+          end
+        end
+
+        context 'when a subclass encrypts an inherited field differently' do
+          let(:models) do
+            parent = define_model { field :code, type: String, encrypt: { deterministic: true } }
+            Class.new(parent) { field :code, type: String, encrypt: { deterministic: false } }
+            [ parent ]
+          end
+
+          it 'raises' do
+            expect { encryption_schema_map }.to raise_error(Mongoid::Errors::InvalidEncryptionSchema)
+          end
+        end
+      end
+    end
   end
 end

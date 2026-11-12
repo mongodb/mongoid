@@ -63,7 +63,9 @@ module Mongoid
       end
 
       # Walks the models reachable through this model's embeds_one relations,
-      # looking for one that declares encryption.
+      # looking for one that declares encryption. Subclasses of an
+      # association target are included: any of them can be assigned to the
+      # association.
       #
       # embeds_many is not considered: libmongocrypt cannot express per-field
       # encryption under array items, so those fields are never mapped.
@@ -92,13 +94,16 @@ module Mongoid
 
           # An association target does not have to be a Mongoid document.
           next unless klass.respond_to?(:encrypted?)
-          next if path.include?(klass)
-          return [ true, true ] if klass.encrypted?
 
-          found, nested_complete = klass.embedded_encryption_scan(path + [ klass ])
-          return [ true, true ] if found
+          ([ klass ] + klass.descendants).uniq.each do |candidate|
+            next if path.include?(candidate)
+            return [ true, true ] if candidate.encrypted?
 
-          complete &&= nested_complete
+            found, nested_complete = candidate.embedded_encryption_scan(path + [ candidate ])
+            return [ true, true ] if found
+
+            complete &&= nested_complete
+          end
         end
 
         [ false, complete ]
