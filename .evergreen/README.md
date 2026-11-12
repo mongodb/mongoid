@@ -11,6 +11,27 @@ ruby .evergreen/update-evergreen-configs
 ```
 
 
+## Private S3 "latest" server downloads
+
+`MONGODB_VERSION=latest` uses the private `origin-mongodb-server-latest` S3
+bucket. Only the non-PR `test-latest` task assumes `aws_test_secrets_role`,
+in the `download latest mongodb` function. The pinned tools are installed
+before the role, then `.evergreen/download-latest-mongodb.sh` downloads the
+server and crypt_shared to `$HOME/mongodb-latest` and drops the credentials.
+
+Bootstrap runs without AWS and reuses the staged binaries through
+`EXISTING_BINARIES_DIR` with `SKIP_CRYPT_SHARED=1`. The staged crypt_shared is
+copied back after bootstrap so `CRYPT_SHARED_LIB_PATH` remains available.
+
+The role and project configuration are not confirmed as a trust boundary.
+Patches can change config and scripts; this is not full protection.
+
+`9.0` resolves to the latest published 9.0.x from `full.json`; it is public and
+does not use the role.
+
+Docker is unchanged and continues to use the public host.
+
+
 ## Scheduled upcoming-version builds (MONGOID-5908)
 
 Two build variants run the test suite against the upcoming, in-development

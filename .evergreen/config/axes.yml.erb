@@ -6,8 +6,9 @@ axes:
         display_name: "MongoDB Latest"
         variables:
            MONGODB_VERSION: "latest"
-      # 9.0 is not yet GA. drivers-evergreen-tools resolves this to the latest
-      # nightly build of the server's v9.0 branch (DRIVERS-3610).
+      # 9.0 is published in full.json. drivers-evergreen-tools no longer maps
+      # it to a private nightly build (DRIVERS-3628), so this requests the
+      # latest published 9.0.x release.
       - id: "9.0"
         display_name: "MongoDB 9.0"
         variables:
