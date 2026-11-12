@@ -21,7 +21,11 @@ module Mongoid
       #
       # @return [ Hash ] The encryption schema map.
       def encryption_schema_map(default_database, models = ::Mongoid.models)
-        models.each_with_object({}) do |model, map|
+        # Subclasses share their parent's collection but are not registered in
+        # Mongoid.models, so they have to be added to the walk explicitly.
+        classes = models.flat_map { |model| [ model ] + model.descendants }.uniq
+
+        classes.each_with_object({}) do |model, map|
           next if model.embedded?
           next unless model.requires_encryption_schema?
 
@@ -35,12 +39,31 @@ module Mongoid
           next if database.respond_to?(:call)
 
           key = "#{database}.#{model.collection_name}"
-          props = metadata_for(model).merge(properties_for(model, [ model ]))
+          props = metadata_for(model).merge(properties_for(model, [ model ], key))
+          next if props.empty?
+
           # The root of a collection schema describes the document, so it is
           # always an object. Saying so matters when a nested schema carries
           # encryptMetadata: mongocryptd rejects the schema otherwise.
-          map[key] = { 'bsonType' => 'object' }.merge(props) unless props.empty?
+          entry = { 'bsonType' => 'object' }.merge(props)
+          map[key] = map.key?(key) ? merge_schema_entries(map[key], entry, key) : entry
         end
+      end
+
+      # Collect the paths of the fields encrypted by the schema generated for
+      # a single model.
+      #
+      # @param [ Mongoid::Document ] model The model.
+      #
+      # @return [ Array<Array<String>> ] The property paths, outermost first.
+      #
+      # @api private
+      def encrypted_paths_for(model)
+        return model.instance_variable_get(:@encrypted_paths_for) if
+          model.instance_variable_defined?(:@encrypted_paths_for)
+
+        properties = properties_for(model, [ model ])['properties'] || {}
+        model.instance_variable_set(:@encrypted_paths_for, collect_encrypted_paths(properties, []))
       end
 
       private
@@ -110,10 +133,12 @@ module Mongoid
       # @param [ Mongoid::Document ] model The model to generate the properties for.
       # @param [ Array<Mongoid::Document> ] path The models the walk is already
       #   inside of, outermost first.
+      # @param [ String | nil ] namespace The namespace the schema is built
+      #   for, used for error reporting.
       #
       # @return [ Hash ] The encryption properties.
-      def properties_for(model, path)
-        result = properties_for_fields(model).merge(properties_for_relations(model, path))
+      def properties_for(model, path, namespace = nil)
+        result = properties_for_fields(model).merge(properties_for_relations(model, path, namespace))
         if result.empty?
           {}
         else
@@ -152,9 +177,11 @@ module Mongoid
       # @param [ Mongoid::Document ] model The model to generate the properties for.
       # @param [ Array<Mongoid::Document> ] path The models the walk is already
       #   inside of, outermost first.
+      # @param [ String | nil ] namespace The namespace the schema is built
+      #   for, used for error reporting.
       #
       # @return [ Hash ] The encryption properties.
-      def properties_for_relations(model, path)
+      def properties_for_relations(model, path, namespace = nil)
         model.relations.each_with_object({}) do |(name, relation), props|
           # relation_class constantizes, and a polymorphic embedded_in has no
           # class to resolve, so the relation type has to be checked first.
@@ -164,19 +191,123 @@ module Mongoid
           # An association target does not have to be a Mongoid document, and
           # the class it names does not have to exist.
           next unless klass.respond_to?(:requires_encryption_schema?)
-          # Stop at a model the walk is already inside of, or a self-embedding
-          # model never terminates. The path covers the current branch only:
-          # a model embedded by two parents, or twice by one parent, has to be
-          # emitted at every place it appears.
-          next if path.include?(klass)
-          next unless klass.requires_encryption_schema?
 
-          metadata_for(klass).merge(
-            properties_for(klass, path + [ klass ])
-          ).tap do |properties|
-            props[name] = { 'bsonType' => 'object' }.merge(properties) unless properties.empty?
+          # Any subclass of the declared class can be assigned to the
+          # association, so its encrypted fields have to be mapped here too.
+          properties = ([ klass ] + klass.descendants).uniq.inject({}) do |merged, candidate|
+            # Stop at a model the walk is already inside of, or a self-embedding
+            # model never terminates. The path covers the current branch only:
+            # a model embedded by two parents, or twice by one parent, has to be
+            # emitted at every place it appears.
+            next merged if path.include?(candidate)
+            next merged unless candidate.respond_to?(:requires_encryption_schema?)
+            next merged unless candidate.requires_encryption_schema?
+
+            merge_schema_entries(
+              merged,
+              metadata_for(candidate).merge(
+                properties_for(candidate, path + [ candidate ], namespace)
+              ),
+              namespace
+            )
+          end
+          props[name] = { 'bsonType' => 'object' }.merge(properties) unless properties.empty?
+        end
+      end
+
+      # Walk the schema properties and collect the path of every encrypted
+      # leaf.
+      #
+      # @param [ Hash ] properties The properties to walk.
+      # @param [ Array<String> ] path The properties the walk is already
+      #   inside of.
+      #
+      # @return [ Array<Array<String>> ] The property paths.
+      def collect_encrypted_paths(properties, path)
+        properties.each_with_object([]) do |(name, schema), paths|
+          if schema.key?('encrypt')
+            paths << (path + [ name ])
+          elsif schema['properties']
+            paths.concat(collect_encrypted_paths(schema['properties'], path + [ name ]))
           end
         end
+      end
+
+      # Merge two schema objects covering the same model or namespace.
+      #
+      # Every model writing to one namespace contributes an entry to the
+      # schema map. Those entries have to agree on everything they have in
+      # common, or the schema would silently encrypt a field differently for
+      # one model than for another.
+      #
+      # @param [ Hash ] left The first schema.
+      # @param [ Hash ] right The second schema.
+      # @param [ String | nil ] namespace The namespace the schema belongs to.
+      #
+      # @return [ Hash ] The merged schema.
+      def merge_schema_entries(left, right, namespace = nil)
+        left.merge(right) do |key, left_value, right_value|
+          case key
+          when 'bsonType'
+            left_value
+          when 'encryptMetadata'
+            merge_encrypt_metadata(left_value, right_value, namespace)
+          when 'properties'
+            merge_properties(left_value, right_value, namespace)
+          else
+            raise_invalid_encryption_schema(namespace, key)
+          end
+        end
+      end
+
+      # Merge two encryptMetadata objects.
+      #
+      # @param [ Hash ] left The first encryptMetadata object.
+      # @param [ Hash ] right The second encryptMetadata object.
+      # @param [ String | nil ] namespace The namespace the schema belongs to.
+      #
+      # @return [ Hash ] The merged encryptMetadata object.
+      def merge_encrypt_metadata(left, right, namespace)
+        left.merge(right) do |key, left_value, right_value|
+          unless left_value == right_value
+            raise_invalid_encryption_schema(namespace, "encryptMetadata.#{key}")
+          end
+
+          left_value
+        end
+      end
+
+      # Merge two properties objects.
+      #
+      # @param [ Hash ] left The first properties object.
+      # @param [ Hash ] right The second properties object.
+      # @param [ String | nil ] namespace The namespace the schema belongs to.
+      #
+      # @return [ Hash ] The merged properties object.
+      def merge_properties(left, right, namespace)
+        left.merge(right) do |name, left_value, right_value|
+          if left_value.key?('encrypt') && right_value.key?('encrypt')
+            unless left_value['encrypt'] == right_value['encrypt']
+              raise_invalid_encryption_schema(namespace, "properties.#{name}")
+            end
+
+            left_value
+          elsif left_value.key?('encrypt') || right_value.key?('encrypt')
+            raise_invalid_encryption_schema(namespace, "properties.#{name}")
+          else
+            merge_schema_entries(left_value, right_value, namespace)
+          end
+        end
+      end
+
+      # Raise an error for a schema conflicting with another one.
+      #
+      # @param [ String | nil ] namespace The namespace the schema belongs to.
+      # @param [ String ] path The conflicting path in the schema.
+      #
+      # @raise [ Errors::InvalidEncryptionSchema ] Always raised.
+      def raise_invalid_encryption_schema(namespace, path)
+        raise Errors::InvalidEncryptionSchema.new(namespace, path)
       end
 
       # Get the BSON type identifier for the provided field according to the

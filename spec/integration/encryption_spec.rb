@@ -246,4 +246,153 @@ describe 'Encryption' do
       end
     end
   end
+
+  # The schema map has one entry per namespace, and it has to cover every model
+  # that writes there: models sharing a collection, subclasses, and subclasses
+  # of embedded models. Documents are read back through a client without
+  # automatic encryption, to see what is actually stored.
+  describe 'when more than one model writes to a namespace' do
+    let(:root_models) do
+      [ Crypt::Badge, Crypt::BadgeScan, Crypt::Member, Crypt::Listing, Crypt::Box, Crypt::Locker ]
+    end
+
+    let(:keyed_models) do
+      [ Crypt::Badge, Crypt::BadgeScan, Crypt::Member, Crypt::PrivateListing, Crypt::Box, Crypt::SecretContent ]
+    end
+
+    around do |example|
+      original_options = root_models.to_h { |model| [ model, model.storage_options ] }
+      existing_key_ids = keyed_models.to_h { |model| [ model, model.encrypt_metadata[:key_id] ] }
+      keyed_models.each { |model| model.set_key_id(data_key_id) }
+      root_models.each do |model|
+        unencrypted_client[model.collection_name.to_s].drop
+        model.store_in(client: :encrypted)
+      end
+      # The schema map is generated when the client is built, so the client has
+      # to be built after the key ids above are in place.
+      Mongoid::Clients.clear
+
+      example.run
+
+      original_options.each { |model, options| model.storage_options = options }
+      existing_key_ids.each { |model, key_id| model.set_key_id(key_id) }
+      Mongoid::Clients.clear
+    end
+
+    def stored_document(model, id)
+      unencrypted_client[model.collection_name.to_s].find(_id: id).first
+    end
+
+    def expect_ciphertext(value)
+      expect(value).to be_a(BSON::Binary).and(have_attributes(type: :ciphertext))
+    end
+
+    context 'when two models are stored in one collection' do
+      it 'stores the fields of both models encrypted', :aggregate_failures do
+        badge = Crypt::Badge.create!(serial: 'SERIAL-1')
+        scan = Crypt::BadgeScan.create!(holder: 'HOLDER-1')
+
+        expect_ciphertext(stored_document(Crypt::Badge, badge.id)['serial'])
+        expect_ciphertext(stored_document(Crypt::BadgeScan, scan.id)['holder'])
+      end
+    end
+
+    context 'when a subclass adds an encrypted field to an encrypted parent' do
+      it 'stores the fields of the parent and of the subclass encrypted', :aggregate_failures do
+        employee = Crypt::Employee.create!(ssn: 'SSN-1', salary: 'SALARY-1')
+
+        stored_document(Crypt::Member, employee.id).tap do |doc|
+          expect_ciphertext(doc['ssn'])
+          expect_ciphertext(doc['salary'])
+        end
+      end
+
+      it 'stores the fields of a sibling subclass encrypted' do
+        contractor = Crypt::Contractor.create!(ssn: 'SSN-2', rate: 'RATE-1')
+
+        expect_ciphertext(stored_document(Crypt::Member, contractor.id)['rate'])
+      end
+
+      it 'reads the fields back' do
+        employee = Crypt::Employee.create!(ssn: 'SSN-3', salary: 'SALARY-3')
+
+        expect(Crypt::Member.find(employee.id).salary).to eq('SALARY-3')
+      end
+    end
+
+    context 'when only a subclass has encrypted fields' do
+      it 'stores the fields of the subclass encrypted' do
+        listing = Crypt::PrivateListing.create!(title: 'TITLE-1', owner_ssn: 'SSN-4')
+
+        expect_ciphertext(stored_document(Crypt::Listing, listing.id)['owner_ssn'])
+      end
+    end
+
+    context 'when a subclass of an embeds_one target adds an encrypted field' do
+      it 'stores the fields of the target and of the subclass encrypted', :aggregate_failures do
+        box = Crypt::Box.create!(item: Crypt::SealedItem.new(label: 'LABEL-1', seal: 'SEAL-1'))
+
+        stored_document(Crypt::Box, box.id)['item'].tap do |item|
+          expect_ciphertext(item['label'])
+          expect_ciphertext(item['seal'])
+        end
+      end
+    end
+
+    context 'when only a subclass of an embeds_one target has encrypted fields' do
+      it 'stores the fields of the subclass encrypted' do
+        locker = Crypt::Locker.create!(content: Crypt::SecretContent.new(label: 'LABEL-2', code: 'CODE-1'))
+
+        expect_ciphertext(stored_document(Crypt::Locker, locker.id)['content']['code'])
+      end
+    end
+
+    # An entry for the namespace exists, but it does not cover every encrypted
+    # field of the model. The driver encrypts what the entry lists and writes
+    # the rest in plaintext.
+    context 'when the schema entry for the namespace misses an encrypted field' do
+      let(:config) do
+        super().merge(
+          partial: {
+            hosts: SpecConfig.instance.addresses,
+            database: database_id,
+            options: {
+              auto_encryption_options: {
+                key_vault_client: :key_vault,
+                kms_providers: kms_providers,
+                key_vault_namespace: key_vault_namespace,
+                extra_options: extra_options,
+                schema_map: partial_schema_map
+              }
+            }
+          }
+        )
+      end
+
+      let(:partial_schema_map) do
+        {
+          "#{database_id}.#{Crypt::Member.collection_name}" => {
+            'bsonType' => 'object',
+            'encryptMetadata' => {
+              'keyId' => [ BSON::Binary.new(Base64.decode64(data_key_id), :uuid) ],
+              'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+            },
+            'properties' => {
+              'ssn' => { 'encrypt' => { 'bsonType' => 'string' } }
+            }
+          }
+        }
+      end
+
+      it 'does not store the field in plaintext', :aggregate_failures do
+        expect do
+          Crypt::Employee.with(client: :partial) { |klass| klass.create!(ssn: 'SSN-5', salary: 'PARTIAL-1') }
+        end.to raise_error(Mongoid::Errors::NoEncryptionSchema)
+
+        expect(
+          unencrypted_client[Crypt::Member.collection_name.to_s].find(salary: 'PARTIAL-1').to_a
+        ).to be_empty
+      end
+    end
+  end
 end

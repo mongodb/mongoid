@@ -15,11 +15,13 @@ module Mongoid
       # @param [ Class ] klass The model class.
       # @param [ String ] namespace The namespace the model resolved to.
       # @param [ String | Symbol ] client The name of the client in use.
-      def initialize(klass, namespace, client)
+      # @param [ String | nil ] field The encrypted field missing from the
+      #   schema entry, if the namespace itself is covered.
+      def initialize(klass, namespace, client, field = nil)
         super(
           compose_message(
-            'no_encryption_schema',
-            { klass: klass, namespace: namespace, client: client }
+            field ? 'no_encryption_schema_field' : 'no_encryption_schema',
+            { klass: klass, namespace: namespace, client: client, field: field }
           )
         )
       end
