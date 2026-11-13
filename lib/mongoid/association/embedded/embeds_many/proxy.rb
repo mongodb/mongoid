@@ -423,6 +423,73 @@ module Mongoid
             doc._id || doc.object_id
           end
 
+          # Replace the old path prefix in pending update keys.
+          #
+          # @api private
+          # @param [ Document ] document The document with delayed updates.
+          # @param [ String ] previous_path The original atomic path.
+          # @param [ String ] current_path The updated atomic path.
+          def remap_atomic_update_paths(document, previous_path, current_path)
+            return if previous_path == current_path
+
+            prefix = /\A#{Regexp.escape(previous_path)}(?=\.|\z)/
+            [ document.delayed_atomic_sets, document.delayed_atomic_unsets ].each do |updates|
+              remapped = updates.each_with_object({}) do |(path, value), result|
+                result[path.sub(prefix, current_path)] = value
+              end
+              updates.replace(remapped)
+            end
+          end
+
+          # Walk loaded embedded descendants without memoizing child collections.
+          #
+          # @api private
+          # @param [ Document ] document The root document to traverse.
+          # @return [ Array<Document> ] The document and its descendants.
+          def atomic_path_documents(document)
+            documents = []
+            pending = [ document ]
+            seen = {}.compare_by_identity
+
+            until pending.empty?
+              descendant = pending.pop
+              next if seen.key?(descendant)
+
+              seen[descendant] = true
+              documents << descendant
+              pending.concat(loaded_atomic_path_children(descendant))
+              descendant.delayed_atomic_unsets.each_value { |documents| pending.concat(documents) }
+            end
+
+            documents
+          end
+
+          # Return embedded children already loaded on this document.
+          #
+          # @api private
+          # @param [ Document ] document The document whose children to collect.
+          # @return [ Array<Document> ] The loaded embedded children.
+          def loaded_atomic_path_children(document)
+            document.embedded_relations.each_with_object([]) do |(name, _association), children|
+              relation = document.ivar(name)
+              next if relation == false
+
+              children.concat(Array.wrap(relation)) if relation
+            end
+          end
+
+          # Clear cached atomic paths after document positions change.
+          #
+          # @api private
+          # @param [ Array<Document> ] documents The affected documents.
+          def reset_atomic_path_caches(documents)
+            documents.each do |document|
+              next unless document.atomic_paths_cached?
+
+              document.reset_atomic_paths
+            end
+          end
+
           # Optimized version of #append that handles multiple documents
           # in a more efficient way.
           #
@@ -549,7 +616,24 @@ module Mongoid
           #   person.addresses.reindex
           def reindex
             _unscoped.each_with_index do |doc, index|
+              next if doc._index == index
+
+              unless doc.atomic_paths_cached? || doc.delayed_atomic_sets.any? || doc.delayed_atomic_unsets.any?
+                doc._index = index
+                next
+              end
+
+              descendants = atomic_path_documents(doc)
+              previous_paths = descendants.each_with_object({}) do |descendant, paths|
+                next if descendant.delayed_atomic_sets.empty? && descendant.delayed_atomic_unsets.empty?
+
+                paths[descendant] = descendant.atomic_position
+              end
               doc._index = index
+              reset_atomic_path_caches(descendants)
+              previous_paths.each do |descendant, previous_path|
+                remap_atomic_update_paths(descendant, previous_path, descendant.atomic_position)
+              end
             end
           end
 
