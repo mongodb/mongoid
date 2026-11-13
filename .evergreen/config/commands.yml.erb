@@ -39,6 +39,8 @@ functions:
           MONGODB_BINARIES: "$MONGODB_BINARIES"
           UPLOAD_BUCKET: "$UPLOAD_BUCKET"
           PROJECT_DIRECTORY: "$PROJECT_DIRECTORY"
+          MONGODB_LATEST_BINARIES: ""
+          MONGODB_LATEST_CRYPT_SHARED: ""
           PREPARE_SHELL: |
             set -o errexit
             set -o xtrace
@@ -73,6 +75,37 @@ functions:
       params:
         file: src/expansion.yml
 
+  "download latest mongodb":
+    # Only the non-PR test-latest task uses this function. Prepare the pinned
+    # tools without credentials, then download with the AWS role.
+    - command: shell.exec
+      params:
+        working_dir: "src"
+        env:
+          DRIVERS_TOOLS: ${DRIVERS_TOOLS}
+          IS_PATCH: ${is_patch}
+        script: |
+          set -eu
+          if [ "$IS_PATCH" = "true" ]; then
+            echo "Refusing to assume the private S3 role for a patch build." >&2
+            exit 1
+          fi
+          bash "$DRIVERS_TOOLS/.evergreen/orchestration/setup.sh"
+    - command: ec2.assume_role
+      params:
+        role_arn: ${aws_test_secrets_role}
+    - command: shell.exec
+      params:
+        working_dir: "src"
+        include_expansions_in_env: [AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN]
+        env:
+          DRIVERS_TOOLS: ${DRIVERS_TOOLS}
+        script: |
+          ./.evergreen/download-latest-mongodb.sh
+    - command: expansions.update
+      params:
+        file: src/latest-mongodb-expansion.yml
+
   bootstrap-mongo-orchestration:
       - command: shell.exec
         params:
@@ -80,6 +113,15 @@ functions:
           script: |
             set -x
             ${PREPARE_SHELL}
+
+            if [ "${MONGODB_VERSION}" = "latest" ]; then
+              if [ -z "${MONGODB_LATEST_BINARIES}" ]; then
+                echo "MONGODB_LATEST_BINARIES is not set; refusing to download latest without credentials." >&2
+                exit 1
+              fi
+              export EXISTING_BINARIES_DIR="${MONGODB_LATEST_BINARIES}"
+              export SKIP_CRYPT_SHARED=1
+            fi
 
             MONGODB_VERSION=${MONGODB_VERSION} \
             TOPOLOGY=${TOPOLOGY} \
@@ -360,6 +402,25 @@ tasks:
     - name: "test"
       commands:
         - func: bootstrap-mongo-orchestration
+        - func: "run tests"
+    - name: "test-latest"
+      # Private S3 latest; not part of the PR matrix.
+      commands:
+        - func: "download latest mongodb"
+        - func: bootstrap-mongo-orchestration
+        - command: shell.exec
+          params:
+            working_dir: "src"
+            env:
+              DRIVERS_TOOLS: ${DRIVERS_TOOLS}
+              CRYPT_SHARED: ${MONGODB_LATEST_CRYPT_SHARED}
+            script: |
+              set -eu
+              cp "$CRYPT_SHARED" "$DRIVERS_TOOLS/mongo_crypt_v1.so"
+              echo "CRYPT_SHARED_LIB_PATH: \"$DRIVERS_TOOLS/mongo_crypt_v1.so\"" > latest-crypt-expansion.yml
+        - command: expansions.update
+          params:
+            file: src/latest-crypt-expansion.yml
         - func: "run tests"
     - name: "test-full-atlas-task"
       commands:
