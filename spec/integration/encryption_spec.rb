@@ -34,23 +34,33 @@ describe 'Encryption' do
     Mongoid.default_client[Crypt::Patient.collection_name].drop
     Mongoid.default_client[Crypt::Car.collection_name].drop
     Mongoid.default_client[Crypt::Folder.collection_name].drop
+    Mongoid.default_client[Crypt::Dossier.collection_name].drop
+    Mongoid.default_client[Crypt::Archive.collection_name].drop
     existing_key_id = Crypt::Patient.encrypt_metadata[:key_id]
     Crypt::Patient.set_key_id(data_key_id)
     Crypt::Car.set_key_id(data_key_id)
     Crypt::Note.set_key_id(data_key_id)
+    Crypt::Dossier.set_key_id(data_key_id)
+    Crypt::Archive.set_key_id(data_key_id)
     Mongoid::Config.send(:clients=, config)
     Mongoid::Clients.with_name(:key_vault)[key_vault_collection].drop
     Crypt::Patient.store_in(client: :encrypted)
     Crypt::Car.store_in(client: :encrypted, database: Crypt::Car.storage_options[:database])
     Crypt::Folder.store_in(client: :encrypted)
+    Crypt::Dossier.store_in(client: :encrypted)
+    Crypt::Archive.store_in(client: :encrypted)
 
     example.run
 
     Crypt::Patient.reset_storage_options!
     Crypt::Folder.reset_storage_options!
+    Crypt::Dossier.reset_storage_options!
+    Crypt::Archive.reset_storage_options!
     Crypt::Patient.set_key_id(existing_key_id)
     Crypt::Car.set_key_id(existing_key_id)
     Crypt::Note.set_key_id(existing_key_id)
+    Crypt::Dossier.set_key_id(existing_key_id)
+    Crypt::Archive.set_key_id(existing_key_id)
   end
 
   it 'encrypts and decrypts fields' do
@@ -99,6 +109,27 @@ describe 'Encryption' do
       expect(doc['note']['text']).to be_a(BSON::Binary)
       expect(doc['note']['text'].type).to eq(:ciphertext)
     end
+  end
+
+  # The document is persisted under the store_as key, not the association
+  # name, so the schema has to be keyed by it or the field is stored in the
+  # clear.
+  it 'stores an embedded field encrypted when the association uses store_as' do
+    dossier = Crypt::Dossier.create!(secret: Crypt::DossierSecret.new(token: 'SECRET'))
+    unencrypted_client[Crypt::Dossier.collection.name].find(_id: dossier.id).first.tap do |doc|
+      expect(doc['s']['token']).to be_a(BSON::Binary)
+      expect(doc['s']['token'].type).to eq(:ciphertext)
+    end
+    expect(Crypt::Dossier.find(dossier.id).secret.token).to eq('SECRET')
+  end
+
+  it 'stores a nested embedded field encrypted when the associations use store_as' do
+    archive = Crypt::Archive.create!(entry: Crypt::ArchiveEntry.new(payload: Crypt::ArchivePayload.new(token: 'SECRET')))
+    unencrypted_client[Crypt::Archive.collection.name].find(_id: archive.id).first.tap do |doc|
+      expect(doc['e']['p']['token']).to be_a(BSON::Binary)
+      expect(doc['e']['p']['token'].type).to eq(:ciphertext)
+    end
+    expect(Crypt::Archive.find(archive.id).entry.payload.token).to eq('SECRET')
   end
 
   it 'stores data encrypted in the non-default database' do

@@ -445,6 +445,75 @@ describe Mongoid::Config::Encryption do
         end
       end
 
+      # The document is persisted under the store_as key, so that is the key
+      # libmongocrypt has to find. Keyed by the association name, the fields
+      # would be written in plaintext.
+      context 'when the association uses store_as' do
+        let(:token_properties) do
+          {
+            'bsonType' => 'object',
+            'properties' => {
+              'token' => {
+                'encrypt' => {
+                  'bsonType' => 'string',
+                  'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+                }
+              }
+            }
+          }
+        end
+
+        let(:models) do
+          [ Crypt::Dossier, Crypt::DossierSecret ]
+        end
+
+        let(:properties) do
+          encryption_schema_map.dig('mongoid_test.crypt_dossiers', 'properties')
+        end
+
+        it 'keys the nested schema by the stored name' do
+          expect(properties.keys).to eq([ 's' ])
+          expect(properties['s']).to eq(token_properties)
+        end
+
+        it 'reports the stored name as the encrypted path' do
+          expect(Mongoid.config.encrypted_paths_for(Crypt::Dossier)).to eq([ %w[s token] ])
+        end
+      end
+
+      context 'when a nested association uses store_as' do
+        let(:token_properties) do
+          {
+            'bsonType' => 'object',
+            'properties' => {
+              'token' => {
+                'encrypt' => {
+                  'bsonType' => 'string',
+                  'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+                }
+              }
+            }
+          }
+        end
+
+        let(:models) do
+          [ Crypt::Archive, Crypt::ArchiveEntry, Crypt::ArchivePayload ]
+        end
+
+        it 'keys every level by its stored name' do
+          expect(encryption_schema_map.dig('mongoid_test.crypt_archives', 'properties')).to eq(
+            'e' => {
+              'bsonType' => 'object',
+              'properties' => { 'p' => token_properties }
+            }
+          )
+        end
+
+        it 'reports the stored names as the encrypted path' do
+          expect(Mongoid.config.encrypted_paths_for(Crypt::Archive)).to eq([ %w[e p token] ])
+        end
+      end
+
       # The walk has to keep stopping at a model it is already inside of,
       # otherwise a self-embedding model recurses forever.
       context 'when a model embeds itself' do

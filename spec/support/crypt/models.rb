@@ -147,6 +147,48 @@ module Crypt
     embedded_in :account, class_name: 'Crypt::Account'
   end
 
+  # Embedded associations persisted under a store_as key that differs from
+  # the association name. The schema has to be keyed by the stored name.
+  class Dossier
+    include Mongoid::Document
+
+    encrypt_with key_id: 'grolrnFVSSW9Gq04Q87R9Q=='
+
+    embeds_one :secret, class_name: 'Crypt::DossierSecret', store_as: :s
+  end
+
+  class DossierSecret
+    include Mongoid::Document
+
+    field :token, type: String, encrypt: { deterministic: true }
+
+    embedded_in :dossier, class_name: 'Crypt::Dossier'
+  end
+
+  # The same, one level down: both associations use store_as.
+  class Archive
+    include Mongoid::Document
+
+    encrypt_with key_id: 'grolrnFVSSW9Gq04Q87R9Q=='
+
+    embeds_one :entry, class_name: 'Crypt::ArchiveEntry', store_as: :e
+  end
+
+  class ArchiveEntry
+    include Mongoid::Document
+
+    embedded_in :archive, class_name: 'Crypt::Archive'
+    embeds_one :payload, class_name: 'Crypt::ArchivePayload', store_as: :p
+  end
+
+  class ArchivePayload
+    include Mongoid::Document
+
+    field :token, type: String, encrypt: { deterministic: true }
+
+    embedded_in :entry, class_name: 'Crypt::ArchiveEntry'
+  end
+
   # A model that embeds itself. The walk over embedded relations has to stop
   # here, or generating the map never terminates.
   class Comment

@@ -181,7 +181,7 @@ module Mongoid
       #
       # @return [ Hash ] The encryption properties.
       def properties_for_relations(model, path, namespace = nil)
-        model.relations.each_with_object({}) do |(name, relation), props|
+        model.relations.each_with_object({}) do |(_name, relation), props|
           # relation_class constantizes, and a polymorphic embedded_in has no
           # class to resolve, so the relation type has to be checked first.
           next unless relation.is_a?(Association::Embedded::EmbedsOne)
@@ -210,7 +210,9 @@ module Mongoid
               namespace
             )
           end
-          props[name] = { 'bsonType' => 'object' }.merge(properties) unless properties.empty?
+          # The document is persisted under the store_as key, not under the
+          # name of the association, so that is the key the schema needs.
+          props[relation.store_as] = { 'bsonType' => 'object' }.merge(properties) unless properties.empty?
         end
       end
 
