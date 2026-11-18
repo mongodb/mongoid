@@ -41,6 +41,21 @@ module Mongoid
     # @api private
     PRELOADED_PREFIX = '__mongoid_eager_loaded_'
 
+    # The documents a $lookup preloaded for an association. The wrapper tells
+    # the builders that these documents come from eager loading, so that a key
+    # that happens to be an array of hashes is not built into documents.
+    #
+    # @api private
+    class PreloadedDocuments
+      # @return [ Array<Hash> ] The documents the $lookup returned.
+      attr_reader :documents
+
+      # @param [ Array<Hash> ] documents The documents the $lookup returned.
+      def initialize(documents)
+        @documents = documents || []
+      end
+    end
+
     # Map the macros to their corresponding Association classes.
     #
     # @return [ Hash ] The mapping from macros to their Association class.

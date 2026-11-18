@@ -374,6 +374,14 @@ describe Mongoid::Factory do
       end
     end
 
+    context 'when type resolves to a class that is not a Mongoid model' do
+      it 'raises an unknown model error' do
+        expect do
+          described_class.from_db(Person, { '_type' => 'String' })
+        end.to raise_error(Mongoid::Errors::UnknownModel)
+      end
+    end
+
     context 'when type does not correspond to a Class name with custom discriminator key' do
       before do
         Person.discriminator_key = 'dkey'

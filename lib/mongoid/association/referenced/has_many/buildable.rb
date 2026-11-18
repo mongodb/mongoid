@@ -19,14 +19,11 @@ module Mongoid
           #
           # @return [ Document ] A single document.
           def build(base, object, _type = nil, selected_fields = nil)
-            return object || [] unless query?(object)
-
-            # Handle array of hashes from $lookup aggregation
-            if object.is_a?(Array) && object.all? { |o| o.is_a?(Hash) }
-              return object.map do |attrs|
-                Factory.execute_from_db(klass, attrs, nil, selected_fields, execute_callbacks: false)
-              end
+            if object.is_a?(PreloadedDocuments)
+              return build_preloaded(object.documents, selected_fields)
             end
+
+            return object || [] unless query?(object)
 
             return [] if object.is_a?(Array)
 
@@ -34,6 +31,19 @@ module Mongoid
           end
 
           private
+
+          # Builds the documents a $lookup preloaded for this association.
+          #
+          # @param [ Array<Hash> ] documents The preloaded documents.
+          # @param [ Hash | nil ] selected_fields Fields which were retrieved via #only.
+          #
+          # @return [ Array<Document> ] The built documents.
+          def build_preloaded(documents, selected_fields)
+            documents.map do |attrs|
+              Factory.execute_from_db(klass, attrs, nil, selected_fields,
+                                      execute_callbacks: false)
+            end
+          end
 
           def query?(object)
             object && Array(object).all? { |d| !d.is_a?(Mongoid::Document) }

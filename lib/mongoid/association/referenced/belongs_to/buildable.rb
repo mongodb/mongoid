@@ -19,28 +19,32 @@ module Mongoid
           #
           # @return [ Document ] A single document.
           def build(_base, object, type = nil, selected_fields = nil)
+            if object.is_a?(PreloadedDocuments)
+              return build_preloaded(object.documents, selected_fields)
+            end
+
             return object unless query?(object)
-
-            # Handle array from $lookup aggregation (returns array even for belongs_to)
-            if object.is_a?(Array)
-              first = object.first
-              case first
-              when nil, Mongoid::Document then return first
-              when Hash then return Factory.execute_from_db(klass, first, nil, selected_fields,
-                                                            execute_callbacks: false)
-              else raise ArgumentError, 'Cannot build belongs_to association from array'
-              end
-            end
-
-            # Handle single hash from $lookup with $unwind
-            if object.is_a?(Hash)
-              return Factory.execute_from_db(klass, object, nil, selected_fields, execute_callbacks: false)
-            end
 
             execute_query(object, type)
           end
 
           private
+
+          # Builds the document from the documents a $lookup preloaded for this
+          # association. The lookup returns an array, even for belongs_to, and
+          # may be unwound to a single document.
+          #
+          # @param [ Array<Hash> | Hash | nil ] documents The preloaded documents.
+          # @param [ Hash | nil ] selected_fields Fields which were retrieved via #only.
+          #
+          # @return [ Document | nil ] The built document.
+          def build_preloaded(documents, selected_fields)
+            document = documents.is_a?(Array) ? documents.first : documents
+            return document if document.nil? || document.is_a?(Mongoid::Document)
+
+            Factory.execute_from_db(klass, document, nil, selected_fields,
+                                    execute_callbacks: false)
+          end
 
           def execute_query(object, type)
             query_criteria(object, type).take

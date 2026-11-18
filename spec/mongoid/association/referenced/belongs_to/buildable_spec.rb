@@ -122,18 +122,47 @@ describe Mongoid::Association::Referenced::BelongsTo::Buildable do
       end
     end
 
-    context 'when provided an array of hashes' do
+    context 'when provided preloaded documents' do
       let(:object) do
-        [
-          { '_id' => BSON::ObjectId.new, 'username' => 'user1' },
-          { '_id' => BSON::ObjectId.new, 'username' => 'user2' }
-        ]
+        Mongoid::Association::PreloadedDocuments.new(
+          [
+            { '_id' => BSON::ObjectId.new, 'username' => 'user1' },
+            { '_id' => BSON::ObjectId.new, 'username' => 'user2' }
+          ]
+        )
       end
 
-      it 'queries and returns the document' do
+      it 'returns the preloaded document' do
         first_doc = document
         expect(first_doc).to be_a(Person)
         expect(first_doc.username).to eq('user1')
+      end
+    end
+
+    context 'when the foreign key is supplied as attributes' do
+      it 'does not build a document from a hash-valued foreign key' do
+        game = Game.new(person_id: { '_id' => BSON::ObjectId.new, '_type' => 'Canvas' })
+
+        expect(game.person).to be_nil
+      end
+
+      it 'does not build a document from an array-valued foreign key' do
+        game = Game.new(person_id: [ { '_id' => BSON::ObjectId.new, '_type' => 'Canvas' } ])
+
+        expect(game.person).to be_nil
+      end
+
+      it 'does not build a document from a stored hash-valued foreign key' do
+        game = Game.new(person_id: { '_id' => BSON::ObjectId.new, '_type' => 'Canvas' })
+        game.save!(validate: false)
+
+        expect(Game.find(game.id).person).to be_nil
+      end
+
+      it 'does not treat an array of ids as a lookup result' do
+        game = Game.new(person_id: [ BSON::ObjectId.new ])
+
+        expect { game.person }.not_to raise_error
       end
     end
 

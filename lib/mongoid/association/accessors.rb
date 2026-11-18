@@ -92,6 +92,9 @@ module Mongoid
       # it returns, including those of a sibling subclass that has no such
       # association.
       #
+      # The documents are wrapped in PreloadedDocuments so that the builders
+      # know where they came from.
+      #
       # @param [ Hash ] preloaded The preloaded documents by the field they
       #   travelled in.
       #
@@ -100,7 +103,7 @@ module Mongoid
         preloaded.each do |field, documents|
           name = field.delete_prefix(PRELOADED_PREFIX)
           association = relations[name]
-          __build__(name, documents, association) if association
+          __build__(name, PreloadedDocuments.new(documents), association) if association
         end
       end
 

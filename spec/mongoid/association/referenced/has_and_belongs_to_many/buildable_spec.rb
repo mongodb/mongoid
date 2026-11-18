@@ -86,7 +86,32 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Buildable do
       end
     end
 
-    context 'when provided an array of hashes' do
+    context 'when provided preloaded documents' do
+      let(:attributes) do
+        [
+          { '_id' => BSON::ObjectId.new, 'name' => 'Emails' },
+          { '_id' => BSON::ObjectId.new, 'name' => 'SMS' }
+        ]
+      end
+
+      let(:object) do
+        Mongoid::Association::PreloadedDocuments.new(attributes)
+      end
+
+      let(:preference1) do
+        Preference.new(attributes[0])
+      end
+
+      let(:preference2) do
+        Preference.new(attributes[1])
+      end
+
+      it 'returns the preloaded documents' do
+        expect(documents).to eq([ preference1, preference2 ])
+      end
+    end
+
+    context 'when the foreign key is an array of hashes' do
       let(:object) do
         [
           { '_id' => BSON::ObjectId.new, 'name' => 'Emails' },
@@ -94,16 +119,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Buildable do
         ]
       end
 
-      let(:preference1) do
-        Preference.new(object[0])
-      end
+      it 'does not instantiate the key as preloaded documents' do
+        allow(association).to receive(:query_criteria).and_return(Preference.none)
+        expect(Mongoid::Factory).not_to receive(:execute_from_db)
 
-      let(:preference2) do
-        Preference.new(object[1])
-      end
-
-      it 'returns the documents' do
-        expect(documents).to eq([ preference1, preference2 ])
+        documents
       end
     end
 
