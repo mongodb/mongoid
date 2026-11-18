@@ -75,14 +75,29 @@ describe Mongoid::Association::Referenced::HasOne::Buildable do
       end
     end
 
-    context 'when provided an array of hashes' do
+    context 'when provided preloaded documents' do
       let(:object) do
-        [ { '_id' => BSON::ObjectId.new, 'name' => 'Savings', 'balance' => 500 } ]
+        Mongoid::Association::PreloadedDocuments.new(
+          [ { '_id' => BSON::ObjectId.new, 'name' => 'Savings', 'balance' => 500 } ]
+        )
       end
 
-      it 'returns the document' do
+      it 'returns the preloaded document' do
         expect(document.name).to eq('Savings')
         expect(document.balance).to eq(500)
+      end
+    end
+
+    context 'when the key is an array of hashes' do
+      let(:object) do
+        [ { '_id' => BSON::ObjectId.new, 'name' => 'Savings' } ]
+      end
+
+      it 'does not instantiate the key as a preloaded document' do
+        allow(association).to receive(:execute_query).and_return(nil)
+        expect(Mongoid::Factory).not_to receive(:execute_from_db)
+
+        document
       end
     end
 

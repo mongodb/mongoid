@@ -102,7 +102,25 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
       end
     end
 
-    context 'when provided an array of hashes' do
+    context 'when provided preloaded documents' do
+      let(:object) do
+        Mongoid::Association::PreloadedDocuments.new(
+          [
+            { '_id' => BSON::ObjectId.new, 'title' => 'Post 1' },
+            { '_id' => BSON::ObjectId.new, 'title' => 'Post 2' }
+          ]
+        )
+      end
+
+      it 'returns the preloaded documents' do
+        for doc in documents
+          expect(doc).to be_a(Post)
+        end
+        expect(documents.map(&:title)).to eq([ 'Post 1', 'Post 2' ])
+      end
+    end
+
+    context 'when the key is an array of hashes' do
       let(:object) do
         [
           { '_id' => BSON::ObjectId.new, 'title' => 'Post 1' },
@@ -110,11 +128,11 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
         ]
       end
 
-      it 'queries and returns the documents' do
-        for doc in documents
-          expect(doc).to be_a(Post)
-        end
-        expect(documents.map(&:title)).to eq([ 'Post 1', 'Post 2' ])
+      it 'does not instantiate the key as preloaded documents' do
+        allow(association).to receive(:query_criteria).and_return(Post.none)
+        expect(Mongoid::Factory).not_to receive(:execute_from_db)
+
+        documents
       end
     end
 

@@ -109,7 +109,7 @@ module Mongoid
           constantized = klass.get_discriminator_mapping(type) || constantize(type)
 
           # Check if the class is a Document class
-          raise Errors::UnknownModel.new(camelized, type) unless constantized.respond_to?(:instantiate)
+          raise Errors::UnknownModel.new(type.camelize, type) unless constantized.respond_to?(:instantiate)
 
           constantized
         end

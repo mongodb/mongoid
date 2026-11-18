@@ -19,18 +19,15 @@ module Mongoid
           #
           # @return [ Array<Document> ] The documents.
           def build(_base, object, _type = nil, selected_fields = nil)
+            if object.is_a?(PreloadedDocuments)
+              return build_preloaded(object.documents, selected_fields)
+            end
+
             if query?(object)
               if object.is_a?(Array) && object.empty?
                 # An empty stored key array is not $lookup output. Build a none
                 # criteria so reset, empty?, and size do not query the database.
                 return query_criteria(nil)
-              end
-
-              # Handle array of hashes from $lookup aggregation
-              if object.is_a?(Array) && object.all? { |o| o.is_a?(Hash) }
-                return object.map do |attrs|
-                  Factory.execute_from_db(klass, attrs, nil, selected_fields, execute_callbacks: false)
-                end
               end
 
               query_criteria(object)
@@ -40,6 +37,23 @@ module Mongoid
           end
 
           private
+
+          # Builds the documents a $lookup preloaded for this association. An
+          # empty result builds a none criteria, like an empty key does, so that
+          # reset, empty?, and size do not query the database.
+          #
+          # @param [ Array<Hash> ] documents The preloaded documents.
+          # @param [ Hash | nil ] selected_fields Fields which were retrieved via #only.
+          #
+          # @return [ Array<Document> | Mongoid::Criteria ] The documents.
+          def build_preloaded(documents, selected_fields)
+            return query_criteria(nil) if documents.empty?
+
+            documents.map do |attrs|
+              Factory.execute_from_db(klass, attrs, nil, selected_fields,
+                                      execute_callbacks: false)
+            end
+          end
 
           def query?(object)
             object.nil? || Array(object).all? { |d| !d.is_a?(Mongoid::Document) }

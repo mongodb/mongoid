@@ -21,13 +21,11 @@ module Mongoid
           #
           # @return [ Document ] A single document.
           def build(base, object, _type = nil, selected_fields = nil)
-            if query?(object)
-              # Handle array of hashes from $lookup aggregation
-              if object.is_a?(Array) && object.all? { |o| o.is_a?(Hash) }
-                doc = object.first
-                return doc ? Factory.execute_from_db(klass, doc, nil, selected_fields, execute_callbacks: false) : nil
-              end
+            if object.is_a?(PreloadedDocuments)
+              return build_preloaded(object.documents, selected_fields)
+            end
 
+            if query?(object)
               execute_query(object, base) unless base.new_record?
             else
               clear_associated(object)
@@ -36,6 +34,22 @@ module Mongoid
           end
 
           private
+
+          # Builds the document from the documents a $lookup preloaded for this
+          # association. A has_one lookup returns an array with at most one
+          # document.
+          #
+          # @param [ Array<Hash> ] documents The preloaded documents.
+          # @param [ Hash | nil ] selected_fields Fields which were retrieved via #only.
+          #
+          # @return [ Document | nil ] The built document.
+          def build_preloaded(documents, selected_fields)
+            document = documents.first
+            return unless document
+
+            Factory.execute_from_db(klass, document, nil, selected_fields,
+                                    execute_callbacks: false)
+          end
 
           def clear_associated(object)
             unless inverse
