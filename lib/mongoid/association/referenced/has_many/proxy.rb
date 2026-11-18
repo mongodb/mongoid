@@ -537,8 +537,10 @@ module Mongoid
           #
           # @return [ Integer ] The number of documents deleted.
           def remove_all(conditions = nil, method = :delete_all)
-            selector = conditions || {}
-            selector.merge!(criteria.selector)
+            # Conjoin the conditions with the association selector so that a
+            # key present in both is intersected rather than overwritten. This
+            # also leaves the caller's Hash alone.
+            selector = criteria.where(conditions || {}).selector
 
             # Scanning before the delete means scanning only what is already in
             # memory, so it is only done where there is a pattern whose cost has
