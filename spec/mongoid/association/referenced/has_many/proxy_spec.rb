@@ -3537,4 +3537,85 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
   end
+
+  # Conditions that share a key with the association selector must be
+  # intersected with it, whatever kind of key the caller used.
+  key_variants = {
+    'String' => :stringify_keys,
+    'Symbol' => :symbolize_keys,
+    'indifferent access' => :with_indifferent_access
+  }.freeze
+
+  %i[ delete_all destroy_all ].each do |method|
+    describe "##{method} with conditions on a key the association selector uses" do
+      let(:account) { DeleteAllAccount.create! }
+      let(:other) { DeleteAllAccount.create! }
+
+      key_variants.each do |label, converter|
+        context "when the keys are #{label}" do
+          shared_examples 'an intersected bulk delete' do
+            let(:reloaded) { DeleteAllAccount.find(account.id) }
+            let(:proxy) { reloaded.send(association) }
+            let(:conditions) { raw_conditions.send(converter) }
+            let!(:expected) { DeleteAllAccount.find(account.id).send(association).where(raw_conditions).pluck(:_id) }
+            let!(:everything) { klass.pluck(:_id) }
+
+            it 'deletes the same documents as the where chain' do
+              expect(proxy.send(method, conditions)).to eq(expected.size)
+              expect(klass.pluck(:_id)).to match_array(everything - expected)
+            end
+
+            it 'does not modify the conditions' do
+              original = conditions.deep_dup
+              proxy.send(method, conditions)
+              expect(conditions).to eq(original)
+            end
+          end
+
+          context 'with an association scope' do
+            let(:klass) { DeleteAllItem }
+            let(:association) { :items }
+            let(:raw_conditions) { { state: 'draft' } }
+
+            before do
+              2.times { DeleteAllItem.create!(account: account, state: 'open') }
+              DeleteAllItem.create!(account: account, state: 'draft')
+              DeleteAllItem.create!(account: other, state: 'draft')
+              DeleteAllItem.create!(account: account, state: 'closed')
+            end
+
+            it_behaves_like 'an intersected bulk delete'
+          end
+
+          context 'with a child default scope' do
+            let(:klass) { DeleteAllScopedItem }
+            let(:association) { :scoped_items }
+            let(:raw_conditions) { { state: 'draft' } }
+
+            before do
+              2.times { DeleteAllScopedItem.create!(account: account, state: 'open') }
+              DeleteAllScopedItem.create!(account: account, state: 'draft')
+              DeleteAllScopedItem.create!(account: other, state: 'draft')
+              DeleteAllScopedItem.collection.insert_one(account_id: account.id, state: 'closed')
+            end
+
+            it_behaves_like 'an intersected bulk delete'
+          end
+
+          context 'with a condition on the foreign key' do
+            let(:klass) { DeleteAllItem }
+            let(:association) { :items }
+            let(:raw_conditions) { { account_id: other.id } }
+
+            before do
+              2.times { DeleteAllItem.create!(account: account, state: 'open') }
+              DeleteAllItem.create!(account: other, state: 'open')
+            end
+
+            it_behaves_like 'an intersected bulk delete'
+          end
+        end
+      end
+    end
+  end
 end

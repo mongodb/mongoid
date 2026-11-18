@@ -3590,4 +3590,52 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       expect(contract.signature_ids).to eq([ signature.id ])
     end
   end
+
+  # Conditions that share a key with the association selector must be
+  # intersected with it, whatever kind of key the caller used.
+  key_variants = {
+    'String' => :stringify_keys,
+    'Symbol' => :symbolize_keys,
+    'indifferent access' => :with_indifferent_access
+  }.freeze
+
+  %i[ delete_all destroy_all ].each do |method|
+    describe "##{method} with conditions on a key the association selector uses" do
+      key_variants.each do |label, converter|
+        context "when the keys are #{label}" do
+          let(:draft) { DeleteAllTag.create!(state: 'draft') }
+          let(:outside) { DeleteAllTag.create!(state: 'draft') }
+          let(:account) { DeleteAllAccount.create!(tags: [ draft, DeleteAllTag.create!(state: 'open') ]) }
+          let(:proxy) { DeleteAllAccount.find(account.id).tags }
+
+          before { outside }
+
+          context 'with a condition on the primary key' do
+            let(:conditions) { { _id: outside.id }.send(converter) }
+
+            it 'deletes nothing outside the association' do
+              expect(proxy.send(method, conditions)).to eq(0)
+              expect(DeleteAllTag.count).to eq(3)
+            end
+
+            it 'does not modify the conditions' do
+              original = conditions.deep_dup
+              proxy.send(method, conditions)
+              expect(conditions).to eq(original)
+            end
+          end
+
+          context 'with a condition on the primary key inside the association' do
+            let(:conditions) { { _id: draft.id }.send(converter) }
+
+            it 'deletes only the matching document' do
+              expect(proxy.send(method, conditions)).to eq(1)
+              expect(DeleteAllTag.pluck(:_id)).not_to include(draft.id)
+              expect(DeleteAllTag.count).to eq(2)
+            end
+          end
+        end
+      end
+    end
+  end
 end
