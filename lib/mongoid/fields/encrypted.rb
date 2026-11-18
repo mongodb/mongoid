@@ -2,8 +2,8 @@
 
 module Mongoid
   module Fields
-    # Represents a field that should be encrypted.
-    class Encrypted < Standard
+    # Behavior shared by the field types whose value is encrypted.
+    module EncryptionOptions
       def initialize(name, options = {})
         @encryption_options = if options[:encrypt].is_a?(Hash)
                                 options[:encrypt]
@@ -11,6 +11,11 @@ module Mongoid
                                 {}
                               end
         super
+      end
+
+      # @return [ true ] Always true: this field is encrypted.
+      def encrypted?
+        true
       end
 
       # @return [ true | false | nil ] Whether the field should be encrypted using a
@@ -26,7 +31,8 @@ module Mongoid
       end
 
       # @return [ String | nil ] The name of the field that contains the
-      #   key alt name to use for encryption; if not specified, nil is returned.
+      #   key alt name to use for encryption; if not specified, nil is
+      #   returned.
       def key_name_field
         @encryption_options[:key_name_field]
       end
@@ -42,6 +48,11 @@ module Mongoid
       def set_key_id(key_id)
         @encryption_options[:key_id] = key_id
       end
+    end
+
+    # Represents a field that should be encrypted.
+    class Encrypted < Standard
+      include EncryptionOptions
     end
   end
 end

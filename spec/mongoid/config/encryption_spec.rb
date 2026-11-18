@@ -160,6 +160,164 @@ describe Mongoid::Config::Encryption do
       end
     end
 
+    # A belongs_to association generates an Object field for its foreign key.
+    # When the field was declared with a type of its own, that declared type
+    # has to reach the schema: it is what libmongocrypt checks the value
+    # against before encrypting it.
+    context 'when an encrypted field is a belongs_to foreign key' do
+      let(:defined_models) { [] }
+
+      let(:encryption_options) { { deterministic: true } }
+
+      let(:models) do
+        owner = Class.new do
+          include Mongoid::Document
+
+          store_in collection: 'crypt_encrypted_foreign_key_owners'
+        end
+        defined_models << owner
+        stub_const('Crypt::EncryptedForeignKeyOwner', owner)
+
+        reference = Class.new do
+          include Mongoid::Document
+
+          store_in collection: 'crypt_encrypted_foreign_key_references'
+        end
+        defined_models << reference
+        stub_const('Crypt::EncryptedForeignKeyReference', reference)
+        reference.field(:owner_id, type: BSON::ObjectId, encrypt: encryption_options)
+        reference.belongs_to(:owner, class_name: 'Crypt::EncryptedForeignKeyOwner', inverse_of: nil)
+
+        [ reference ]
+      end
+
+      after do
+        defined_models.each { |model| Mongoid.deregister_model(model) }
+      end
+
+      it 'uses the declared type of the foreign key' do
+        expect(encryption_schema_map['mongoid_test.crypt_encrypted_foreign_key_references']).to eq(
+          'bsonType' => 'object',
+          'properties' => {
+            'owner_id' => {
+              'encrypt' => {
+                'bsonType' => 'objectId',
+                'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+              }
+            }
+          }
+        )
+      end
+
+      context 'when the field specifies a key alt name' do
+        let(:encryption_options) { { deterministic: false, key_name_field: :owner_key_name } }
+
+        it 'keeps the key alt name of the field' do
+          expect(
+            encryption_schema_map.dig(
+              'mongoid_test.crypt_encrypted_foreign_key_references',
+              'properties', 'owner_id', 'encrypt'
+            )
+          ).to eq(
+            'keyId' => '/owner_key_name',
+            'bsonType' => 'objectId',
+            'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Random'
+          )
+        end
+      end
+    end
+
+    # A parent and its subclass write to one collection. When each declares the
+    # belongs_to foreign key with its own encryption options, the declaration of
+    # the subclass must not be replaced by the association declared on the
+    # parent: the schema merge reports the disagreement instead.
+    context 'when a belongs_to foreign key is encrypted differently on a parent and a subclass' do
+      let(:defined_models) { [] }
+
+      let(:parent_key_id) { 'grolrnFVSSW9Gq04Q87R9Q==' }
+
+      let(:child_key_id) { 'S34mE/HhSFSym3yErpER6Q==' }
+
+      let(:parent_options) { { deterministic: true, key_id: parent_key_id } }
+
+      let(:child_options) { { deterministic: false, key_id: child_key_id } }
+
+      let(:parent) do
+        klass = Class.new do
+          include Mongoid::Document
+
+          store_in collection: 'crypt_inherited_foreign_keys'
+        end
+        defined_models << klass
+        stub_const('Crypt::SchemaInheritedParent', klass)
+        klass
+      end
+
+      let(:child) do
+        parent
+        klass = Class.new(parent)
+        defined_models << klass
+        stub_const('Crypt::SchemaInheritedChild', klass)
+        klass
+      end
+
+      let(:models) do
+        [ parent, child ]
+      end
+
+      before do
+        parent.field(:owner_id, type: BSON::ObjectId, encrypt: parent_options)
+        child.field(:owner_id, type: BSON::ObjectId, encrypt: child_options)
+        parent.belongs_to(:owner, class_name: 'Person', inverse_of: nil)
+      end
+
+      after do
+        defined_models.each { |model| Mongoid.deregister_model(model) }
+      end
+
+      it 'keeps the options of each field' do
+        parent_field = parent.fields['owner_id']
+        child_field = child.fields['owner_id']
+
+        expect(parent_field).to be_a(Mongoid::Fields::EncryptedForeignKey)
+        expect(parent_field.type).to eq(BSON::ObjectId)
+        expect(parent_field.deterministic?).to be true
+        expect(parent_field.key_id).to eq(parent_key_id)
+
+        expect(child_field).to be_a(Mongoid::Fields::EncryptedForeignKey)
+        expect(child_field.type).to eq(BSON::ObjectId)
+        expect(child_field.deterministic?).to be false
+        expect(child_field.key_id).to eq(child_key_id)
+      end
+
+      it 'raises for the shared collection' do
+        expect { encryption_schema_map }.to raise_error(Mongoid::Errors::InvalidEncryptionSchema)
+      end
+
+      context 'when both fields use the same encryption options' do
+        let(:child_options) { parent_options }
+
+        it 'keeps the shared options on both fields' do
+          expect(parent.fields['owner_id'].deterministic?).to be true
+          expect(parent.fields['owner_id'].key_id).to eq(parent_key_id)
+          expect(child.fields['owner_id'].deterministic?).to be true
+          expect(child.fields['owner_id'].key_id).to eq(parent_key_id)
+        end
+
+        it 'builds the schema for the shared collection' do
+          expect(
+            encryption_schema_map.dig('mongoid_test.crypt_inherited_foreign_keys', 'properties', 'owner_id')
+          ).to eq(
+            'encrypt' => {
+              'bsonType' => 'objectId',
+              'algorithm' => 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+              'keyId' => [ BSON::Binary.new(Base64.decode64(parent_key_id), :uuid) ]
+            }
+          )
+        end
+      end
+    end
+
     # A field left out of the schema map is written in plaintext, with no
     # exception and nothing logged, so an omission here is silent data
     # exposure rather than a broken feature.

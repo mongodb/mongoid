@@ -34,6 +34,7 @@ module Mongoid
           validate_field_name(klass, name)
           validate_name_uniqueness(klass, name, options)
           validate_options(klass, name, options)
+          validate_encrypted_association(klass, name, options)
         end
 
         # Validate the association definition.
@@ -107,6 +108,34 @@ module Mongoid
             end
 
             Mongoid::Warnings.warn_symbol_type_deprecated if option == :type && options[option] == Symbol
+          end
+        end
+
+        # Determine if an encrypted field is the foreign key of a
+        # has_and_belongs_to_many association. Defining the field after the
+        # association has to be rejected, and so does defining it on a parent
+        # of the class that declares the association: the field is propagated
+        # to the descendants and would replace their association key.
+        #
+        # @api private
+        #
+        # @param [ Class ] klass The model class.
+        # @param [ Symbol | String ] name The field name.
+        # @param [ Hash ] options The provided options.
+        #
+        # @raise [ Errors::InvalidEncryptedAssociation ] If the field is the
+        #   foreign key of a has_and_belongs_to_many association.
+        def validate_encrypted_association(klass, name, options)
+          return unless options[:encrypt]
+
+          ([ klass ] + klass.descendants).each do |candidate|
+            field = candidate.fields[name.to_s]
+            next unless field&.foreign_key?
+
+            association = field.association
+            next unless association.is_a?(Association::Referenced::HasAndBelongsToMany)
+
+            raise Errors::InvalidEncryptedAssociation.new(candidate, association.name, name)
           end
         end
       end

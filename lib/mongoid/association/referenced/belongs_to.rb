@@ -233,14 +233,22 @@ module Mongoid
         end
 
         def create_foreign_key_field!
-          @owner_class.field(
-            foreign_key,
+          options = {
             type: FOREIGN_KEY_FIELD_TYPE,
             identity: true,
             overwrite: true,
             association: self,
             default: nil
-          )
+          }
+          # The association must not replace an encrypted field with a plain
+          # foreign key: the key would then be stored in the clear. Keep the
+          # declared type as well, so the encryption schema describes it
+          # correctly.
+          if (existing = @owner_class.fields[foreign_key])&.encrypted?
+            options[:type] = existing.type
+            options[:encrypt] = existing.options[:encrypt]
+          end
+          @owner_class.field(foreign_key, options)
         end
       end
     end

@@ -239,6 +239,19 @@ en:
             Mongoid does not support."
           resolution: "Valid field operators are: %{valid_operators}.
             Ensure you are using one of these operators."
+        invalid_encrypted_association:
+          message: "The %{association} association of %{klass} uses the encrypted
+            field %{field} as its foreign key."
+          summary: "Client-side field level encryption can encrypt an array
+            only as a whole, using the random algorithm; the deterministic
+            algorithm does not support arrays at all. A
+            has_and_belongs_to_many association stores its foreign key in an
+            array and queries and atomically updates individual elements of
+            it, which encryption does not support. Mongoid raises this error
+            when the association or the field is defined, whichever comes
+            first, rather than defining a key the association cannot manage."
+          resolution: "Remove the encryption from %{field}, or store a single
+            encrypted value with a belongs_to association instead."
         invalid_encryption_schema:
           message: "The encryption schema for %{namespace} is invalid."
           summary: "Two models writing to %{namespace} describe %{path}

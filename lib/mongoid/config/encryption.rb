@@ -152,7 +152,7 @@ module Mongoid
       # @return [ Hash ] The encryption properties.
       def properties_for_fields(model)
         model.fields.each_with_object({}) do |(name, field), props|
-          next unless field.is_a?(Mongoid::Fields::Encrypted)
+          next unless field.encrypted?
 
           props[name] = {
             'encrypt' => {

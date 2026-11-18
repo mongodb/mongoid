@@ -238,6 +238,18 @@ module Mongoid
         end
 
         def create_foreign_key_field!
+          # An encrypted array field cannot be used as the foreign key:
+          # encryption protects the array only as a whole, while this
+          # association queries and atomically updates its elements. Reject
+          # the association rather than replace the field and store the key in
+          # plaintext. The field may already be declared on a parent, whose
+          # declaration is propagated to the descendants.
+          ([ @owner_class ] + @owner_class.descendants).each do |candidate|
+            next unless candidate.fields[foreign_key]&.encrypted?
+
+            raise Errors::InvalidEncryptedAssociation.new(candidate, name, foreign_key)
+          end
+
           inverse_class.aliased_associations[foreign_key] = name.to_s
           @owner_class.field(
             foreign_key,
