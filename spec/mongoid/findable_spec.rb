@@ -855,6 +855,20 @@ describe Mongoid::Findable do
         expect(criteria.size).to eq(0)
       end
     end
+
+    context 'when none is called on a criteria with a cached context' do
+      let(:criteria) do
+        Band.where(name: 'Depeche Mode')
+      end
+
+      it 'does not use the cached context' do
+        expect(criteria.count).to eq(1)
+
+        criteria.none
+
+        expect(criteria.count).to eq(0)
+      end
+    end
   end
 
   describe '.pluck' do

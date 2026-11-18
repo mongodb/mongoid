@@ -26,6 +26,31 @@ module Mongoid
         other.is_a?(None)
       end
 
+      # Delete all documents in the database that match the selector. There
+      # are no documents in the null context, so nothing is deleted.
+      #
+      # @example Delete all the documents.
+      #   context.delete
+      #
+      # @return [ Integer ] Always zero.
+      def delete
+        0
+      end
+      alias delete_all delete
+
+      # Destroy all documents in the database that match the selector. There
+      # are no documents in the null context, so nothing is destroyed and no
+      # callbacks are run.
+      #
+      # @example Destroy all the documents.
+      #   context.destroy
+      #
+      # @return [ Integer ] Always zero.
+      def destroy
+        0
+      end
+      alias destroy_all destroy
+
       # Get the distinct field values in null context.
       #
       # @example Get the distinct values in null context.
@@ -109,6 +134,32 @@ module Mongoid
       # @return [ Hash ] An empty Hash.
       def tally(_field)
         {}
+      end
+
+      # Update the first matching document atomically. There are no documents
+      # in the null context, so nothing is updated.
+      #
+      # @example Update the matching document.
+      #   context.update(name: "Smiths")
+      #
+      # @param [ Hash ] attributes The new attributes for the document.
+      #
+      # @return [ nil | false ] False if no attributes were provided.
+      def update(attributes = nil, _opts = {})
+        attributes ? nil : false
+      end
+
+      # Update all the matching documents atomically. There are no documents
+      # in the null context, so nothing is updated.
+      #
+      # @example Update all the matching documents.
+      #   context.update_all(name: "Smiths")
+      #
+      # @param [ Hash ] attributes The new attributes for each document.
+      #
+      # @return [ nil | false ] False if no attributes were provided.
+      def update_all(attributes = nil, _opts = {})
+        attributes ? nil : false
       end
 
       # Create the new null context.

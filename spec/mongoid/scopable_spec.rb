@@ -149,6 +149,90 @@ describe Mongoid::Scopable do
       end
     end
 
+    context 'when the default scope is none' do
+      before do
+        Band.create!(name: 'Depeche Mode', active: true)
+        Band.default_scope -> { Band.none }
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      it 'does not return any documents' do
+        expect(Band.count).to eq(0)
+        expect(Band.all.to_a).to be_empty
+        expect(Band.where(name: 'Depeche Mode').first).to be_nil
+      end
+
+      it 'does not update documents' do
+        Band.update_all(active: false)
+        expect(Band.unscoped.first.active).to be(true)
+      end
+
+      it 'does not delete documents' do
+        expect(Band.delete_all).to eq(0)
+        expect(Band.unscoped.count).to eq(1)
+      end
+
+      it 'removes the none from the default scope when unscoping' do
+        crit = Band.all
+        expect(crit.count).to eq(0)
+        expect(crit.unscoped.count).to eq(1)
+        expect(Band.all.merge(Band.all).unscoped.count).to eq(1)
+      end
+
+      it 'keeps an explicit none when unscoping' do
+        expect(Band.none.unscoped.count).to eq(0)
+        expect(Band.all.none.unscoped.count).to eq(0)
+        expect(Band.all.merge(Band.none).unscoped.count).to eq(0)
+      end
+    end
+
+    context 'when the default scope is conditionally none' do
+      before do
+        Band.create!(name: 'Depeche Mode', active: true)
+        Band.default_scope -> { allow_all ? Band.where(active: true) : Band.none }
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      context 'when the condition restricts the scope' do
+        let(:allow_all) { false }
+
+        it 'does not return any documents' do
+          expect(Band.count).to eq(0)
+        end
+      end
+
+      context 'when the condition allows all documents' do
+        let(:allow_all) { true }
+
+        it 'returns the documents' do
+          expect(Band.count).to eq(1)
+        end
+      end
+    end
+
+    context 'when multiple default scopes are combined with none last' do
+      before do
+        Band.create!(name: 'Depeche Mode', active: true)
+        Band.default_scope -> { Band.where(active: true) }
+        Band.default_scope -> { Band.none }
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      it 'does not return any documents' do
+        expect(Band.count).to eq(0)
+        expect(Band.all.to_a).to be_empty
+      end
+    end
+
     context 'when parent class has default scope' do
       let(:selector) do
         AudibleSound.all.selector
@@ -870,6 +954,24 @@ describe Mongoid::Scopable do
 
       it 'uses subclass context for all the other used scopes' do
         expect(Circle.visible.selector).to eq('radius' => 5)
+      end
+    end
+
+    context 'when the scope name matches an internal criteria helper' do
+      before do
+        Band.scope(:none_state, -> { where(active: true) })
+        Band.scope(:clear_default_scope_none, -> { where(origin: 'England') })
+      end
+
+      after do
+        remove_scope(Band, :none_state)
+        remove_scope(Band, :clear_default_scope_none)
+      end
+
+      it 'applies both scopes when chained on a criteria' do
+        selector = Band.where(name: 'Depeche Mode').none_state.clear_default_scope_none.selector
+
+        expect(selector).to eq('name' => 'Depeche Mode', 'active' => true, 'origin' => 'England')
       end
     end
   end
