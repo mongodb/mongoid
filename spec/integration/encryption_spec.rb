@@ -394,4 +394,242 @@ describe 'Encryption' do
       end
     end
   end
+
+  describe 'an encrypted belongs_to foreign key' do
+    let(:foreign_key_models) { [] }
+
+    let(:owner_class) do
+      klass = stub_const('Crypt::ForeignKeyOwner', Class.new)
+      klass.include(Mongoid::Document)
+      foreign_key_models << klass
+      klass
+    end
+
+    let(:reference_class) do
+      owner_class
+      klass = stub_const('Crypt::ForeignKeyReference', Class.new)
+      klass.include(Mongoid::Document)
+      foreign_key_models << klass
+      klass.encrypt_with(key_id: data_key_id) if deterministic
+      klass.store_in(client: :encrypted)
+      association_options = { class_name: 'Crypt::ForeignKeyOwner', inverse_of: nil }
+      association_options[:foreign_key] = foreign_key if foreign_key != :owner_id
+      encryption_options = { deterministic: deterministic }
+      encryption_options[:key_id] = data_key_id unless deterministic
+
+      klass.field(foreign_key, type: BSON::ObjectId, encrypt: encryption_options)
+      klass.belongs_to(:owner, association_options)
+
+      # The schema map is built when the client is constructed.
+      Mongoid::Clients.clear
+      klass
+    end
+
+    after do
+      foreign_key_models.each { |model| Mongoid.deregister_model(model) }
+      Mongoid::Clients.clear
+    end
+
+    foreign_keys = %i[owner_id secret_owner_id]
+    [ true, false ].each do |deterministic|
+      foreign_keys.each do |foreign_key|
+        key_type = (foreign_key == :owner_id) ? 'default' : 'custom'
+        context "with #{deterministic ? 'deterministic' : 'random'} encryption and the " \
+                "#{key_type} foreign key" do
+          let(:deterministic) { deterministic }
+          let(:foreign_key) { foreign_key }
+
+          it 'encrypts the key and preserves association behavior', :aggregate_failures do
+            owner = owner_class.create!
+            other_owner = owner_class.create!
+            reference = reference_class.create!(owner: owner)
+            same_owner = reference_class.create!(owner: owner)
+            collection = unencrypted_client[reference_class.collection_name.to_s]
+
+            stored = collection.find(_id: reference.id).first
+            expect(stored[foreign_key.to_s]).to be_a(BSON::Binary).and(have_attributes(type: :ciphertext))
+            other_ciphertext = collection.find(_id: same_owner.id).first[foreign_key.to_s]
+            if deterministic
+              expect(stored[foreign_key.to_s]).to eq(other_ciphertext)
+            else
+              expect(stored[foreign_key.to_s]).not_to eq(other_ciphertext)
+            end
+
+            reference.reload
+            expect(reference.public_send(foreign_key)).to eq(owner.id)
+            expect(reference.owner.id).to eq(owner.id)
+
+            # Assigning the foreign key must also invalidate the cached association.
+            reference.public_send("#{foreign_key}=", other_owner.id)
+            expect(reference.owner.id).to eq(other_owner.id)
+            reference.save!
+
+            stored = collection.find(_id: reference.id).first
+            expect(stored[foreign_key.to_s]).to be_a(BSON::Binary).and(have_attributes(type: :ciphertext))
+            expect(reference.reload.owner.id).to eq(other_owner.id)
+          end
+        end
+      end
+    end
+  end
+
+  # A belongs_to declared on a parent generates the foreign key on the whole
+  # hierarchy. An encrypted declaration of that key on a subclass must survive
+  # the propagation, or the subclass silently loses its encryption.
+  describe 'an encrypted belongs_to foreign key declared on a subclass' do
+    let(:models) { [] }
+
+    let(:owner_class) do
+      klass = stub_const('Crypt::InheritedForeignKeyOwner', Class.new)
+      klass.include(Mongoid::Document)
+      models << klass
+      klass
+    end
+
+    let(:parent_class) do
+      klass = stub_const('Crypt::InheritedForeignKeyParent', Class.new)
+      klass.include(Mongoid::Document)
+      models << klass
+      klass
+    end
+
+    let(:child_class) do
+      parent_class
+      klass = stub_const('Crypt::InheritedForeignKeyChild', Class.new(parent_class))
+      models << klass
+      klass.store_in(client: :encrypted)
+      klass.encrypt_with(key_id: data_key_id) if model_key
+      klass.field(foreign_key, type: BSON::ObjectId, encrypt: encryption_options)
+      klass.belongs_to(:owner, association_options) if child_association
+      klass
+    end
+
+    let(:association_options) do
+      { class_name: 'Crypt::InheritedForeignKeyOwner', inverse_of: nil }.tap do |options|
+        options[:foreign_key] = foreign_key if foreign_key != :owner_id
+      end
+    end
+
+    let(:encryption_options) do
+      { deterministic: deterministic }.tap do |options|
+        options[:key_id] = data_key_id unless model_key
+      end
+    end
+
+    let(:algorithm) do
+      if deterministic
+        'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+      else
+        'AEAD_AES_256_CBC_HMAC_SHA_512-Random'
+      end
+    end
+
+    before do
+      child_class
+      parent_class.belongs_to(:owner, association_options)
+      # The schema map is built when the client is constructed.
+      Mongoid::Clients.clear
+    end
+
+    after do
+      models.each { |model| Mongoid.deregister_model(model) }
+      Mongoid::Clients.clear
+    end
+
+    shared_examples 'an encrypted inherited foreign key' do
+      it 'keeps the encryption on the subclass and supports the association', :aggregate_failures do
+        field = child_class.fields[foreign_key.to_s]
+        expect(field).to be_a(Mongoid::Fields::EncryptedForeignKey)
+        expect(field).to be_foreign_key
+        expect(field.type).to eq(BSON::ObjectId)
+        expect(field.options[:encrypt]).to eq(encryption_options)
+        expect(field.deterministic?).to eq(deterministic)
+        if model_key
+          expect(field.key_id).to be_nil
+        else
+          expect(field.key_id).to eq(data_key_id)
+        end
+        expect(child_class.encrypted?).to be true
+        expect(parent_class.encrypted?).to be false
+
+        # The classes share a collection, and only the subclass contributes an
+        # entry to the schema map for it.
+        expect(child_class.collection_name).to eq(parent_class.collection_name)
+        schema = Mongoid.config.encryption_schema_map(
+          database_id, [ parent_class, child_class ]
+        ).fetch("#{database_id}.#{child_class.collection_name}")
+        encryption = schema.dig('properties', foreign_key.to_s, 'encrypt')
+        expect(encryption['bsonType']).to eq('objectId')
+        expect(encryption['algorithm']).to eq(algorithm)
+        if model_key
+          expect(encryption).not_to have_key('keyId')
+          expect(schema.dig('encryptMetadata', 'keyId')).to be_a(Array)
+        else
+          expect(encryption['keyId']).to be_a(Array)
+        end
+
+        owner = owner_class.create!
+        other_owner = owner_class.create!
+        child = child_class.create!(owner: owner)
+        same_owner = child_class.create!(owner: owner)
+        collection = unencrypted_client[child_class.collection_name.to_s]
+
+        stored = collection.find(_id: child.id).first
+        expect(stored[foreign_key.to_s]).to be_a(BSON::Binary).and(have_attributes(type: :ciphertext))
+        other_ciphertext = collection.find(_id: same_owner.id).first[foreign_key.to_s]
+        if deterministic
+          expect(stored[foreign_key.to_s]).to eq(other_ciphertext)
+        else
+          expect(stored[foreign_key.to_s]).not_to eq(other_ciphertext)
+        end
+
+        child.reload
+        expect(child.public_send(foreign_key)).to eq(owner.id)
+        expect(child.owner.id).to eq(owner.id)
+
+        child.public_send("#{foreign_key}=", other_owner.id)
+        expect(child.owner.id).to eq(other_owner.id)
+      end
+    end
+
+    context 'when only the subclass declares the field' do
+      let(:child_association) { false }
+
+      context 'with deterministic encryption and the default foreign key' do
+        let(:deterministic) { true }
+        let(:model_key) { false }
+        let(:foreign_key) { :owner_id }
+
+        it_behaves_like 'an encrypted inherited foreign key'
+      end
+
+      context 'with random encryption, a custom foreign key and a model-level key' do
+        let(:deterministic) { false }
+        let(:model_key) { true }
+        let(:foreign_key) { :secret_owner_id }
+
+        it_behaves_like 'an encrypted inherited foreign key'
+      end
+    end
+
+    context 'when the subclass also declares the association' do
+      let(:child_association) { true }
+
+      context 'with deterministic encryption, a custom foreign key and a model-level key' do
+        let(:deterministic) { true }
+        let(:model_key) { true }
+        let(:foreign_key) { :secret_owner_id }
+
+        it_behaves_like 'an encrypted inherited foreign key'
+      end
+
+      context 'with random encryption and the default foreign key' do
+        let(:deterministic) { false }
+        let(:model_key) { false }
+        let(:foreign_key) { :owner_id }
+
+        it_behaves_like 'an encrypted inherited foreign key'
+      end
+    end
+  end
 end

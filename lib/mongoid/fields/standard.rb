@@ -56,6 +56,16 @@ module Mongoid
         false
       end
 
+      # Is this field encrypted?
+      #
+      # @example Is the field encrypted?
+      #   field.encrypted?
+      #
+      # @return [ true | false ] If the field is encrypted.
+      def encrypted?
+        false
+      end
+
       # Create the new field with a name and optional additional options.
       #
       # @example Create the new field.

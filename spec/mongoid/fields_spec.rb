@@ -1208,6 +1208,35 @@ describe Mongoid::Fields do
       end
     end
 
+    context 'when a subclass declares an encrypted field and the parent declares it as a plain field' do
+      let(:parent) do
+        klass = stub_const('PlainFieldParent', Class.new)
+        klass.include(Mongoid::Document)
+        klass
+      end
+
+      let(:child) do
+        parent
+        klass = stub_const('PlainFieldChild', Class.new(parent))
+        klass.field(:secret, type: String, encrypt: { deterministic: true })
+        klass
+      end
+
+      after do
+        Mongoid.deregister_model(child)
+        Mongoid.deregister_model(parent)
+      end
+
+      it 'replaces the encrypted field on the subclass' do
+        child
+
+        parent.field(:secret, type: String)
+
+        expect(parent.fields['secret']).not_to be_encrypted
+        expect(child.fields['secret']).not_to be_encrypted
+      end
+    end
+
     context 'custom options' do
       let(:handler) do
         proc {}

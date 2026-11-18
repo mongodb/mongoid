@@ -33,7 +33,7 @@ module Mongoid
       #
       # @return [ true | false ] Whether the model is encrypted.
       def encrypted?
-        !encrypt_metadata.empty? || fields.any? { |_, field| field.is_a?(Mongoid::Fields::Encrypted) }
+        !encrypt_metadata.empty? || fields.any? { |_, field| field.encrypted? }
       end
 
       # Whether an encryption schema has to be generated for this model.

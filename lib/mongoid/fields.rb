@@ -586,7 +586,7 @@ module Mongoid
         Validators::Macro.validate(self, name, options)
         added = add_field(named, options)
         descendants.each do |subclass|
-          subclass.add_field(named, options)
+          subclass.add_field(named, descendant_field_options(subclass, named, options))
         end
         added
       end
@@ -679,6 +679,41 @@ module Mongoid
         create_dirty_methods(name, name)
         create_dirty_methods(name, aliased) if aliased
         field
+      end
+
+      # Build the options to apply to a descendant when a belongs_to
+      # association declared on an ancestor generates its foreign key. A
+      # descendant may declare the field as encrypted before the association
+      # is declared on the parent. The encryption options and the declared
+      # type belong to the descendant and must survive the propagation, as
+      # must the foreign key behavior.
+      #
+      # When the descendant's encryption options differ from the ancestor's,
+      # the difference is preserved: the schema generation reports it instead
+      # of one declaration silently overriding the other.
+      #
+      # A field declared without an association is not covered: the ancestor's
+      # declaration keeps replacing the descendant's field as before.
+      #
+      # @api private
+      #
+      # @param [ Class ] subclass The descendant the field is propagated to.
+      # @param [ String ] name The field name.
+      # @param [ Hash ] options The options of the ancestor's declaration.
+      #
+      # @return [ Hash ] The options to apply to the descendant.
+      def descendant_field_options(subclass, name, options)
+        return options unless options[:identity]
+        return options unless options[:association].is_a?(Association::Referenced::BelongsTo)
+
+        existing = subclass.fields[name]
+        return options unless existing&.encrypted?
+
+        preserved = options.merge(type: existing.type, encrypt: existing.options[:encrypt])
+        if existing.foreign_key? && existing.association
+          preserved[:association] = existing.association
+        end
+        preserved
       end
 
       # Run through all custom options stored in Mongoid::Fields.options and
@@ -901,7 +936,12 @@ module Mongoid
         opts = options.merge(klass: self)
         opts[:type] = retrieve_and_validate_type(name, options[:type])
         return Fields::Localized.new(name, opts) if options[:localize]
-        return Fields::ForeignKey.new(name, opts) if options[:identity]
+
+        if options[:identity]
+          return Fields::EncryptedForeignKey.new(name, opts) if options[:encrypt]
+
+          return Fields::ForeignKey.new(name, opts)
+        end
         return Fields::Encrypted.new(name, opts) if options[:encrypt]
 
         Fields::Standard.new(name, opts)
