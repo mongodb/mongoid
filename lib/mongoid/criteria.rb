@@ -371,6 +371,20 @@ module Mongoid
       self.inclusions = (inclusions + other.inclusions).uniq
       self._raw_results = _raw_results || other._raw_results
       @use_lookup ||= other.use_lookup?
+      if other.empty_and_chainable?
+        # An explicit none wins over a none that only came from a default
+        # scope. Association proxies forward is_a? to their target, so the
+        # runtime class is checked instead; anything that is not a criteria is
+        # treated as an explicit none.
+        explicit = if Criteria === other # rubocop:disable Style/CaseEquality
+                     other.send(:none_state) == true
+                   else
+                     true
+                   end
+        @none = true if @none == true || explicit
+        @none ||= :default
+        @context = nil
+      end
       self
     end
 
@@ -382,7 +396,9 @@ module Mongoid
     #
     # @return [ Criteria ] The none criteria.
     def none
-      @none = true and self
+      @none = true
+      @context = nil
+      self
     end
 
     # Is the criteria an empty but chainable criteria?
@@ -562,6 +578,34 @@ module Mongoid
     Mongoid.deprecate(self, :for_js)
 
     private
+
+    # The kind of none on this criteria, if any. An explicit none is +true+,
+    # a none coming only from the default scope is +:default+, and a criteria
+    # that is not none returns +nil+.
+    #
+    # @api private
+    #
+    # @example Get the none state.
+    #   criteria.send(:none_state)
+    #
+    # @return [ true | :default | nil ] The none state.
+    def none_state
+      @none
+    end
+
+    # Removes the none flag if it was set only by the default scope. An
+    # explicitly requested none is never removed.
+    #
+    # @api private
+    #
+    # @example Clear a default scope none.
+    #   criteria.send(:clear_default_scope_none)
+    #
+    # @return [ Criteria ] The criteria.
+    def clear_default_scope_none
+      @none = nil if @none == :default
+      self
+    end
 
     # Are documents in the query missing, and are we configured to raise an
     # error?

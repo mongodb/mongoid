@@ -279,6 +279,8 @@ describe 'Readonly dotted attributes' do
   end
 
   context 'with a separate field whose name contains a dot' do
+    min_server_version '5.0'
+
     let(:document) { model_class.create!(settings: { 'theme' => 'light' }) }
 
     context 'when the dotted field is readonly' do
