@@ -46,7 +46,7 @@ jobs:
     steps:
       - name: "Run the check action"
         id: check
-        uses: mongodb-labs/drivers-github-tools/ruby/pr-check@v3
+        uses: mongodb-labs/drivers-github-tools/ruby/pr-check@93fbe45aa64cf4d57ea3198423eb0e46e8cd402d # v3
 
   build:
     name: "Build Gems"
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Run the build action"
-        uses: mongodb-labs/drivers-github-tools/ruby/build@v3
+        uses: mongodb-labs/drivers-github-tools/ruby/build@93fbe45aa64cf4d57ea3198423eb0e46e8cd402d # v3
         with:
           app_id: ${{ vars.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
@@ -71,7 +71,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: "Run the publish action"
-        uses: mongodb-labs/drivers-github-tools/ruby/publish@v3
+        uses: mongodb-labs/drivers-github-tools/ruby/publish@93fbe45aa64cf4d57ea3198423eb0e46e8cd402d # v3
         with:
           app_id: ${{ vars.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
