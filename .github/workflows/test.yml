@@ -30,13 +30,13 @@ jobs:
 
     steps:
     - name: repo checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
       with:
         submodules: recursive
 
     # the default python 3.8 doesn't cut it, and causes mongo-orchestration
     # to fail in mongodb-labs/drivers-evergreen-tools.
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
       with:
         python-version: '3.13'
 
@@ -47,7 +47,7 @@ jobs:
         version: "${{matrix.mongodb}}"
         topology: "${{matrix.topology}}"
     - name: load ruby
-      uses: ruby/setup-ruby@v1
+      uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1
       env:
         FLE: "${{matrix.fle}}"
         BUNDLE_GEMFILE: "${{env.BUNDLE_GEMFILE}}"
