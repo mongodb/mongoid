@@ -60,6 +60,20 @@ module HabtmSpec
 end
 
 describe 'has_and_belongs_to_many associations' do
+  context 'when the stored foreign-key array is empty' do
+    it 'can reset and enumerate the association proxy' do
+      item = HabtmSpec::Item.create!(color_ids: [])
+      colors = item.reload.colors
+
+      expect_query(0) do
+        colors.reset
+        expect(colors.empty?).to be true
+        expect(colors.size).to be 0
+        expect(colors.to_a).to eq []
+      end
+    end
+  end
+
   context 'when an anonymous class defines a has_and_belongs_to_many association' do
     let(:klass) do
       Class.new do
@@ -90,8 +104,23 @@ describe 'has_and_belongs_to_many associations' do
                         })
     end
 
-    it 'does not raise on save' do
-      expect { image_block.save! }.not_to raise_error
+    # The nested attributes are processed before the attachment_ids
+    # assignment is applied, so at that point the id is not yet in the
+    # association and resolving it requires a collection-wide lookup.
+    context 'when allow_reparenting_via_nested_attributes is false' do
+      config_override :allow_reparenting_via_nested_attributes, false
+
+      it 'raises a document not found error' do
+        expect { image_block.save! }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+    end
+
+    context 'when allow_reparenting_via_nested_attributes is true' do
+      config_override :allow_reparenting_via_nested_attributes, true
+
+      it 'does not raise on save' do
+        expect { image_block.save! }.not_to raise_error
+      end
     end
   end
 

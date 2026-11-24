@@ -67,7 +67,7 @@ module Mongoid
             'from' => association.klass.collection.name,
             'localField' => local_field,
             'foreignField' => foreign_field,
-            'as' => association.name.to_s,
+            'as' => association.preloaded_field,
             'pipeline' => sub_pipeline
           } }
         end

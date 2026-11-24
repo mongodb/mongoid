@@ -90,6 +90,8 @@ module Mongoid
         return nil unless opts[:auto_encryption_options]
 
         opts[:auto_encryption_options].dup.tap do |auto_encryption_options|
+          Mongoid::Warnings.warn_bypass_auto_encryption if auto_encryption_options[:bypass_auto_encryption]
+
           if auto_encryption_options.key?(:schema_map)
             default_logger.warn(
               'The :schema_map is configured in the :auto_encryption_options for the client;' +

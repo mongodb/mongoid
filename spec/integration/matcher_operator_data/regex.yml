@@ -135,6 +135,27 @@
       $regex: bar
   matches: false
 
+# Object#=~ is gone as of Ruby 3.2, so an element that cannot be matched
+# against has to be skipped rather than passed to =~.
+- name: array field value - element that cannot be matched against
+  document:
+    title:
+      - 42
+      - foo
+  query:
+    title:
+      $regex: foo
+  matches: true
+
+- name: array field value - no element can be matched against
+  document:
+    title:
+      - 42
+  query:
+    title:
+      $regex: foo
+  matches: false
+
 - name: true field value
   document:
     title: true

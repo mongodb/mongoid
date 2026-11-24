@@ -125,6 +125,8 @@ module Mongoid
 
         client = client.with(options) unless options.empty?
 
+        verify_encryption_schema!(client)
+
         client
       end
     end
@@ -197,6 +199,81 @@ module Mongoid
       return nil unless name
 
       name.respond_to?(:call) ? name.call.to_sym : name.to_sym
+    end
+
+    # Refuse to use a client that would store a model's encrypted fields in
+    # plaintext.
+    #
+    # The automatic encryption schema is keyed by namespace and is built once,
+    # when the client is created. The driver looks the target namespace up in
+    # that schema, and when it is absent it asks the server for a schema
+    # instead; a collection without a validator then yields no encryption at
+    # all, and no error. Checking the namespace here is what turns that silent
+    # downgrade into a failure. When the namespace is present, its entry is
+    # checked against the fields the model declares as encrypted too: a
+    # hand-written schema can cover the namespace and still leave out a field.
+    #
+    # @param [ Mongo::Client ] client The client this context resolved to.
+    #
+    # @raise [ Errors::NoEncryptionSchema ] if the model needs an encryption
+    #   schema and the client's schema does not cover the target namespace, or
+    #   the namespace entry does not cover every encrypted field of the model.
+    def verify_encryption_schema!(client)
+      klass = @object.is_a?(Class) ? @object : @object.class
+      # A model whose encrypted fields all live on embedded models declares no
+      # encryption of its own, and still needs a schema for its collection.
+      return unless klass.respond_to?(:requires_encryption_schema?) && klass.requires_encryption_schema?
+      # An embedded document is persisted as part of its parent, so the
+      # parent's context is what governs the namespace.
+      return if klass.embedded?
+      # Collection and index management sends no document data, so it does not
+      # need an encryption-capable client.
+      return if Threaded.managing_collection?
+
+      schema_map = client.options.dig(:auto_encryption_options, :schema_map)
+      namespace = "#{client.database.name}.#{collection_name}"
+      entry = schema_map && schema_map[namespace]
+      raise Errors::NoEncryptionSchema.new(klass, namespace, client_name) unless entry
+
+      # The schema map may have been written by hand, with symbol keys rather
+      # than strings; both are tolerated at every level.
+      Mongoid.config.encrypted_paths_for(klass).each do |path|
+        next if encryption_schema_has_path?(entry, path)
+
+        raise Errors::NoEncryptionSchema.new(
+          klass, namespace, client_name, path.join('.')
+        )
+      end
+    end
+
+    # Whether a schema entry encrypts the property at the given path.
+    #
+    # @param [ Hash ] entry The namespace schema entry.
+    # @param [ Array<String> ] path The property path, outermost first.
+    #
+    # @return [ true | false ] Whether the leaf is marked as encrypted.
+    def encryption_schema_has_path?(entry, path)
+      node = entry
+      path.each do |name|
+        properties = schema_value(node, 'properties')
+        return false unless properties.is_a?(Hash)
+
+        node = schema_value(properties, name)
+        return false unless node.is_a?(Hash)
+      end
+      !schema_value(node, 'encrypt').nil?
+    end
+
+    # Read a schema key that may be written as a string or a symbol.
+    #
+    # @param [ Hash ] hash The schema object.
+    # @param [ String ] key The key to read.
+    #
+    # @return [ Object ] The value, or nil when the key is absent.
+    def schema_value(hash, key)
+      return hash[key] if hash.key?(key)
+
+      hash[key.to_sym]
     end
 
     def client_options

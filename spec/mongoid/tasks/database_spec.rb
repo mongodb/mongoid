@@ -69,6 +69,24 @@ describe Mongoid::Tasks::Database do
   end
 
   describe '.create_collections' do
+    # Creating a collection sends no document data, so it must not require a
+    # client that can encrypt, even for a model that declares encrypted
+    # fields. Otherwise this task cannot run without KMS credentials.
+    context 'when a model declares encrypted fields' do
+      before do
+        require 'support/crypt/models'
+      end
+
+      after do
+        Mongoid.default_client[Crypt::Patient.collection_name].drop
+      end
+
+      it 'creates the collection using a client without automatic encryption' do
+        expect { Mongoid::Tasks::Database.create_collections([ Crypt::Patient ]) }
+          .not_to raise_error
+      end
+    end
+
     context 'collection_options are specified' do
       let(:models) do
         [ DatabaseSpec::Measurement ]
@@ -234,6 +252,19 @@ describe Mongoid::Tasks::Database do
         expect(described_class).not_to receive(:wait_for_search_indexes)
 
         described_class.create_search_indexes([ searchable_model_spy ], wait: false)
+      end
+    end
+
+    context 'when waiting for the indexes' do
+      it 'runs the wait inside collection management' do
+        managing = nil
+        allow(described_class).to receive(:wait_for_search_indexes) do
+          managing = Mongoid::Threaded.managing_collection?
+        end
+
+        described_class.create_search_indexes([ searchable_model_spy ], wait: true)
+
+        expect(managing).to be true
       end
     end
   end

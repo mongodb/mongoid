@@ -689,6 +689,41 @@ describe Mongoid::Association::Accessors do
         end
       end
     end
+
+    context 'when the document has a stored field named like a referenced association' do
+      before(:all) do
+        class Musician
+          include Mongoid::Document
+
+          belongs_to :orchestra, optional: true
+        end
+
+        class Orchestra
+          include Mongoid::Document
+
+          has_many :musicians
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :Orchestra)
+        Object.send(:remove_const, :Musician)
+      end
+
+      # The musicians used to be embedded, so the stored orchestra still holds
+      # the old array under the association's name.
+      let!(:orchestra_id) do
+        BSON::ObjectId.new.tap do |id|
+          Orchestra.collection.insert_one('_id' => id, 'musicians' => [ { '_id' => BSON::ObjectId.new } ])
+        end
+      end
+
+      let!(:musician) { Musician.create!(orchestra_id: orchestra_id) }
+
+      it 'loads the association by its key' do
+        expect(Orchestra.find(orchestra_id).musicians.to_a).to eq([ musician ])
+      end
+    end
   end
 
   context 'when setting associations to empty values' do

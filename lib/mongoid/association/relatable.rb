@@ -177,6 +177,23 @@ module Mongoid
       end
       alias klass relation_class
 
+      # The class of the association target, or nil when the named class is
+      # not defined.
+      #
+      # An association may name a class that never gets defined. The
+      # association is then unusable, but its owner still has to be. Callers
+      # that walk every association of every model, rather than following the
+      # one the application asked for, use this instead of relation_class.
+      #
+      # @return [ Class | nil ] The association objects' class.
+      #
+      # @api private
+      def try_relation_class
+        relation_class
+      rescue NameError
+        nil
+      end
+
       # The class name of the object owning this association.
       #
       # @return [ String ] The owning objects' class name.
@@ -198,6 +215,24 @@ module Mongoid
       # @return [ Symbol | String ] The primary key.
       def key
         stores_foreign_key? ? foreign_key : primary_key
+      end
+
+      # The field a $lookup writes this association's preloaded documents into.
+      #
+      # @return [ String ] The field.
+      def preloaded_field
+        "#{PRELOADED_PREFIX}#{name}"
+      end
+
+      # A field where the aggregation collects this association's documents
+      # before moving them to where they belong. The qualifier tells it apart
+      # from the other temporary fields of the same association.
+      #
+      # @param [ String ] qualifier What tells this temporary field apart.
+      #
+      # @return [ String ] The field.
+      def temporary_field(qualifier)
+        "#{preloaded_field}_#{qualifier}"
       end
 
       # The name of the setter on this object for assigning an associated object.

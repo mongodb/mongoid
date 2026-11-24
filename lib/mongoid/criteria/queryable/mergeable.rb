@@ -320,6 +320,10 @@ module Mongoid
               end
             end
           end
+          # Every query method that takes a user-supplied expression normalizes
+          # it here, so this is where the operator guard is enforced. See
+          # Selectable#_mongoid_validate_operators! for what it does not cover.
+          _mongoid_validate_operators!(result)
           result
         end
 

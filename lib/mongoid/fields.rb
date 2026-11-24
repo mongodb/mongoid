@@ -412,6 +412,13 @@ module Mongoid
         return '' unless name.present?
 
         key = name.to_s
+
+        # A key without a "." refers to an immediate field, so it resolves to
+        # its alias (or itself) with no splitting. Short-circuiting here avoids
+        # the split and dup on every read, which is a hot path. This mirrors the
+        # same optimization already applied to the matcher.
+        return aliased_fields[key]&.dup || key unless key.include?('.')
+
         segment, remaining = key.split('.', 2)
 
         # Don't get the alias for the field when a belongs_to association

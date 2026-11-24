@@ -39,13 +39,79 @@ module Mongoid
         { atomic_insert_modifier => { atomic_position => as_attributes } }
       end
 
+      # Determine whether merging the touch updates into the insert
+      # operations would produce an update whose operators target both a
+      # path and one of its ancestors or descendants. MongoDB rejects such
+      # an update with error 40. This can happen for embeds_many inserts,
+      # where the operations target the array (via $push) but the touches
+      # include a path inside that array (e.g. items.0.updated_at) when a
+      # sibling has a pending touch.
+      #
+      # @api private
+      #
+      # @param [ Hash ] operations The atomic insert operations.
+      # @param [ Hash ] touches The touch updates to merge.
+      #
+      # @return [ true | false ] Whether any touch path conflicts with a
+      #   path the insert operations target.
+      def conflicting_touch_paths?(operations, touches)
+        targeted = operations.each_value.flat_map do |doc|
+          doc.respond_to?(:keys) ? doc.keys.map(&:to_s) : []
+        end
+
+        touches.each_key.any? do |touch_path|
+          path = touch_path.to_s
+          targeted.any? do |target|
+            path == target || path.start_with?("#{target}.") ||
+              target.start_with?("#{path}.")
+          end
+        end
+      end
+
+      # Rewrite the indices in the touch updates to the positional operator,
+      # as the final update will do to the merged operations. The touches of
+      # the parent chain target the inserted element, so rewriting them is
+      # safe, and merging the rewritten keys into the operations lets the
+      # final update reuse them as-is. A pending touch on a different element
+      # of the same array, however, would be rewritten to the same positional
+      # path and silently touch the wrong document; in that case this method
+      # returns nil and the caller persists the touch updates in their own
+      # round-trip after the insert instead of merging them.
+      #
+      # @api private
+      #
+      # @param [ Hash ] selector The update selector.
+      # @param [ Document ] parent The parent document being touched.
+      # @param [ Symbol, String, nil ] field The parent's custom touch field.
+      # @param [ Hash ] touches The touch updates to rewrite.
+      #
+      # @return [ Hash | nil ] The rewritten touch updates, or nil if any
+      #   touch would be misdirected by the rewriting.
+      def rewritten_touch_updates(selector, parent, field, touches)
+        rewritten = positionally(selector, { '$set' => touches })['$set']
+
+        chain_paths = parent._touchable_chain_paths(field)
+        touches.each_key do |key|
+          path = key.to_s
+          next if rewritten.key?(path)
+
+          return nil unless chain_paths.include?(path)
+        end
+        rewritten
+      end
+
       # Insert the embedded document.
       #
       # When the parent association is touchable (which is the default for
-      # +embedded_in+), the touch timestamp updates are merged into the
-      # same +update_one+ call that performs the insert. This avoids a
-      # second round-trip that the +after_save+ touch callback would
-      # otherwise issue.
+      # +embedded_in+), the touch updates are merged into the same
+      # +update_one+ call that performs the insert. This avoids a second
+      # round-trip that the +after_save+ touch callback would otherwise
+      # issue. The merge is skipped when a touch path would conflict with a
+      # path the insert targets (see +conflicting_touch_paths?+) or when
+      # rewriting the touch indices to the positional operator would
+      # misdirect a touch (see +rewritten_touch_updates+); such touches are
+      # persisted in their own round-trip right after the insert, so their
+      # persistence does not depend on the callback chain running.
       #
       # @api private
       #
@@ -62,19 +128,59 @@ module Mongoid
           selector = _parent.atomic_selector
           operations = atomic_inserts
 
-          if _touchable_parent?
-            touches = _parent._gather_touch_updates(Time.current)
-            if touches.present?
-              operations['$set'] = (operations['$set'] || {}).merge(touches)
-              Threaded.begin_touch_merged(self)
-            end
-          end
+          deferred_touches = merge_touch_updates(selector, operations)
 
-          _root.collection.find(selector).update_one(
-            positionally(selector, operations),
-            session: _session
-          )
+          begin
+            _root.collection.find(selector).update_one(
+              positionally(selector, operations),
+              session: _session
+            )
+            _root.persist_atomic_operations('$set' => deferred_touches) if deferred_touches
+          rescue StandardError
+            # If the insert failed, the after_save callback will not run to
+            # consume and clear the merged-touch flag, so clear it here.
+            Threaded.exit_touch_merged(self)
+            raise
+          end
         end
+      end
+
+      # Merge the parent chain's pending touch updates into the insert
+      # operations when doing so would not produce a conflicting update
+      # (see +conflicting_touch_paths?+ and +rewritten_touch_updates+).
+      # Either way, marks the touch as merged so the after_save callback
+      # does not persist the updates a second time. Returns the touch
+      # updates that could not be merged; they are persisted in their own
+      # round-trip right after the insert, rather than relying on the
+      # after_save callback, so that an aborted callback chain cannot
+      # silently drop them.
+      #
+      # @api private
+      #
+      # @param [ Hash ] selector The update selector.
+      # @param [ Hash ] operations The atomic insert operations, modified
+      #   in place when the touches are merged.
+      #
+      # @return [ Hash | nil ] The deferred touch updates, if any.
+      def merge_touch_updates(selector, operations)
+        return nil unless _touchable_parent?
+
+        field = _association&.inverse_association&.touch_field
+        touches = _parent._gather_touch_updates(Time.current, field)
+        return nil if touches.blank?
+
+        if conflicting_touch_paths?(operations, touches)
+          deferred_touches = touches
+        else
+          rewritten = rewritten_touch_updates(selector, _parent, field, touches)
+          if rewritten
+            operations['$set'] = (operations['$set'] || {}).merge(rewritten)
+          else
+            deferred_touches = touches
+          end
+        end
+        Threaded.begin_touch_merged(self)
+        deferred_touches
       end
 
       # Insert the root document.

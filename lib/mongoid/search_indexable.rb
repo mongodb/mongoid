@@ -161,7 +161,9 @@ module Mongoid
       def create_search_indexes
         return if search_index_specs.empty?
 
-        collection.search_indexes.create_many(search_index_specs)
+        Threaded.with_collection_management do
+          collection.search_indexes.create_many(search_index_specs)
+        end
       end
 
       # Waits for the named search indexes to be created.
@@ -192,7 +194,9 @@ module Mongoid
       # @option options [ Hash ] :aggregate The options hash to pass to the
       #    aggregate command (optional)
       def search_indexes(options = {})
-        collection.search_indexes(options)
+        Threaded.with_collection_management do
+          collection.search_indexes(options)
+        end
       end
 
       # Removes the search index specified by the given name or id. Either
@@ -201,12 +205,14 @@ module Mongoid
       # @param [ String | nil ] name the name of the index to remove
       # @param [ String | nil ] id the id of the index to remove
       def remove_search_index(name: nil, id: nil)
-        logger.info(
-          "MONGOID: Removing search index '#{name || id}' " \
-          "on collection '#{collection.name}'."
-        )
+        Threaded.with_collection_management do
+          logger.info(
+            "MONGOID: Removing search index '#{name || id}' " \
+            "on collection '#{collection.name}'."
+          )
 
-        collection.search_indexes.drop_one(name: name, id: id)
+          collection.search_indexes.drop_one(name: name, id: id)
+        end
       end
 
       # Request the removal of all registered search indexes. Note
@@ -415,7 +421,11 @@ module Mongoid
       #
       # @return [ Array<Hash> ] the raw index documents
       def get_indexes(names)
-        collection.search_indexes.select { |i| names.include?(i['name']) }
+        # Reading index metadata sends no document data, so it is exempt from
+        # the encryption schema check, like the other index operations here.
+        Threaded.with_collection_management do
+          collection.search_indexes.select { |i| names.include?(i['name']) }
+        end
       end
 
       # Resolves the index name and vector path from the declared specs,

@@ -1732,6 +1732,9 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
 
       context 'when the following criteria uses string were form' do
+        # String criteria compile to $where, which requires the opt-in.
+        config_override :allow_unsafe_query_operators, true
+
         let(:selection) do
           query.not.where('hello world')
         end

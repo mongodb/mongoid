@@ -13,13 +13,9 @@ module Mongoid
       # @param [ Hash ] modifications The add to set modifiers.
       def add_to_set(modifications)
         modifications.each_pair do |field, value|
-          if add_to_sets.has_key?(field)
-            value.each do |val|
-              add_to_sets[field]['$each'].push(val)
-            end
-          else
-            add_to_sets[field] = { '$each' => value }
-          end
+          mods = add_to_set_conflict?(field) ? conflicting_add_to_sets : add_to_sets
+          add_each_operation(mods, field, value)
+          add_to_set_fields[field.split('.', 2)[0]] = field
         end
       end
 
@@ -31,7 +27,8 @@ module Mongoid
       # @param [ Hash ] modifications The pull all modifiers.
       def pull_all(modifications)
         modifications.each_pair do |field, value|
-          add_operation(pull_alls, field, value)
+          mods = pull_all_conflict?(field) ? conflicting_pull_alls : pull_alls
+          add_operation(mods, field, value)
           pull_fields[field.split('.', 2)[0]] = field
         end
       end
@@ -40,6 +37,14 @@ module Mongoid
       #
       # @example Add pull all operations.
       #   modifiers.pull({ "addresses" => { "_id" => { "$in" => [ 1, 2, 3 ]}}})
+      #
+      # A $pull is never split out into a separate write. It shifts the
+      # positions of the remaining array elements, and the paths of the other
+      # operations on that array are built for the positions after the $pull.
+      # In a separate write the $pull could run after them, so they would hit
+      # a different element. Kept in the main update, an operation that
+      # conflicts with the $pull is rejected by MongoDB (code 40) without
+      # changing stored data.
       #
       # @param [ Hash ] modifications The pull all modifiers.
       def pull(modifications)
@@ -99,6 +104,7 @@ module Mongoid
           else
             unsets.update(field => true)
           end
+          unset_fields[field.split('.', 2)[0]] = field
         end
       end
 
@@ -166,17 +172,28 @@ module Mongoid
       # @return [ true | false ] If this field is a conflict.
       def set_conflict?(field)
         name = field.split('.', 2)[0]
-        pull_fields.has_key?(name) || push_fields.has_key?(name)
+        pull_fields.has_key?(name) || push_fields.has_key?(name) ||
+          add_to_set_fields.has_key?(name)
       end
 
       # Is the operation going to be a conflict for an $unset?
+      #
+      # A $push or $addToSet does not shift existing array element positions,
+      # so a conflicting $unset can be safely applied in a separate write
+      # afterwards. A $pull does shift positions, so the $unset is not split
+      # out in that case; the operations stay in the same update and MongoDB
+      # rejects the update (code 40) without changing stored data, rather
+      # than risking the $unset hitting a different element.
       #
       # @param [ String ] field The field.
       #
       # @return [ true | false ] If this field is a conflict.
       def unset_conflict?(field)
         key = field.split('.', 2)[0]
-        set_fields.has_key?(key)
+        return true if set_fields.has_key?(key)
+        return false if pull_fields.has_key?(key)
+
+        push_fields.has_key?(key) || add_to_set_fields.has_key?(key)
       end
 
       # Is the operation going to be a conflict for a $push?
@@ -190,7 +207,34 @@ module Mongoid
       def push_conflict?(field)
         name = field.split('.', 2)[0]
         set_fields.has_key?(name) || pull_fields.has_key?(name) ||
+          add_to_set_fields.has_key?(name) || unset_fields.has_key?(name) ||
           (push_fields.keys.count { |item| item.split('.', 2).first == name } > 1)
+      end
+
+      # Is the operation going to be a conflict for an $addToSet?
+      #
+      # As with $push, an $addToSet is only split out when the other
+      # operation does not shift array element positions. A conflicting
+      # $pull is left as-is so MongoDB rejects the update rather than the
+      # $addToSet possibly hitting a different element in a separate write.
+      #
+      # @param [ String ] field The field.
+      #
+      # @return [ true | false ] If this field is a conflict.
+      def add_to_set_conflict?(field)
+        name = field.split('.', 2)[0]
+        set_fields.has_key?(name) || push_fields.has_key?(name)
+      end
+
+      # Is the operation going to be a conflict for a $pullAll?
+      #
+      # @param [ String ] field The field.
+      #
+      # @return [ true | false ] If this field is a conflict.
+      def pull_all_conflict?(field)
+        name = field.split('.', 2)[0]
+        set_fields.has_key?(name) || push_fields.has_key?(name) ||
+          add_to_set_fields.has_key?(name) || pull_root?(name)
       end
 
       # Returns true if the $unset is made redundant by a $set that covers
@@ -202,16 +246,26 @@ module Mongoid
       # @param [ String ] field the field
       def unset_superseded_by_set?(field)
         key = field.split('.', 2).first
-        sets(initialize: false).has_key?(key)
+        sets(initialize: false)&.has_key?(key)
       end
 
-      # Get the conflicting pull modifications.
+      # Get the conflicting $addToSet operations.
       #
-      # @example Get the conflicting pulls.
-      #   modifiers.conflicting_pulls
+      # @example Get the conflicting add to sets.
+      #   modifiers.conflicting_add_to_sets
       #
-      # @return [ Hash ] The conflicting pull operations.
-      def conflicting_pulls
+      # @return [ Hash ] The conflicting add to set operations.
+      def conflicting_add_to_sets
+        conflicts['$addToSet'] ||= {}
+      end
+
+      # Get the conflicting pull all modifications.
+      #
+      # @example Get the conflicting pull alls.
+      #   modifiers.conflicting_pull_alls
+      #
+      # @return [ Hash ] The conflicting pull all operations.
+      def conflicting_pull_alls
         conflicts['$pullAll'] ||= {}
       end
 
@@ -282,6 +336,26 @@ module Mongoid
         @set_fields ||= {}
       end
 
+      # Get the names of the fields that need to be added to sets.
+      #
+      # @example Get the add to set fields.
+      #   modifiers.add_to_set_fields
+      #
+      # @return [ Array<String> ] The add to set fields.
+      def add_to_set_fields
+        @add_to_set_fields ||= {}
+      end
+
+      # Get the names of the fields that need to be unset.
+      #
+      # @example Get the unset fields.
+      #   modifiers.unset_fields
+      #
+      # @return [ Array<String> ] The unset fields.
+      def unset_fields
+        @unset_fields ||= {}
+      end
+
       # Get the $pullAll operations or initialize a new one.
       #
       # @example Get the $pullAll operations.
@@ -332,6 +406,16 @@ module Mongoid
       # @return [ Hash ] The $unset operations.
       def unsets
         self['$unset'] ||= {}
+      end
+
+      # Is there a $pull on the given root-level field? Does not initialize
+      # the $pull operations.
+      #
+      # @param [ String ] name The root-level field name.
+      #
+      # @return [ true | false ] If a $pull touches this field.
+      def pull_root?(name)
+        (self['$pull'] || {}).keys.any? { |key| key.split('.', 2)[0] == name }
       end
     end
   end

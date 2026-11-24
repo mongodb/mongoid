@@ -7,10 +7,12 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       field :title, type: String
+      field :last_used_at, type: Time
 
       embeds_many :entrances, class_name: 'TouchableSpec::Embedded::Entrance'
       embeds_many :floors, class_name: 'TouchableSpec::Embedded::Floor'
       embeds_one :lobby, class_name: 'TouchableSpec::Embedded::Lobby'
+      embeds_many :waiting_rooms, class_name: 'TouchableSpec::Embedded::WaitingRoom'
     end
 
     class Lobby
@@ -74,6 +76,41 @@ module TouchableSpec
       include Mongoid::Timestamps
 
       embedded_in :floor, touch: true, class_name: 'TouchableSpec::Embedded::Floor'
+    end
+
+    class WaitingRoom
+      include Mongoid::Document
+      include Mongoid::Timestamps
+
+      field :name, type: String
+
+      embedded_in :building, touch: :last_used_at,
+                             class_name: 'TouchableSpec::Embedded::Building'
+    end
+  end
+
+  module Short
+    class Building
+      include Mongoid::Document
+      include Mongoid::Timestamps::Short
+
+      embeds_many :floors, class_name: 'TouchableSpec::Short::Floor'
+    end
+
+    class Floor
+      include Mongoid::Document
+      include Mongoid::Timestamps::Short
+
+      embedded_in :building, touch: true, class_name: 'TouchableSpec::Short::Building'
+
+      embeds_many :gadgets, class_name: 'TouchableSpec::Short::Gadget'
+    end
+
+    class Gadget
+      include Mongoid::Document
+      include Mongoid::Timestamps::Short
+
+      embedded_in :floor, touch: true, class_name: 'TouchableSpec::Short::Floor'
     end
   end
 

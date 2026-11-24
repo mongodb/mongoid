@@ -18,10 +18,8 @@ module Mongoid
       # @api private
       module_function def matches?(_original_operator, value, condition)
         case condition
-        when Regexp
-          value.respond_to?(:=~) && value =~ condition
-        when ::BSON::Regexp::Raw
-          value.respond_to?(:=~) && value =~ condition.compile
+        when Regexp, ::BSON::Regexp::Raw
+          value.respond_to?(:=~) && RegexpBudget.match?(value, condition)
         else
           if value.is_a?(Time) && condition.is_a?(Time)
             EqImpl.time_eq?(value, condition)

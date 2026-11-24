@@ -126,8 +126,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(A)
         Object.send(:remove_const, :A)
+        Mongoid.deregister_model(B)
         Object.send(:remove_const, :B)
+        Mongoid.deregister_model(C)
         Object.send(:remove_const, :C)
       end
 
@@ -186,9 +189,13 @@ describe Mongoid::Criteria::Includable do
         end
 
         after(:all) do
+          Mongoid.deregister_model(A)
           Object.send(:remove_const, :A)
+          Mongoid.deregister_model(B)
           Object.send(:remove_const, :B)
+          Mongoid.deregister_model(C)
           Object.send(:remove_const, :C)
+          Mongoid.deregister_model(D)
           Object.send(:remove_const, :D)
         end
 
@@ -255,9 +262,13 @@ describe Mongoid::Criteria::Includable do
         end
 
         after(:all) do
+          Mongoid.deregister_model(A)
           Object.send(:remove_const, :A)
+          Mongoid.deregister_model(B)
           Object.send(:remove_const, :B)
+          Mongoid.deregister_model(C)
           Object.send(:remove_const, :C)
+          Mongoid.deregister_model(D)
           Object.send(:remove_const, :D)
         end
 
@@ -1121,9 +1132,13 @@ describe Mongoid::Criteria::Includable do
         end
 
         after(:all) do
+          Mongoid.deregister_model(A)
           Object.send(:remove_const, :A)
+          Mongoid.deregister_model(B)
           Object.send(:remove_const, :B)
+          Mongoid.deregister_model(C)
           Object.send(:remove_const, :C)
+          Mongoid.deregister_model(D)
           Object.send(:remove_const, :D)
         end
 
@@ -1408,6 +1423,106 @@ describe Mongoid::Criteria::Includable do
 
   describe '#includes' do
     it_behaves_like 'eager loading', :includes
+
+    context 'when a nested association sits behind a parent whose class_name is not the resolved class name' do
+      before(:all) do
+        class IncEagerGallery
+          include Mongoid::Document
+
+          has_many :rooted_photos, class_name: '::IncEagerPhoto', inverse_of: :gallery
+        end
+
+        class IncEagerPhoto
+          include Mongoid::Document
+
+          belongs_to :gallery, class_name: 'IncEagerGallery', inverse_of: :rooted_photos
+          belongs_to :author, class_name: '::IncEagerAuthor'
+        end
+
+        class IncEagerAuthor
+          include Mongoid::Document
+        end
+
+        module IncEagerShop
+          class Order
+            include Mongoid::Document
+
+            has_many :items, class_name: 'Item', inverse_of: :order
+          end
+
+          class Item
+            include Mongoid::Document
+
+            belongs_to :order, class_name: 'Order', inverse_of: :items
+            belongs_to :author, class_name: '::IncEagerAuthor'
+          end
+        end
+
+        class IncEagerAlbum
+          include Mongoid::Document
+
+          has_many :poly_photos, class_name: '::IncEagerPolyPhoto', as: :imageable, inverse_of: :imageable
+        end
+
+        class IncEagerPolyPhoto
+          include Mongoid::Document
+
+          belongs_to :imageable, polymorphic: true, inverse_of: :poly_photos
+          belongs_to :author, class_name: '::IncEagerAuthor'
+        end
+      end
+
+      after(:all) do
+        Mongoid.deregister_model(IncEagerAlbum)
+        Object.send(:remove_const, :IncEagerAlbum)
+        Mongoid.deregister_model(IncEagerPolyPhoto)
+        Object.send(:remove_const, :IncEagerPolyPhoto)
+        Mongoid.deregister_model(IncEagerShop::Order)
+        Mongoid.deregister_model(IncEagerShop::Item)
+        Object.send(:remove_const, :IncEagerShop)
+        Mongoid.deregister_model(IncEagerAuthor)
+        Object.send(:remove_const, :IncEagerAuthor)
+        Mongoid.deregister_model(IncEagerPhoto)
+        Object.send(:remove_const, :IncEagerPhoto)
+        Mongoid.deregister_model(IncEagerGallery)
+        Object.send(:remove_const, :IncEagerGallery)
+      end
+
+      let!(:gallery) { IncEagerGallery.create! }
+      let!(:order) { IncEagerShop::Order.create! }
+
+      before do
+        IncEagerPhoto.create!(gallery: gallery, author: IncEagerAuthor.create!)
+        IncEagerShop::Item.create!(order: order, author: IncEagerAuthor.create!)
+      end
+
+      it 'eager loads a nested association behind a class_name with a leading ::' do
+        result = IncEagerGallery.includes(rooted_photos: :author).first
+
+        expect_query(0) do
+          expect(result.rooted_photos.first.author).to be_a(IncEagerAuthor)
+        end
+      end
+
+      it 'eager loads a nested association behind a module-relative class_name' do
+        result = IncEagerShop::Order.includes(items: :author).first
+
+        expect_query(0) do
+          expect(result.items.first.author).to be_a(IncEagerAuthor)
+        end
+      end
+
+      it 'eager loads a nested association behind a polymorphic parent with a leading ::' do
+        album = IncEagerAlbum.create!
+        IncEagerPolyPhoto.create!(imageable: album, author: IncEagerAuthor.create!)
+
+        result = IncEagerAlbum.includes(poly_photos: :author).first
+
+        expect_query(0) do
+          expect(result.poly_photos.first.author).to be_a(IncEagerAuthor)
+        end
+      end
+    end
   end
 
   describe '#eager_load' do
@@ -1442,9 +1557,13 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Mouse)
         Object.send(:remove_const, :Mouse)
+        Mongoid.deregister_model(Webcam)
         Object.send(:remove_const, :Webcam)
+        Mongoid.deregister_model(Peripheral)
         Object.send(:remove_const, :Peripheral)
+        Mongoid.deregister_model(Machine)
         Object.send(:remove_const, :Machine)
       end
 
@@ -1484,10 +1603,15 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Mouse)
         Object.send(:remove_const, :Mouse)
+        Mongoid.deregister_model(Peripheral)
         Object.send(:remove_const, :Peripheral)
+        Mongoid.deregister_model(Laptop)
         Object.send(:remove_const, :Laptop)
+        Mongoid.deregister_model(Machine)
         Object.send(:remove_const, :Machine)
+        Mongoid.deregister_model(Brand)
         Object.send(:remove_const, :Brand)
       end
 
@@ -1522,8 +1646,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Cable)
         Object.send(:remove_const, :Cable)
+        Mongoid.deregister_model(Speaker)
         Object.send(:remove_const, :Speaker)
+        Mongoid.deregister_model(Gadget)
         Object.send(:remove_const, :Gadget)
       end
 
@@ -1556,8 +1683,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Cable)
         Object.send(:remove_const, :Cable)
+        Mongoid.deregister_model(Speaker)
         Object.send(:remove_const, :Speaker)
+        Mongoid.deregister_model(Gadget)
         Object.send(:remove_const, :Gadget)
       end
 
@@ -1590,8 +1720,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Speaker)
         Object.send(:remove_const, :Speaker)
+        Mongoid.deregister_model(Gadget)
         Object.send(:remove_const, :Gadget)
+        Mongoid.deregister_model(Cable)
         Object.send(:remove_const, :Cable)
       end
 
@@ -1627,8 +1760,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1675,8 +1811,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1726,9 +1865,13 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Panel)
         Object.send(:remove_const, :Panel)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1767,9 +1910,13 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(UsbPort)
         Object.send(:remove_const, :UsbPort)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1805,8 +1952,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1843,8 +1993,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1879,8 +2032,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1922,9 +2078,13 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Desk)
         Object.send(:remove_const, :Desk)
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -1974,10 +2134,15 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Desk)
         Object.send(:remove_const, :Desk)
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Pin)
         Object.send(:remove_const, :Pin)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -2027,10 +2192,15 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Desk)
         Object.send(:remove_const, :Desk)
+        Mongoid.deregister_model(Computer)
         Object.send(:remove_const, :Computer)
+        Mongoid.deregister_model(Card)
         Object.send(:remove_const, :Card)
+        Mongoid.deregister_model(Port)
         Object.send(:remove_const, :Port)
+        Mongoid.deregister_model(Device)
         Object.send(:remove_const, :Device)
       end
 
@@ -2072,8 +2242,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Cartridge)
         Object.send(:remove_const, :Cartridge)
+        Mongoid.deregister_model(Scanner)
         Object.send(:remove_const, :Scanner)
+        Mongoid.deregister_model(Printer)
         Object.send(:remove_const, :Printer)
       end
 
@@ -2111,8 +2284,11 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Accessory)
         Object.send(:remove_const, :Accessory)
+        Mongoid.deregister_model(RemoteDevice)
         Object.send(:remove_const, :RemoteDevice)
+        Mongoid.deregister_model(LocalDevice)
         Object.send(:remove_const, :LocalDevice)
       end
 
@@ -2155,7 +2331,9 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Workstation)
         Object.send(:remove_const, :Workstation)
+        Mongoid.deregister_model(RemoteServer)
         Object.send(:remove_const, :RemoteServer)
       end
 
@@ -2214,11 +2392,17 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Press)
         Object.send(:remove_const, :Press)
+        Mongoid.deregister_model(Lathe)
         Object.send(:remove_const, :Lathe)
+        Mongoid.deregister_model(Machine)
         Object.send(:remove_const, :Machine)
+        Mongoid.deregister_model(Belt)
         Object.send(:remove_const, :Belt)
+        Mongoid.deregister_model(Cog)
         Object.send(:remove_const, :Cog)
+        Mongoid.deregister_model(Supplier)
         Object.send(:remove_const, :Supplier)
       end
 
@@ -2272,9 +2456,13 @@ describe Mongoid::Criteria::Includable do
       end
 
       after(:all) do
+        Mongoid.deregister_model(Board)
         Object.send(:remove_const, :Board)
+        Mongoid.deregister_model(Cable)
         Object.send(:remove_const, :Cable)
+        Mongoid.deregister_model(Chip)
         Object.send(:remove_const, :Chip)
+        Mongoid.deregister_model(Part)
         Object.send(:remove_const, :Part)
       end
 
@@ -2286,6 +2474,164 @@ describe Mongoid::Criteria::Includable do
         expect_query(1) do
           loaded = Board.eager_load(:chips).first
           expect(loaded.chips.to_a).to eq([ chip ])
+        end
+      end
+    end
+
+    context 'when a document is saved after eager loading' do
+      context 'when the reference lives inside an embedded document' do
+        before(:all) do
+          class Device
+            include Mongoid::Document
+          end
+
+          class Port
+            include Mongoid::Document
+
+            embedded_in :computer
+            belongs_to :device
+          end
+
+          class Computer
+            include Mongoid::Document
+
+            embeds_many :ports
+          end
+        end
+
+        after(:all) do
+          Object.send(:remove_const, :Computer)
+          Object.send(:remove_const, :Port)
+          Object.send(:remove_const, :Device)
+        end
+
+        let!(:device) { Device.create! }
+        let!(:computer) { Computer.create!(ports: [ Port.new(device: device) ]) }
+
+        it 'does not persist the eager-loaded association data' do
+          loaded = Computer.eager_load(ports: :device).first
+
+          # Reassigning the collection makes the save rewrite the whole array,
+          # serializing each already-hydrated port.
+          loaded.ports = loaded.ports.to_a + [ Port.new(device: Device.create!) ]
+          loaded.save!
+
+          # With the bug present, the persisted port comes back as:
+          #
+          #   {
+          #     '_id' => ...,
+          #     'device_id' => ...,
+          #     'device' => [ { ...the whole device document... } ]  # <-- the $lookup left this
+          #   }
+          raw_ports = Computer.collection.find(_id: computer.id).first['ports']
+          expect(raw_ports.first).to eq('_id' => computer.ports.first.id, 'device_id' => device.id)
+        end
+      end
+
+      context 'when the reference lives on a referenced document' do
+        before(:all) do
+          class Device
+            include Mongoid::Document
+          end
+
+          class Port
+            include Mongoid::Document
+
+            belongs_to :computer
+            belongs_to :device
+          end
+
+          class Computer
+            include Mongoid::Document
+
+            has_many :ports
+          end
+        end
+
+        after(:all) do
+          Object.send(:remove_const, :Computer)
+          Object.send(:remove_const, :Port)
+          Object.send(:remove_const, :Device)
+        end
+
+        let!(:device) { Device.create! }
+        let!(:computer) { Computer.create!(ports: [ Port.new(device: device) ]) }
+
+        it 'does not persist the eager-loaded association data' do
+          loaded = Computer.eager_load(ports: :device).first
+          port = loaded.ports.first
+
+          # An upsert rewrites the whole document, so everything the port
+          # carries gets serialized.
+          port.upsert
+
+          # With the bug present, the persisted port comes back as:
+          #
+          #   {
+          #     '_id' => ...,
+          #     'computer_id' => ...,
+          #     'device_id' => ...,
+          #     'device' => [ { ...the whole device document... } ]  # <-- the $lookup left this
+          #   }
+          expect(Port.collection.find(_id: port.id).first)
+            .to eq('_id' => port.id, 'computer_id' => computer.id, 'device_id' => device.id)
+        end
+      end
+
+      context 'when more than one subclass defines the association' do
+        before(:all) do
+          class Cog
+            include Mongoid::Document
+
+            belongs_to :machine, optional: true
+          end
+
+          class Belt
+            include Mongoid::Document
+
+            belongs_to :machine, optional: true
+          end
+
+          class Machine
+            include Mongoid::Document
+          end
+
+          class Lathe < Machine
+            has_many :widgets, class_name: 'Cog', inverse_of: :machine
+          end
+
+          class Press < Machine
+            has_many :widgets, class_name: 'Belt', inverse_of: :machine
+          end
+        end
+
+        after(:all) do
+          Object.send(:remove_const, :Press)
+          Object.send(:remove_const, :Lathe)
+          Object.send(:remove_const, :Machine)
+          Object.send(:remove_const, :Belt)
+          Object.send(:remove_const, :Cog)
+        end
+
+        let!(:lathe) { Lathe.create! }
+        let!(:cog) { Cog.create!(machine: lathe) }
+
+        it 'does not persist the eager-loaded association data' do
+          loaded = Machine.eager_load(:widgets).first
+
+          # An upsert rewrites the whole document, so everything the lathe
+          # carries gets serialized.
+          loaded.upsert
+
+          # With the bug present, the persisted lathe comes back as:
+          #
+          #   {
+          #     '_id' => ...,
+          #     '_type' => 'Lathe',
+          #     'widgets' => [ { '_id' => ..., 'machine_id' => ... } ]  # <-- the $lookup left this
+          #   }
+          expect(Machine.collection.find(_id: lathe.id).first)
+            .to eq('_id' => lathe.id, '_type' => 'Lathe')
         end
       end
     end
