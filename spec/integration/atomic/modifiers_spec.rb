@@ -417,4 +417,36 @@ describe Mongoid::Atomic::Modifiers do
       end
     end
   end
+
+  context 'when moving an existing embedded document with pending nested changes' do
+    let(:cabinet) do
+      cabinet = ModifierModels::Cabinet.find(ModifierModels::Cabinet.create!.id)
+      cabinet.build_source(items: [ { name: 'old' } ])
+      cabinet.save!
+      cabinet
+    end
+
+    let(:item) { cabinet.source.items.first }
+
+    before do
+      item.assign_attributes(widgets: [ { label: 'w' } ])
+      cabinet.drawer.assign_attributes(items: [ item ])
+    end
+
+    it 'does not retain an atomic set at the old path' do
+      expect(cabinet.atomic_updates.fetch('$set', {}).keys).to contain_exactly('drawer')
+    end
+
+    it 'saves the moved document and replaces the source without duplicates' do
+      item_id = item.id
+      cabinet.source.assign_attributes(items: [ { name: 'new' } ])
+      cabinet.save!
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      expect(stored['source']['items'].map { |doc| doc['name'] }).to eq([ 'new' ])
+      expect(stored['drawer']['items'].map { |doc| doc['_id'] }).to eq([ item_id ])
+      expect(stored['drawer']['items'].first['name']).to eq('old')
+      expect(stored['drawer']['items'].first['widgets'].map { |doc| doc['label'] }).to eq([ 'w' ])
+    end
+  end
 end

@@ -62,6 +62,7 @@ module ModifierModels
   class Cabinet
     include Mongoid::Document
 
+    embeds_one :source, class_name: 'ModifierModels::Drawer'
     embeds_one :drawer, class_name: 'ModifierModels::Drawer', autobuild: true
   end
 
