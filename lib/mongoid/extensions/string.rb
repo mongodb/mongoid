@@ -163,7 +163,7 @@ module Mongoid
         #
         # @return [ String ] The object mongoized.
         def mongoize(object)
-          object.try(:to_s)
+          object&.to_s
         end
         alias demongoize mongoize
       end

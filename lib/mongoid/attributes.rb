@@ -243,6 +243,9 @@ module Mongoid
     #
     # @return [ true | false ] If the attribute is missing.
     def attribute_missing?(name)
+      # Without a projection every attribute is loaded.
+      return false if __selected_fields.nil?
+
       !Projector.new(__selected_fields).attribute_or_path_allowed?(name)
     end
 
