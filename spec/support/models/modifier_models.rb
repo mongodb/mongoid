@@ -64,6 +64,7 @@ module ModifierModels
 
     embeds_one :source, class_name: 'ModifierModels::Drawer'
     embeds_one :drawer, class_name: 'ModifierModels::Drawer', autobuild: true
+    embeds_one :shelf, class_name: 'ModifierModels::Drawer'
   end
 
   class Drawer
@@ -87,5 +88,13 @@ module ModifierModels
 
     field :label, type: String
     embedded_in :item, class_name: 'ModifierModels::Item'
+    embeds_many :parts, class_name: 'ModifierModels::Part'
+  end
+
+  class Part
+    include Mongoid::Document
+
+    field :code, type: String
+    embedded_in :widget, class_name: 'ModifierModels::Widget'
   end
 end

@@ -211,19 +211,46 @@ module Mongoid
           def delete(document)
             execute_callbacks_around(:remove, document) do
               _target.delete_one(document).tap do |doc|
-                if doc && !_binding?
-                  _unscoped.delete_one(doc)
-                  if _assigning?
-                    _base.add_atomic_pull(doc)
-                  else
-                    doc.delete(suppress: true)
-                    unbind_one(doc)
+                if doc
+                  if remove_from_unscoped?
+                    # The document must leave the association in memory even
+                    # when this happens as part of binding it to another
+                    # parent. Serialization reads _unscoped, so leaving the
+                    # document there would persist it in both associations.
+                    _unscoped.delete_one(doc)
+                    update_attributes_hash
+                    refresh_delayed_atomic_sets if _binding?
                   end
-                  update_attributes_hash
+                  unless _binding?
+                    if _assigning?
+                      _base.add_atomic_pull(doc)
+                    else
+                      doc.delete(suppress: true)
+                      unbind_one(doc)
+                    end
+                  end
                 end
                 reindex
               end
             end
+          end
+
+          # Whether the deleted document should be removed from _unscoped.
+          #
+          # During binding the document is moving to another parent. When the
+          # current parent is persisted without a pending whole-array write,
+          # the database still stores the document at its old index until that
+          # removal is persisted. Dropping it from _unscoped would reindex the
+          # remaining documents and make later writes target the wrong array
+          # entries.
+          #
+          # @api private
+          #
+          # @return [ true | false ] If _unscoped must be updated.
+          def remove_from_unscoped?
+            return true unless _binding?
+
+            _base.new_record? || _base.delayed_atomic_sets.key?(path)
           end
 
           # Mongoid::Extensions::Array defines Array#delete_one, so we need
@@ -241,6 +268,21 @@ module Mongoid
             _unscoped.delete_one(document)
             update_attributes_hash
             reindex
+          end
+
+          # Refresh a pending whole-array write for this association after a
+          # document left it while being bound to another parent. Serialization
+          # reads _unscoped, so a pending write would still contain the moved
+          # document and persist it in both associations.
+          #
+          # @api private
+          def refresh_delayed_atomic_sets
+            return unless _base.persisted?
+
+            key = path
+            return unless _base.delayed_atomic_sets.key?(key)
+
+            _base.delayed_atomic_sets[key] = _unscoped.map { |doc| doc.send(:as_attributes) }
           end
 
           # Delete all the documents in the association without running callbacks.

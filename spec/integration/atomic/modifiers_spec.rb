@@ -448,5 +448,189 @@ describe Mongoid::Atomic::Modifiers do
       expect(stored['drawer']['items'].first['name']).to eq('old')
       expect(stored['drawer']['items'].first['widgets'].map { |doc| doc['label'] }).to eq([ 'w' ])
     end
+
+    it 'writes subsequent changes to the new parent without a reload' do
+      item_id = item.id
+      cabinet.source.assign_attributes(items: [ { name: 'new' } ])
+      cabinet.save!
+
+      moved = cabinet.drawer.items.first
+      moved.widgets.build(label: 'w2')
+      cabinet.save!
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      expect(stored['source']['items'].map { |doc| doc['name'] }).to eq([ 'new' ])
+      expect(stored['source']['items'].first).not_to have_key('widgets')
+
+      moved_item = stored['drawer']['items'].find { |doc| doc['_id'] == item_id }
+      expect(moved_item['widgets'].map { |doc| doc['label'] }).to eq(%w[w w2])
+    end
+
+    context 'when a validation fails before saving' do
+      before do
+        ModifierModels::Item.validates :name, presence: true
+      end
+
+      after do
+        ModifierModels::Item.clear_validators!
+      end
+
+      it 'keeps the pending move and saves it after the error is fixed' do
+        item_id = item.id
+        cabinet.source.assign_attributes(items: [ { name: nil } ])
+        expect { cabinet.save! }.to raise_error(Mongoid::Errors::Validations)
+
+        stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+        expect(stored['source']['items'].map { |doc| doc['name'] }).to eq([ 'old' ])
+        expect(stored['source']['items'].first).not_to have_key('widgets')
+        expect(stored).not_to have_key('drawer')
+
+        cabinet.source.assign_attributes(items: [ { name: 'new' } ])
+        cabinet.save!
+
+        stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+        expect(stored['source']['items'].map { |doc| doc['name'] }).to eq([ 'new' ])
+        moved_item = stored['drawer']['items'].find { |doc| doc['_id'] == item_id }
+        expect(moved_item['widgets'].map { |doc| doc['label'] }).to eq([ 'w' ])
+      end
+    end
+  end
+
+  context 'when moving an existing embedded document with pending changes deeper in its subtree' do
+    let(:cabinet) do
+      cabinet = ModifierModels::Cabinet.find(ModifierModels::Cabinet.create!.id)
+      cabinet.build_source(items: [ { name: 'old', widgets: [ { label: 'w' } ] } ])
+      cabinet.save!
+      cabinet
+    end
+
+    let(:item) { cabinet.source.items.first }
+    let(:widget) { item.widgets.first }
+
+    before do
+      widget.assign_attributes(parts: [ { code: 'p' } ])
+      cabinet.drawer.assign_attributes(items: [ item ])
+    end
+
+    it 'saves the moved subtree once and replaces the source' do
+      item_id = item.id
+      widget_id = widget.id
+      cabinet.source.assign_attributes(items: [ { name: 'new' } ])
+      cabinet.save!
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      expect(stored['source']['items'].map { |doc| doc['name'] }).to eq([ 'new' ])
+      expect(stored['source']['items'].first).not_to have_key('widgets')
+
+      expect(stored['drawer']['items'].length).to eq(1)
+      moved_item = stored['drawer']['items'].first
+      expect(moved_item['_id']).to eq(item_id)
+      expect(moved_item['widgets'].length).to eq(1)
+
+      moved_widget = moved_item['widgets'].first
+      expect(moved_widget['_id']).to eq(widget_id)
+      expect(moved_widget['label']).to eq('w')
+      expect(moved_widget['parts'].map { |doc| doc['code'] }).to eq([ 'p' ])
+    end
+  end
+
+  context 'when moving an existing embedded document through two new parents' do
+    let(:cabinet) do
+      cabinet = ModifierModels::Cabinet.find(ModifierModels::Cabinet.create!.id)
+      cabinet.build_source(items: [ { name: 'old', widgets: [ { label: 'w' } ] } ])
+      cabinet.save!
+      cabinet
+    end
+
+    it 'persists the document only in the final parent' do
+      fresh = ModifierModels::Cabinet.find(cabinet.id)
+      item = fresh.source.items.first
+      item_id = item.id
+      widget = item.widgets.first
+      widget_id = widget.id
+
+      widget.assign_attributes(parts: [ { code: 'p' } ])
+      fresh.drawer.assign_attributes(items: [ item ])
+      fresh.build_shelf(matcher: 's')
+      fresh.shelf.assign_attributes(items: [ item ])
+      fresh.source.assign_attributes(items: [ { name: 'new' } ])
+
+      fresh.save!
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      expect(stored['source']['items'].map { |doc| doc['name'] }).to eq([ 'new' ])
+
+      locations = %w[source drawer shelf].flat_map do |key|
+        Array(stored.dig(key, 'items'))
+          .select { |doc| doc['_id'] == item_id }
+          .map { key }
+      end
+      expect(locations).to eq([ 'shelf' ])
+      expect(stored.dig('drawer', 'items')).to be_blank
+      expect(stored.dig('shelf', 'matcher')).to eq('s')
+
+      moved_widget = stored.dig('shelf', 'items').first['widgets'].first
+      expect(moved_widget['_id']).to eq(widget_id)
+      expect(moved_widget['label']).to eq('w')
+      expect(moved_widget['parts'].map { |doc| doc['code'] }).to eq([ 'p' ])
+    end
+
+    it 'keeps other items in an already saved intermediate parent' do
+      cabinet.drawer.assign_attributes(items: [ { name: 'sibling' } ])
+      cabinet.save!
+
+      fresh = ModifierModels::Cabinet.find(cabinet.id)
+      sibling = fresh.drawer.items.first
+      item = fresh.source.items.first
+      item.widgets.first.assign_attributes(parts: [ { code: 'p' } ])
+
+      fresh.drawer.assign_attributes(items: fresh.drawer.items.to_a + [ item ])
+      fresh.build_shelf(matcher: 's')
+      fresh.shelf.assign_attributes(items: [ item ])
+      fresh.source.assign_attributes(items: [ { name: 'new' } ])
+
+      fresh.save!
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      expect(stored['source']['items'].map { |doc| doc['name'] }).to eq([ 'new' ])
+      expect(stored.dig('drawer', 'items').map { |doc| doc['_id'] }).to eq([ sibling.id ])
+      expect(stored.dig('shelf', 'items').map { |doc| doc['_id'] }).to eq([ item.id ])
+      expect(stored.dig('shelf', 'items').first['widgets'].first['parts'].map { |doc| doc['code'] }).to eq([ 'p' ])
+    end
+  end
+
+  context 'when moving an item out of a saved source and changing a sibling' do
+    let(:cabinet) do
+      cabinet = ModifierModels::Cabinet.find(ModifierModels::Cabinet.create!.id)
+      cabinet.build_source(items: [ { name: 'first' }, { name: 'second' } ])
+      cabinet.save!
+      cabinet
+    end
+
+    it 'updates the sibling at its stored position across two saves' do
+      fresh = ModifierModels::Cabinet.find(cabinet.id)
+      first, second = fresh.source.items.to_a
+      first_id = first.id
+      second_id = second.id
+
+      fresh.build_shelf(matcher: 's')
+      fresh.shelf.assign_attributes(items: [ first ])
+      fresh.save!
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      expect(stored.dig('source', 'items').map { |doc| doc['_id'] }).to eq([ first_id, second_id ])
+      expect(stored.dig('source', 'items').map { |doc| doc['name'] }).to eq(%w[first second])
+      expect(stored.dig('shelf', 'items').map { |doc| doc['_id'] }).to eq([ first_id ])
+
+      second.name = 'x'
+      fresh.save!
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      expect(stored.dig('source', 'items').map { |doc| doc['_id'] }).to eq([ first_id, second_id ])
+      expect(stored.dig('source', 'items').map { |doc| doc['name'] }).to eq(%w[first x])
+      expect(stored.dig('source', 'items').last['name']).to eq('x')
+      expect(stored.dig('shelf', 'items').map { |doc| doc['_id'] }).to eq([ first_id ])
+      expect(stored.dig('shelf', 'items').first['name']).to eq('first')
+    end
   end
 end

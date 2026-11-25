@@ -132,28 +132,40 @@ module Mongoid
         # @param [ Array<Hash> ] sets The atomic sets.
         #
         # @return [ Array<Hash> | nil ] The atomic sets, or nil if the base
-        #   document is not persisted or is not being assigned.
+        #   document is not being assigned.
         def add_atomic_sets(sets)
-          # New embedded documents are persisted whole by their parent with a
-          # $set or $push. A delayed update for one of their associations is
-          # redundant whether or not the document is attached to its parent.
-          # Before attachment, its path is relative to the document instead
-          # of the root.
-          return unless _assigning? && _base.persisted?
+          return unless _assigning?
+
+          unless _base.persisted?
+            # A new document is persisted whole by its parent with a $set or
+            # $push. Pending delayed updates recorded anywhere in its subtree
+            # are redundant, and they may point at paths from before it was
+            # attached (for example, an existing document moved into a new
+            # embedded parent). Drop them so they cannot conflict with the
+            # wholesale write.
+            clear_delayed_atomic_sets(_base)
+            return
+          end
 
           _base.delayed_atomic_sets[path].try(:clear)
           _base.collect_children.each do |child|
             child.delayed_atomic_sets.clear
           end
 
-          # If the base document is itself inserted wholesale via a $set of
-          # its atomic path, that $set already contains these documents, and
-          # a nested $set under the same path would conflict with it. The
-          # cleanup above has already cleared the delayed sets the assigned
-          # children recorded, so skipping the recording here is safe.
-          return if _base.settable?
-
           _base.delayed_atomic_sets[path] = sets
+        end
+
+        # Clear the delayed atomic sets of the document and all of its
+        # descendants.
+        #
+        # @api private
+        #
+        # @param [ Document ] document The root of the subtree to clear.
+        def clear_delayed_atomic_sets(document)
+          document.delayed_atomic_sets.clear
+          document.collect_children.each do |child|
+            clear_delayed_atomic_sets(child)
+          end
         end
 
         # Perform a batch persist of the provided documents with a $set.
