@@ -1072,6 +1072,26 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
+  describe '#path=' do
+    let(:person) do
+      Person.create!
+    end
+
+    let(:proxy) do
+      person.addresses
+    end
+
+    it 'resets the cached selector and returns the assigned path' do
+      cached_selector = proxy.send(:selector)
+      allow(person).to receive(:atomic_selector).and_return('changed-selector')
+
+      expect(proxy.send(:path=, 'custom.addresses')).to eq('custom.addresses')
+      expect(proxy.send(:path)).to eq('custom.addresses')
+      expect(proxy.send(:selector)).to eq('changed-selector')
+      expect(proxy.send(:selector)).not_to eq(cached_selector)
+    end
+  end
+
   describe '#clear' do
     context 'when the parent has been persisted' do
       let(:person) do

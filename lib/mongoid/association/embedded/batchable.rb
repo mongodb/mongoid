@@ -305,6 +305,9 @@ module Mongoid
 
         # Set the atomic path.
         #
+        # The selector is derived from the same path, so it is invalidated
+        # together with it.
+        #
         # @api private
         #
         # @example Set the atomic path.
@@ -314,6 +317,7 @@ module Mongoid
         #
         # @return [ String ] The path.
         def path=(value)
+          @selector = nil
           @path = value
         end
 

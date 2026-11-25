@@ -244,13 +244,20 @@ module Mongoid
           # remaining documents and make later writes target the wrong array
           # entries.
           #
+          # When an ancestor is a new record, this subtree is written whole
+          # with that ancestor, so _unscoped must reflect the current
+          # association state; otherwise a moved document would be serialized
+          # into both the old and the new location.
+          #
           # @api private
           #
           # @return [ true | false ] If _unscoped must be updated.
           def remove_from_unscoped?
             return true unless _binding?
 
-            _base.new_record? || _base.delayed_atomic_sets.key?(path)
+            _base.new_record? ||
+              _base._covered_by_new_ancestor? ||
+              _base.delayed_atomic_sets.key?(path)
           end
 
           # Mongoid::Extensions::Array defines Array#delete_one, so we need

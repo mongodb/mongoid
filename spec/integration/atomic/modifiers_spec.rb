@@ -667,4 +667,106 @@ describe Mongoid::Atomic::Modifiers do
       end
     end
   end
+
+  context 'when a moved item has cached association selectors' do
+    let(:cabinet) do
+      cabinet = ModifierModels::Cabinet.find(ModifierModels::Cabinet.create!.id)
+      cabinet.build_source(items: [ { name: 'a', widgets: [ { label: 'w' } ] } ])
+      cabinet.save!
+      cabinet
+    end
+
+    it 'pushes to the new location for nested associations' do
+      fresh = ModifierModels::Cabinet.find(cabinet.id)
+      item = fresh.source.items.first
+      widget = item.widgets.first
+
+      w1 = ModifierModels::Widget.new(label: 'w1')
+      w1_batch = [ w1 ]
+      item.widgets.concat(w1_batch)
+      p1 = ModifierModels::Part.new(code: 'p1')
+      p1_batch = [ p1 ]
+      widget.parts.concat(p1_batch)
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      source_item = stored.dig('source', 'items').first
+      expect(source_item['widgets'].map { |doc| doc['label'] }).to eq(%w[w w1])
+      expect(source_item['widgets'].first['parts'].map { |doc| doc['code'] }).to eq([ 'p1' ])
+      expect(w1).to be_persisted
+      expect(p1).to be_persisted
+
+      fresh.drawer.assign_attributes(items: [ item ])
+      fresh.source.assign_attributes(items: [ { name: 'n' } ])
+      fresh.save!
+
+      w2 = ModifierModels::Widget.new(label: 'w2')
+      w2_batch = [ w2 ]
+      item.widgets.concat(w2_batch)
+      p2 = ModifierModels::Part.new(code: 'p2')
+      p2_batch = [ p2 ]
+      widget.parts.concat(p2_batch)
+
+      expect(w2).to be_persisted
+      expect(p2).to be_persisted
+
+      fresh.save!
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      expect(stored['source']['items'].map { |doc| doc['name'] }).to eq([ 'n' ])
+      drawer_item = stored.dig('drawer', 'items').first
+      expect(drawer_item['widgets'].map { |doc| doc['label'] }).to eq(%w[w w1 w2])
+      expect(drawer_item['widgets'].map { |doc| doc['_id'] }.uniq.length).to eq(3)
+      expect(drawer_item['widgets'].first['parts'].map { |doc| doc['code'] }).to eq(%w[p1 p2])
+      expect(drawer_item['widgets'].first['parts'].map { |doc| doc['_id'] }.uniq.length).to eq(2)
+    end
+  end
+
+  context 'when a part moves out of a subtree inside a new parent' do
+    let(:cabinet) do
+      cabinet = ModifierModels::Cabinet.find(ModifierModels::Cabinet.create!.id)
+      cabinet.build_source(items: [
+                             { name: 'a', widgets: [ { label: 'w', parts: [ { code: 'p' } ] } ] },
+                             { name: 'b', widgets: [ { label: 'v' } ] }
+                           ])
+      cabinet.save!
+      cabinet
+    end
+
+    it 'does not serialize the moved part into the new parent subtree' do
+      fresh = ModifierModels::Cabinet.find(cabinet.id)
+      item = fresh.source.items[0]
+      destination = fresh.source.items[1].widgets.first
+      part = item.widgets.first.parts.first
+      part_id = part.id
+
+      fresh.drawer.assign_attributes(items: [ item ])
+      destination.parts << part
+      fresh.save!
+      fresh.save!
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      expect(stored.dig('source', 'items', 1, 'widgets', 0, 'parts').map { |doc| doc['_id'] }).to eq([ part_id ])
+      expect(Array(stored.dig('drawer', 'items', 0, 'widgets', 0, 'parts'))).to be_empty
+      expect(part).to be_persisted
+    end
+
+    it 'does not serialize the moved part into another new parent subtree' do
+      fresh = ModifierModels::Cabinet.find(cabinet.id)
+      item = fresh.source.items[0]
+      destination = fresh.source.items[1].widgets.first
+      part = item.widgets.first.parts.first
+      part_id = part.id
+
+      fresh.build_shelf(matcher: 's')
+      fresh.shelf.assign_attributes(items: [ item ])
+      destination.parts << part
+      fresh.save!
+      fresh.save!
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      expect(stored.dig('source', 'items', 1, 'widgets', 0, 'parts').map { |doc| doc['_id'] }).to eq([ part_id ])
+      expect(Array(stored.dig('shelf', 'items', 0, 'widgets', 0, 'parts'))).to be_empty
+      expect(part).to be_persisted
+    end
+  end
 end
