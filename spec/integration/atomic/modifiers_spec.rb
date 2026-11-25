@@ -467,17 +467,19 @@ describe Mongoid::Atomic::Modifiers do
     end
 
     context 'when a validation fails before saving' do
-      before do
-        ModifierModels::Item.validates :name, presence: true
-      end
-
-      after do
-        ModifierModels::Item.clear_validators!
+      around do |example|
+        validators = ModifierModels::Item.validators.dup
+        callbacks = ModifierModels::Item._validate_callbacks.to_a
+        example.run
+        expect(ModifierModels::Item.validators).to eq(validators)
+        expect(ModifierModels::Item._validate_callbacks.to_a).to eq(callbacks)
       end
 
       it 'keeps the pending move and saves it after the error is fixed' do
         item_id = item.id
         cabinet.source.assign_attributes(items: [ { name: nil } ])
+        invalid_item = cabinet.source.items.first
+        expect(invalid_item).to receive(:valid?).at_least(:once).and_return(false)
         expect { cabinet.save! }.to raise_error(Mongoid::Errors::Validations)
 
         stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
@@ -830,12 +832,12 @@ describe Mongoid::Atomic::Modifiers do
     end
 
     context 'when validation fails before saving' do
-      before do
-        ModifierModels::Item.validates :name, presence: true
-      end
-
-      after do
-        ModifierModels::Item.clear_validators!
+      around do |example|
+        validators = ModifierModels::Item.validators.dup
+        callbacks = ModifierModels::Item._validate_callbacks.to_a
+        example.run
+        expect(ModifierModels::Item.validators).to eq(validators)
+        expect(ModifierModels::Item._validate_callbacks.to_a).to eq(callbacks)
       end
 
       it 'keeps the removal pending until a successful save' do
@@ -847,6 +849,8 @@ describe Mongoid::Atomic::Modifiers do
         widget.assign_attributes(parts: [])
         cabinet.source.assign_attributes(items: [ { name: nil } ])
 
+        invalid_item = cabinet.source.items.first
+        expect(invalid_item).to receive(:valid?).at_least(:once).and_return(false)
         expect { cabinet.save! }.to raise_error(Mongoid::Errors::Validations)
         expect(removed).to be_marked_for_destruction
         stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
