@@ -100,8 +100,8 @@ module Mongoid
         def batch_replace(docs)
           if docs.blank?
             if _assigning? && !empty?
-              _base.delayed_atomic_sets.delete(path)
               clear_atomic_path_cache
+              _base.delayed_atomic_sets.delete(path)
               _base.add_atomic_unset(first)
               target_duplicate = _target.dup
               pre_process_batch_remove(target_duplicate, :delete)
@@ -110,6 +110,7 @@ module Mongoid
               batch_remove(_target.dup)
             end
           elsif _target != docs
+            clear_atomic_path_cache
             _base.delayed_atomic_sets.delete(path) unless _assigning?
             docs = normalize_docs(docs).compact
             _target.clear and _unscoped.clear

@@ -321,8 +321,6 @@ describe 'embedded associations' do
 
     context 'when modifying first and removing second' do
       it 'works correctly' do
-        pending 'MONGOID-5364'
-
         user.orders[1].assign_attributes(surcharges: [ { amount: 10 } ])
         user.orders[0].destroy
         user.save!
