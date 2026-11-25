@@ -175,6 +175,14 @@ describe Mongoid::Traversable do
     it 'sets the parent document' do
       expect(address._parent).to eq(person)
     end
+
+    it 'returns the parent document' do
+      expect(address.parentize(person)).to equal(person)
+    end
+
+    it 'returns nil when clearing the parent' do
+      expect(address.parentize(nil)).to be_nil
+    end
   end
 
   describe '#remove_child' do

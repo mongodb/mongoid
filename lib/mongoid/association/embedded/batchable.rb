@@ -277,6 +277,11 @@ module Mongoid
 
         # Get the atomic path.
         #
+        # The path is derived from the base document instead of the first
+        # unscoped document: a document that was moved to another parent keeps
+        # its slot in _unscoped when the removal is not going to be persisted
+        # yet, and its atomic path would then point at the destination.
+        #
         # @api private
         #
         # @example Get the atomic path.
@@ -284,11 +289,7 @@ module Mongoid
         #
         # @return [ String ] The atomic path.
         def path
-          @path ||= if _unscoped.empty?
-                      Mongoid::Atomic::Paths::Embedded::Many.position_without_document(_base, _association)
-                    else
-                      _unscoped.first.atomic_path
-                    end
+          @path ||= Mongoid::Atomic::Paths::Embedded::Many.position_without_document(_base, _association)
         end
 
         # Clear the cache for path and atomic_paths. This method is used when

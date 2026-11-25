@@ -632,5 +632,39 @@ describe Mongoid::Atomic::Modifiers do
       expect(stored.dig('shelf', 'items').map { |doc| doc['_id'] }).to eq([ first_id ])
       expect(stored.dig('shelf', 'items').first['name']).to eq('first')
     end
+
+    it 'appends to the source rather than the destination after the move' do
+      fresh = ModifierModels::Cabinet.find(cabinet.id)
+      first, second = fresh.source.items.to_a
+      fresh.build_shelf(matcher: 's')
+      fresh.shelf.assign_attributes(items: [ first ])
+      fresh.save!
+
+      added = ModifierModels::Item.new(name: 'third')
+      added_items = [ added ]
+      fresh.source.items.concat(added_items)
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      aggregate_failures do
+        expect(stored.dig('source', 'items').map { |doc| doc['_id'] }).to include(second.id, added.id)
+        expect(Array(stored.dig('shelf', 'items')).map { |doc| doc['_id'] }).to eq([ first.id ])
+      end
+    end
+
+    it 'clears the source without deleting the destination items after the move' do
+      fresh = ModifierModels::Cabinet.find(cabinet.id)
+      first = fresh.source.items.first
+      fresh.build_shelf(matcher: 's')
+      fresh.shelf.assign_attributes(items: [ first ])
+      fresh.save!
+
+      fresh.source.items.clear
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      aggregate_failures do
+        expect(Array(stored.dig('source', 'items'))).to be_empty
+        expect(Array(stored.dig('shelf', 'items')).map { |doc| doc['_id'] }).to eq([ first.id ])
+      end
+    end
   end
 end
