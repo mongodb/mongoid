@@ -62,7 +62,9 @@ module ModifierModels
   class Cabinet
     include Mongoid::Document
 
+    embeds_one :source, class_name: 'ModifierModels::Drawer'
     embeds_one :drawer, class_name: 'ModifierModels::Drawer', autobuild: true
+    embeds_one :shelf, class_name: 'ModifierModels::Drawer'
   end
 
   class Drawer
@@ -86,5 +88,14 @@ module ModifierModels
 
     field :label, type: String
     embedded_in :item, class_name: 'ModifierModels::Item'
+    embeds_many :parts, class_name: 'ModifierModels::Part'
+    accepts_nested_attributes_for :parts, allow_destroy: true
+  end
+
+  class Part
+    include Mongoid::Document
+
+    field :code, type: String
+    embedded_in :widget, class_name: 'ModifierModels::Widget'
   end
 end

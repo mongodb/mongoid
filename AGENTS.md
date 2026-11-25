@@ -24,6 +24,12 @@ bundle exec rspec spec/path/to/spec.rb
 
 A replica set is typically available locally at `localhost:27017,27018,27019`.
 
+The `mongoid_test` database is disposable. The test suite drops its collections
+before the suite and before each example; this cleanup is expected and
+authorized. Run the standard test setup without creating an isolated database
+solely to avoid clearing `mongoid_test`. This does not authorize clearing other
+databases.
+
 ## Environment Variables
 
 Avoid prefixing a command with environment variables, which makes it harder to teach you about commands that can be executed safely. Prefer instead to set environment variables first, and then invoke the command.

@@ -119,6 +119,16 @@ module Mongoid
       generate_atomic_updates(mods, self)
       _descendants.each do |child|
         child.process_flagged_destroys
+        # A document inside a new embedded document is written whole with that
+        # ancestor, either as part of a $set or a $push. Its own atomic updates
+        # are redundant and may target paths from before it was attached.
+        if child._covered_by_new_ancestor?
+          # Mark removed documents as destroyed even though their database
+          # modifiers are covered by the ancestor's wholesale write.
+          mark_covered_removals_destroyed(child)
+          next
+        end
+
         generate_atomic_updates(mods, child)
       end
       mods
@@ -315,7 +325,63 @@ module Mongoid
       flagged_destroys.clear
     end
 
+    # Invalidate the cached atomic paths for this document and its
+    # descendants.
+    #
+    # Atomic paths are cached for persisted documents. When a document is
+    # attached to a different parent, those cached paths point at the old
+    # location, and so do the paths cached by the batchable association
+    # proxies below it.
+    #
+    # @api private
+    def _reset_atomic_paths!
+      @atomic_paths = nil
+      embedded_relations.each_key do |name|
+        proxy = ivar(name)
+        next unless proxy
+
+        if proxy.respond_to?(:clear_atomic_path_cache, true)
+          proxy.send(:clear_atomic_path_cache)
+        end
+
+        target = proxy.respond_to?(:_target) ? proxy._target : proxy
+        children = target.is_a?(Array) ? target : [ target ]
+        children.compact.each do |child|
+          child._reset_atomic_paths!
+        end
+      end
+    end
+
+    # Whether this document is inside a new embedded document, which is
+    # persisted whole together with all of its attributes.
+    #
+    # @api private
+    #
+    # @return [ true | false ] True if any ancestor is a new record.
+    def _covered_by_new_ancestor?
+      parent = _parent
+      while parent
+        return true if parent.new_record?
+
+        parent = parent._parent
+      end
+      false
+    end
+
     private
+
+    # Apply the state changes from redundant removals without computing their
+    # old paths or adding database modifiers.
+    def mark_covered_removals_destroyed(document)
+      [ document.delayed_atomic_unsets, document.delayed_atomic_pulls ].each do |removals|
+        removals.each_value do |documents|
+          documents.each do |removed|
+            removed.destroyed = true
+            removed.flagged_for_destroy = false
+          end
+        end
+      end
+    end
 
     # Clears all pending atomic updates.
     def reset_atomic_updates!

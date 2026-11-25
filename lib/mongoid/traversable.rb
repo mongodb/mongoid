@@ -344,6 +344,8 @@ module Mongoid
     # @return [ Document ] The parent document.
     def parentize(document)
       self._parent = document
+      _reset_atomic_paths!
+      document
     end
 
     # Remove a child document from this parent. If an embeds one then set to
