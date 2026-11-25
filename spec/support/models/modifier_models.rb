@@ -89,6 +89,7 @@ module ModifierModels
     field :label, type: String
     embedded_in :item, class_name: 'ModifierModels::Item'
     embeds_many :parts, class_name: 'ModifierModels::Part'
+    accepts_nested_attributes_for :parts, allow_destroy: true
   end
 
   class Part

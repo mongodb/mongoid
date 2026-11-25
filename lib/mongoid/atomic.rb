@@ -122,7 +122,12 @@ module Mongoid
         # A document inside a new embedded document is written whole with that
         # ancestor, either as part of a $set or a $push. Its own atomic updates
         # are redundant and may target paths from before it was attached.
-        next if child._covered_by_new_ancestor?
+        if child._covered_by_new_ancestor?
+          # Mark removed documents as destroyed even though their database
+          # modifiers are covered by the ancestor's wholesale write.
+          mark_covered_removals_destroyed(child)
+          next
+        end
 
         generate_atomic_updates(mods, child)
       end
@@ -364,6 +369,19 @@ module Mongoid
     end
 
     private
+
+    # Apply the state changes from redundant removals without computing their
+    # old paths or adding database modifiers.
+    def mark_covered_removals_destroyed(document)
+      [ document.delayed_atomic_unsets, document.delayed_atomic_pulls ].each do |removals|
+        removals.each_value do |documents|
+          documents.each do |removed|
+            removed.destroyed = true
+            removed.flagged_for_destroy = false
+          end
+        end
+      end
+    end
 
     # Clears all pending atomic updates.
     def reset_atomic_updates!

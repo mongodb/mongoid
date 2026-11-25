@@ -769,4 +769,99 @@ describe Mongoid::Atomic::Modifiers do
       expect(part).to be_persisted
     end
   end
+
+  context 'when clearing an association in a moved subtree' do
+    let(:cabinet) do
+      cabinet = ModifierModels::Cabinet.find(ModifierModels::Cabinet.create!.id)
+      cabinet.build_source(items: [
+                             { name: 'a', widgets: [ { label: 'w', parts: [ { code: 'p' }, { code: 'q' } ] } ] }
+                           ])
+      cabinet.save!
+      ModifierModels::Cabinet.find(cabinet.id)
+    end
+
+    it 'clears the removal flags after saving the moved subtree' do
+      item = cabinet.source.items.first
+      widget = item.widgets.first
+      first, second = widget.parts.to_a
+
+      cabinet.drawer.assign_attributes(items: [ item ])
+      widget.assign_attributes(parts: [])
+      cabinet.source.assign_attributes(items: [ { name: 'new' } ])
+      cabinet.save!
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      aggregate_failures do
+        expect(stored.dig('source', 'items').map { |doc| doc['name'] }).to eq([ 'new' ])
+        expect(Array(stored.dig('drawer', 'items', 0, 'widgets', 0, 'parts'))).to be_empty
+        expect(first).to be_destroyed
+        expect(first).not_to be_persisted
+        expect(first).not_to be_marked_for_destruction
+        expect(second).to be_destroyed
+        expect(second).not_to be_persisted
+        expect(second).not_to be_marked_for_destruction
+      end
+    end
+
+    it 'marks each nested document removed through attributes as destroyed' do
+      item = cabinet.source.items.first
+      widget = item.widgets.first
+      first, second = widget.parts.to_a
+
+      cabinet.drawer.assign_attributes(items: [ item ])
+      widget.assign_attributes(parts_attributes: [
+                                 { id: first.id, _destroy: true },
+                                 { id: second.id, _destroy: true }
+                               ])
+      cabinet.source.assign_attributes(items: [ { name: 'new' } ])
+      cabinet.save!
+
+      stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+      aggregate_failures do
+        expect(stored.dig('source', 'items').map { |doc| doc['name'] }).to eq([ 'new' ])
+        expect(Array(stored.dig('drawer', 'items', 0, 'widgets', 0, 'parts'))).to be_empty
+        expect(first).to be_destroyed
+        expect(first).not_to be_persisted
+        expect(first).not_to be_marked_for_destruction
+        expect(second).to be_destroyed
+        expect(second).not_to be_persisted
+        expect(second).not_to be_marked_for_destruction
+      end
+    end
+
+    context 'when validation fails before saving' do
+      before do
+        ModifierModels::Item.validates :name, presence: true
+      end
+
+      after do
+        ModifierModels::Item.clear_validators!
+      end
+
+      it 'keeps the removal pending until a successful save' do
+        item = cabinet.source.items.first
+        widget = item.widgets.first
+        removed = widget.parts.first
+
+        cabinet.drawer.assign_attributes(items: [ item ])
+        widget.assign_attributes(parts: [])
+        cabinet.source.assign_attributes(items: [ { name: nil } ])
+
+        expect { cabinet.save! }.to raise_error(Mongoid::Errors::Validations)
+        expect(removed).to be_marked_for_destruction
+        stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+        expect(stored).not_to have_key('drawer')
+        expect(stored.dig('source', 'items', 0, 'widgets', 0, 'parts').map { |doc| doc['code'] }).to eq(%w[p q])
+
+        cabinet.source.assign_attributes(items: [ { name: 'new' } ])
+        cabinet.save!
+
+        expect(removed).to be_destroyed
+        expect(removed).not_to be_persisted
+        expect(removed).not_to be_marked_for_destruction
+        stored = ModifierModels::Cabinet.collection.find(_id: cabinet.id).first
+        expect(Array(stored.dig('drawer', 'items', 0, 'widgets', 0, 'parts'))).to be_empty
+      end
+    end
+  end
 end
