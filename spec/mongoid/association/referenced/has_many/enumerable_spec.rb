@@ -1145,6 +1145,68 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
       it 'returns the matching document' do
         expect(enumerable.first(1)).to eq([ first_post ])
       end
+
+      it 'does not load the enumerable' do
+        enumerable.first(1)
+        expect(enumerable).not_to be__loaded
+      end
+
+      context 'when the enumerable is loaded' do
+        let!(:third_post) do
+          person.posts.create!(title: 'Three')
+        end
+
+        before do
+          enumerable.load_all!
+        end
+
+        it 'returns the first documents up to the limit' do
+          expect(enumerable.first(2)).to eq([ first_post, second_post ])
+        end
+      end
+
+      context 'when the enumerable is partially loaded' do
+        let!(:loaded_post) do
+          enumerable.detect { |post| post.title == 'One' }
+        end
+
+        it 'returns the in-memory instance of the loaded document' do
+          expect(enumerable.first(1).first).to equal(loaded_post)
+        end
+
+        it 'does not load the enumerable' do
+          enumerable.first(1)
+          expect(enumerable).not_to be__loaded
+        end
+      end
+
+      context 'when there are added documents' do
+        let(:added_post) do
+          Post.new(person_id: person.id, title: 'Added')
+        end
+
+        before do
+          enumerable << added_post
+        end
+
+        it 'returns the added documents after the persisted ones' do
+          expect(enumerable.first(3)).to eq([ first_post, second_post, added_post ])
+        end
+      end
+
+      context 'when a persisted document is also added' do
+        before do
+          enumerable << first_post
+        end
+
+        it 'does not return it twice' do
+          expect(enumerable.first(3)).to eq([ first_post, second_post ])
+        end
+
+        it 'returns the added instance' do
+          expect(enumerable.first(1).first).to equal(first_post)
+        end
+      end
     end
 
     context 'when no parameters are provided' do
@@ -1576,6 +1638,68 @@ describe Mongoid::Association::Referenced::HasMany::Enumerable do
 
       it 'returns the matching document' do
         expect(enumerable.last(1)).to eq([ second_post ])
+      end
+
+      it 'does not load the enumerable' do
+        enumerable.last(1)
+        expect(enumerable).not_to be__loaded
+      end
+
+      context 'when the enumerable is loaded' do
+        let!(:third_post) do
+          person.posts.create!(title: 'Three')
+        end
+
+        before do
+          enumerable.load_all!
+        end
+
+        it 'returns the last documents up to the limit' do
+          expect(enumerable.last(2)).to eq([ second_post, third_post ])
+        end
+      end
+
+      context 'when the enumerable is partially loaded' do
+        let!(:loaded_post) do
+          enumerable.detect { |post| post.title == 'One' }
+        end
+
+        it 'returns the in-memory instance of the loaded document' do
+          expect(enumerable.last(2).first).to equal(loaded_post)
+        end
+
+        it 'does not load the enumerable' do
+          enumerable.last(2)
+          expect(enumerable).not_to be__loaded
+        end
+      end
+
+      context 'when there are added documents' do
+        let(:added_post) do
+          Post.new(person_id: person.id, title: 'Added')
+        end
+
+        before do
+          enumerable << added_post
+        end
+
+        it 'returns the added documents last' do
+          expect(enumerable.last(2)).to eq([ second_post, added_post ])
+        end
+      end
+
+      context 'when a persisted document is also added' do
+        before do
+          enumerable << second_post
+        end
+
+        it 'does not return it twice' do
+          expect(enumerable.last(3)).to eq([ first_post, second_post ])
+        end
+
+        it 'returns the added instance' do
+          expect(enumerable.last(1).first).to equal(second_post)
+        end
       end
     end
 

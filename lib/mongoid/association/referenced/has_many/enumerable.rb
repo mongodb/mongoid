@@ -242,10 +242,14 @@ module Mongoid
           #
           # @param [ Integer ] limit The number of documents to return.
           #
-          # @return [ Document ] The first document found.
+          # @return [ Document | Array<Document> | nil ] The first document
+          #   found, or an array with up to limit documents when a limit is
+          #   given.
           def first(limit = nil)
+            return with_limit(:first, limit) if limit
+
             _loaded.try(:values).try(:first) ||
-              _added[(ul = _unloaded.try(:first, limit)).try(:_id)] ||
+              _added[(ul = _unloaded.try(:first)).try(:_id)] ||
               ul ||
               _added.values.try(:first)
           end
@@ -327,11 +331,15 @@ module Mongoid
           #
           # @param [ Integer ] limit The number of documents to return.
           #
-          # @return [ Document ] The last document found.
+          # @return [ Document | Array<Document> | nil ] The last document
+          #   found, or an array with up to limit documents when a limit is
+          #   given.
           def last(limit = nil)
+            return with_limit(:last, limit) if limit
+
             _added.values.try(:last) ||
               _loaded.try(:values).try(:last) ||
-              _added[(ul = _unloaded.try(:last, limit)).try(:_id)] ||
+              _added[(ul = _unloaded.try(:last)).try(:_id)] ||
               ul
           end
 
@@ -593,6 +601,25 @@ module Mongoid
           # @return [ Array<Numeric> ] The non-nil field values.
           def field_values_for(field)
             map { |doc| read_field_value(doc, field) }.compact
+          end
+
+          # Get the first or last documents up to the limit, combining the
+          # persisted documents with the new ones. Prefers the in-memory
+          # instance of a persisted document and puts the new documents
+          # last, as #each does.
+          #
+          # @param [ Symbol ] method Either :first or :last.
+          # @param [ Integer ] limit The number of documents to return.
+          #
+          # @return [ Array<Document> ] Up to limit documents.
+          def with_limit(method, limit)
+            persisted = if _loaded?
+                          _loaded.values
+                        else
+                          _unloaded.public_send(method, limit).map { |doc| _loaded[doc._id] || doc }
+                        end
+
+            persisted.to_h { |doc| [ doc._id, doc ] }.merge(_added).values.public_send(method, limit)
           end
 
           def set_base(document)
