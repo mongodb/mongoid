@@ -136,5 +136,125 @@ describe ActiveModel::Validations::NumericalityValidator do
         end
       end
     end
+
+    context 'when the attribute is not a field' do
+      let(:model_class) do
+        test_model do
+          field :ratio, type: Float
+
+          def percentage
+            ratio * 100 if ratio
+          end
+
+          validates_numericality_of :percentage, less_than_or_equal_to: 100
+        end
+      end
+
+      context 'when the value is within the limit' do
+        let(:model) { model_class.new(ratio: 0.25) }
+
+        it 'is valid' do
+          expect(model).to be_valid
+        end
+      end
+
+      context 'when the value exceeds the limit' do
+        let(:model) { model_class.new(ratio: 2.0) }
+
+        it 'is invalid' do
+          expect(model).not_to be_valid
+          expect(model.errors[:percentage]).to eq([ 'must be less than or equal to 100' ])
+        end
+      end
+    end
+
+    context 'when the attribute is not a field and allow_nil is true' do
+      let(:model_class) do
+        test_model do
+          field :ratio, type: Float
+
+          def percentage
+            ratio * 100 if ratio
+          end
+
+          validates_numericality_of :percentage, less_than_or_equal_to: 100, allow_nil: true
+        end
+      end
+
+      context 'when the value exceeds the limit' do
+        let(:model) { model_class.new(ratio: 2.0) }
+
+        it 'is invalid' do
+          expect(model).not_to be_valid
+        end
+      end
+
+      context 'when the value is nil' do
+        let(:model) { model_class.new }
+
+        it 'is valid' do
+          expect(model).to be_valid
+        end
+      end
+    end
+
+    context 'when the attribute is not a field and its reader is private' do
+      let(:model_class) do
+        test_model do
+          field :ratio, type: Float
+
+          validates_numericality_of :percentage, less_than_or_equal_to: 100
+
+          private
+
+          def percentage
+            ratio * 100 if ratio
+          end
+        end
+      end
+
+      context 'when the value is within the limit' do
+        let(:model) { model_class.new(ratio: 0.25) }
+
+        it 'is valid' do
+          expect(model).to be_valid
+        end
+      end
+
+      context 'when the value exceeds the limit' do
+        let(:model) { model_class.new(ratio: 2.0) }
+
+        it 'is invalid' do
+          expect(model).not_to be_valid
+          expect(model.errors[:percentage]).to eq([ 'must be less than or equal to 100' ])
+        end
+      end
+    end
+
+    context 'when the attribute is dynamic and allow_nil is true' do
+      let(:model_class) do
+        test_model do
+          include Mongoid::Attributes::Dynamic
+
+          validates_numericality_of :score, allow_nil: true
+        end
+      end
+
+      context 'when the value is not set' do
+        let(:model) { model_class.new }
+
+        it 'is valid' do
+          expect(model).to be_valid
+        end
+      end
+
+      context 'when the value is non numeric' do
+        let(:model) { model_class.new(score: 'abc') }
+
+        it 'is invalid' do
+          expect(model).not_to be_valid
+        end
+      end
+    end
   end
 end
