@@ -12,8 +12,6 @@ module Mongoid
       # Set readers for the instance variables.
       attr_accessor :default_val, :label, :name, :options
 
-      def_delegators :type, :demongoize, :evolve, :mongoize
-
       # Adds the atomic changes for this type of resizable field.
       #
       # @example Add the atomic changes.
@@ -27,6 +25,18 @@ module Mongoid
       # @param [ Array ] old The old elements getting removed.
       def add_atomic_changes(_document, _name, key, mods, new, _old)
         mods[key] = new
+      end
+
+      # Convert the object from its Mongo friendly type to the field's type.
+      #
+      # @example Demongoize the object.
+      #   field.demongoize(object)
+      #
+      # @param [ Object ] object The object to demongoize.
+      #
+      # @return [ Object ] The demongoized object.
+      def demongoize(object)
+        type.demongoize(object)
       end
 
       # Evaluate the default value and return it. Will handle the
@@ -44,6 +54,18 @@ module Mongoid
         else
           evaluated_default(doc)
         end
+      end
+
+      # Convert the object to the field's type for use in a query selector.
+      #
+      # @example Evolve the object.
+      #   field.evolve(object)
+      #
+      # @param [ Object ] object The object to evolve.
+      #
+      # @return [ Object ] The evolved object.
+      def evolve(object)
+        type.evolve(object)
       end
 
       # Is this field a foreign key?
@@ -130,6 +152,18 @@ module Mongoid
         @association ||= options[:association]
       end
 
+      # Convert the object from the field's type to a Mongo friendly type.
+      #
+      # @example Mongoize the object.
+      #   field.mongoize(object)
+      #
+      # @param [ Object ] object The object to mongoize.
+      #
+      # @return [ Object ] The mongoized object.
+      def mongoize(object)
+        type.mongoize(object)
+      end
+
       # Is the field a BSON::ObjectId?
       #
       # @example Is the field a BSON::ObjectId?
@@ -202,8 +236,16 @@ module Mongoid
       #
       # @return [ true | false ] If the field was included.
       def included?(fields)
-        (fields.values.first == 1 && fields[name.to_s] == 1) ||
-          (fields.values.first == 0 && !fields.has_key?(name.to_s))
+        # Hash#any? stops at the first pair and, unlike fields.values.first,
+        # does not build an Array of all the values.
+        first = nil
+        fields.any? do |_key, value|
+          first = value
+          true
+        end
+
+        (first == 1 && fields[name.to_s] == 1) ||
+          (first == 0 && !fields.has_key?(name.to_s))
       end
 
       # Get the evaluated default.

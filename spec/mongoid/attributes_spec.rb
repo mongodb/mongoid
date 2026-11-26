@@ -1054,6 +1054,136 @@ describe Mongoid::Attributes do
     end
   end
 
+  describe '#attribute_missing?' do
+    let(:person) do
+      Person.new(title: 'sir')
+    end
+
+    context 'when the document has no projection' do
+      it 'returns false for a field with a value' do
+        expect(person.attribute_missing?('title')).to be false
+      end
+
+      it 'returns false for a field without a value' do
+        expect(person.attribute_missing?('ssn')).to be false
+      end
+
+      it 'returns false for the id' do
+        expect(person.attribute_missing?('_id')).to be false
+      end
+
+      it 'returns false for a nested path' do
+        expect(person.attribute_missing?('map.key')).to be false
+      end
+
+      it 'returns false for an undefined attribute' do
+        expect(person.attribute_missing?('foobar')).to be false
+      end
+    end
+
+    context 'when the document has an inclusion projection' do
+      before do
+        person.__selected_fields = { 'title' => 1, 'map.key' => 1 }
+      end
+
+      it 'returns false for an included field' do
+        expect(person.attribute_missing?('title')).to be false
+      end
+
+      it 'returns false for an included nested path' do
+        expect(person.attribute_missing?('map.key')).to be false
+      end
+
+      it 'returns false for the parent of an included nested path' do
+        expect(person.attribute_missing?('map')).to be false
+      end
+
+      it 'returns false for the id' do
+        expect(person.attribute_missing?('_id')).to be false
+      end
+
+      it 'returns true for a field that is not included' do
+        expect(person.attribute_missing?('ssn')).to be true
+      end
+
+      it 'returns true for a nested path that is not included' do
+        expect(person.attribute_missing?('map.other')).to be true
+      end
+    end
+
+    context 'when the document has an exclusion projection' do
+      before do
+        person.__selected_fields = { 'title' => 0, 'map.key' => 0 }
+      end
+
+      it 'returns true for an excluded field' do
+        expect(person.attribute_missing?('title')).to be true
+      end
+
+      it 'returns true for an excluded nested path' do
+        expect(person.attribute_missing?('map.key')).to be true
+      end
+
+      it 'returns false for the parent of an excluded nested path' do
+        expect(person.attribute_missing?('map')).to be false
+      end
+
+      it 'returns false for the id' do
+        expect(person.attribute_missing?('_id')).to be false
+      end
+
+      it 'returns false for a field that is not excluded' do
+        expect(person.attribute_missing?('ssn')).to be false
+      end
+    end
+
+    context 'when the projection excludes the id' do
+      before do
+        person.__selected_fields = { '_id' => 0 }
+      end
+
+      it 'returns true for the id' do
+        expect(person.attribute_missing?('_id')).to be true
+      end
+
+      it 'returns false for a field' do
+        expect(person.attribute_missing?('title')).to be false
+      end
+    end
+
+    context 'when the document was loaded without a projection' do
+      before do
+        Person.create!(title: 'sir')
+      end
+
+      let(:from_db) do
+        Person.first
+      end
+
+      it 'returns false for a field' do
+        expect(from_db.attribute_missing?('title')).to be false
+      end
+    end
+
+    context 'when the document was loaded with only' do
+      before do
+        Person.create!(title: 'sir')
+      end
+
+      let(:from_db) do
+        Person.only(:title).first
+      end
+
+      it 'returns false for the selected field' do
+        expect(from_db.attribute_missing?('title')).to be false
+      end
+
+      it 'returns true for a field that was not selected' do
+        expect(from_db.attribute_missing?('ssn')).to be true
+      end
+    end
+  end
+
   describe '#attribute_present?' do
     context 'when document is a new record' do
       let(:person) do

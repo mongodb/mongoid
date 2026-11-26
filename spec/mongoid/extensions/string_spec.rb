@@ -162,6 +162,22 @@ describe Mongoid::Extensions::String do
         end
       end
 
+      context 'when the object is a string' do
+        let(:string) do
+          'test'
+        end
+
+        it 'returns the same string' do
+          expect(String.send(method, string)).to equal(string)
+        end
+      end
+
+      context 'when the object is false' do
+        it 'returns the string' do
+          expect(String.send(method, false)).to eq('false')
+        end
+      end
+
       context 'when the object is nil' do
         it 'returns nil' do
           expect(String.send(method, nil)).to be_nil
