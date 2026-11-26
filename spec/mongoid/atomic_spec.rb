@@ -371,6 +371,36 @@ describe Mongoid::Atomic do
       end
     end
 
+    context 'when a foreign key array changes after the updates were built' do
+      let(:preferences) { Array.new(3) { Preference.create! } }
+      let(:person) { Person.create!(preference_ids: [ preferences[0].id ]) }
+
+      before do
+        person.preference_ids = [ preferences[0].id, preferences[1].id ]
+        person.atomic_updates
+      end
+
+      context 'when the change is reverted' do
+        before do
+          person.preference_ids = [ preferences[0].id ]
+        end
+
+        it 'does not include the reverted change' do
+          expect(person.atomic_updates).to eq({})
+        end
+      end
+
+      context 'when the change is replaced' do
+        before do
+          person.preference_ids = [ preferences[2].id ]
+        end
+
+        it 'includes only the current change' do
+          expect(person.atomic_updates).to eq({ '$set' => { 'preference_ids' => [ preferences[2].id ] } })
+        end
+      end
+    end
+
     context 'when adding embedded documents with nil ids' do
       let(:account) { Account.create!(name: 'acc') }
 
