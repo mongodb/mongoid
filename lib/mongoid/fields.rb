@@ -98,6 +98,14 @@ module Mongoid
       def cleanse_localized_field_names(name)
         name = database_field_name(name.to_s)
 
+        # Leave blank names, dotted paths and relations on the existing path.
+        unless name.empty? || !name.valid_encoding? || name.include?('.') || relations.key?(name)
+          return name.delete_suffix(TRANSLATIONS_SFX) if name.end_with?(TRANSLATIONS_SFX) && !fields.key?(name)
+
+          # As with join, return a fresh string without the input's metadata.
+          return String.new(name)
+        end
+
         klass = self
         [].tap do |res|
           ar = name.split('.')
