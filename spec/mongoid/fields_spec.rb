@@ -1886,15 +1886,55 @@ describe Mongoid::Fields do
     end
   end
 
-  describe '#get_field' do
+  describe '.cleanse_localized_field_names' do
     let(:klass) { Person }
     let(:field) { klass.cleanse_localized_field_names(field_name) }
 
-    context 'when cleansing a field' do
-      let(:field_name) { 'employer_id' }
+    context 'when cleansing an aliased field given as a symbol' do
+      let(:field_name) { :aliased_timestamp }
 
-      it 'returns the correct field name' do
+      it 'returns the database field name' do
+        expect(field).to eq('at')
+      end
+    end
+
+    context 'when cleansing a frozen field name' do
+      let(:field_name) do
+        (+ 'employer_id').tap do |name|
+          name.instance_variable_set(:@metadata, :caller)
+          name.freeze
+        end
+      end
+
+      it 'returns a mutable plain string' do
         expect(field).to eq(field_name)
+        expect(field).not_to equal(field_name)
+        expect(field).not_to be_frozen
+        expect(field.instance_variables).to be_empty
+      end
+    end
+
+    context 'when cleansing a blank field name' do
+      let(:field_name) { ' ' }
+
+      it 'returns an empty US-ASCII string' do
+        expect(field).to eq('')
+        expect(field.encoding).to eq(Encoding::US_ASCII)
+      end
+    end
+
+    context 'when cleansing a relation whose class cannot be resolved' do
+      let(:klass) do
+        model = test_model(name: 'TranslationRelationModel') do
+          embeds_one :broken_translations, class_name: 'UnresolvedTranslationClass'
+        end
+        stub_const('TranslationRelationModel', model)
+        model
+      end
+      let(:field_name) { 'broken_translations' }
+
+      it 'still resolves the relation class' do
+        expect { field }.to raise_error(NameError, /UnresolvedTranslationClass/)
       end
     end
 
