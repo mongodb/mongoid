@@ -1933,6 +1933,10 @@ describe Mongoid::Fields do
       end
       let(:field_name) { 'broken_translations' }
 
+      after do
+        Mongoid.deregister_model(klass)
+      end
+
       it 'still resolves the relation class' do
         expect { field }.to raise_error(NameError, /UnresolvedTranslationClass/)
       end
